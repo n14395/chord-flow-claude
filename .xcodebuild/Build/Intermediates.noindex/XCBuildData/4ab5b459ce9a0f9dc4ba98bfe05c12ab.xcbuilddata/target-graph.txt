@@ -1,0 +1,4 @@
+Target dependency graph (2 targets)
+Target 'ChordFlowAUv3' in project 'ChordFlow'
+➜ Explicit dependency on target 'ChordFlowShared' in project 'ChordFlow'
+Target 'ChordFlowShared' in project 'ChordFlow' (no dependencies)

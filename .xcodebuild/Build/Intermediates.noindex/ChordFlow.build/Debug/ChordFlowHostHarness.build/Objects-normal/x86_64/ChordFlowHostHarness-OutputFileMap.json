@@ -1,0 +1,19 @@
+{
+  "" : {
+    "diagnostics" : "/Users/nwf/.local/build/chord-progressions/.xcodebuild/Build/Intermediates.noindex/ChordFlow.build/Debug/ChordFlowHostHarness.build/Objects-normal/x86_64/ChordFlowHostHarness-primary.dia",
+    "emit-module-dependencies" : "/Users/nwf/.local/build/chord-progressions/.xcodebuild/Build/Intermediates.noindex/ChordFlow.build/Debug/ChordFlowHostHarness.build/Objects-normal/x86_64/ChordFlowHostHarness-primary-emit-module.d",
+    "emit-module-diagnostics" : "/Users/nwf/.local/build/chord-progressions/.xcodebuild/Build/Intermediates.noindex/ChordFlow.build/Debug/ChordFlowHostHarness.build/Objects-normal/x86_64/ChordFlowHostHarness-primary-emit-module.dia",
+    "pch" : "/Users/nwf/.local/build/chord-progressions/.xcodebuild/Build/Intermediates.noindex/ChordFlow.build/Debug/ChordFlowHostHarness.build/Objects-normal/x86_64/ChordFlowHostHarness-primary-Bridging-header.pch",
+    "swift-dependencies" : "/Users/nwf/.local/build/chord-progressions/.xcodebuild/Build/Intermediates.noindex/ChordFlow.build/Debug/ChordFlowHostHarness.build/Objects-normal/x86_64/ChordFlowHostHarness-primary.swiftdeps"
+  },
+  "/Users/nwf/.local/build/chord-progressions/Xcode/HostHarness/main.swift" : {
+    "const-values" : "/Users/nwf/.local/build/chord-progressions/.xcodebuild/Build/Intermediates.noindex/ChordFlow.build/Debug/ChordFlowHostHarness.build/Objects-normal/x86_64/main.swiftconstvalues",
+    "dependencies" : "/Users/nwf/.local/build/chord-progressions/.xcodebuild/Build/Intermediates.noindex/ChordFlow.build/Debug/ChordFlowHostHarness.build/Objects-normal/x86_64/main.d",
+    "diagnostics" : "/Users/nwf/.local/build/chord-progressions/.xcodebuild/Build/Intermediates.noindex/ChordFlow.build/Debug/ChordFlowHostHarness.build/Objects-normal/x86_64/main.dia",
+    "index-unit-output-path" : "/ChordFlow.build/Debug/ChordFlowHostHarness.build/Objects-normal/x86_64/main.o",
+    "llvm-bc" : "/Users/nwf/.local/build/chord-progressions/.xcodebuild/Build/Intermediates.noindex/ChordFlow.build/Debug/ChordFlowHostHarness.build/Objects-normal/x86_64/main.bc",
+    "object" : "/Users/nwf/.local/build/chord-progressions/.xcodebuild/Build/Intermediates.noindex/ChordFlow.build/Debug/ChordFlowHostHarness.build/Objects-normal/x86_64/main.o",
+    "swift-dependencies" : "/Users/nwf/.local/build/chord-progressions/.xcodebuild/Build/Intermediates.noindex/ChordFlow.build/Debug/ChordFlowHostHarness.build/Objects-normal/x86_64/main.swiftdeps",
+    "swiftmodule" : "/Users/nwf/.local/build/chord-progressions/.xcodebuild/Build/Intermediates.noindex/ChordFlow.build/Debug/ChordFlowHostHarness.build/Objects-normal/x86_64/main~partial.swiftmodule"
+  }
+}

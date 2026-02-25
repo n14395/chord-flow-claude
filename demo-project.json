@@ -1,0 +1,110 @@
+{
+  "blocks" : [
+    {
+      "barStart" : 0,
+      "beatStart" : 0,
+      "chordToken" : {
+        "alterations" : [
+
+        ],
+        "extensions" : [
+
+        ],
+        "inversion" : 0,
+        "quality" : "major",
+        "root" : 0
+      },
+      "id" : "EADA9775-BD91-469D-A1AA-8A76D02F347F",
+      "lengthBeats" : 4,
+      "patternPreset" : "block",
+      "velocityProfile" : {
+        "base" : 92,
+        "variation" : 10
+      }
+    },
+    {
+      "barStart" : 1,
+      "beatStart" : 0,
+      "chordToken" : {
+        "alterations" : [
+
+        ],
+        "extensions" : [
+
+        ],
+        "inversion" : 0,
+        "quality" : "minor",
+        "root" : 2
+      },
+      "id" : "0650F03D-8A30-4A59-A8E4-4C4DF2E0EDBD",
+      "lengthBeats" : 4,
+      "patternPreset" : "arpUp",
+      "velocityProfile" : {
+        "base" : 92,
+        "variation" : 10
+      }
+    },
+    {
+      "barStart" : 2,
+      "beatStart" : 0,
+      "chordToken" : {
+        "alterations" : [
+
+        ],
+        "extensions" : [
+
+        ],
+        "inversion" : 0,
+        "quality" : "minor",
+        "root" : 4
+      },
+      "id" : "98073D6C-E474-47FB-A4D6-528E4A926B08",
+      "lengthBeats" : 4,
+      "patternPreset" : "block",
+      "velocityProfile" : {
+        "base" : 92,
+        "variation" : 10
+      }
+    },
+    {
+      "barStart" : 3,
+      "beatStart" : 0,
+      "chordToken" : {
+        "alterations" : [
+
+        ],
+        "extensions" : [
+
+        ],
+        "inversion" : 0,
+        "quality" : "major",
+        "root" : 5
+      },
+      "id" : "CF835058-573A-46A2-A787-8A51B64B0EB1",
+      "lengthBeats" : 4,
+      "patternPreset" : "arpUp",
+      "velocityProfile" : {
+        "base" : 92,
+        "variation" : 10
+      }
+    }
+  ],
+  "keyContext" : {
+    "accidentalPreference" : "sharps",
+    "mode" : "major",
+    "tonic" : 0
+  },
+  "routingConfig" : {
+    "clockMode" : "internalTransport",
+    "midiChannelMap" : {
+      "0" : 0
+    },
+    "outputMode" : "virtualMIDI"
+  },
+  "schemaVersion" : 1,
+  "tempo" : 120,
+  "timeSignature" : {
+    "denominator" : 4,
+    "numerator" : 4
+  }
+}

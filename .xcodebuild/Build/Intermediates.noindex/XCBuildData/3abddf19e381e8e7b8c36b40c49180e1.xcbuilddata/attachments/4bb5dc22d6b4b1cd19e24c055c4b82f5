@@ -1,0 +1,29 @@
+{
+  "" : {
+    "diagnostics" : "/Users/nwf/.local/build/chord-progressions/.xcodebuild/Build/Intermediates.noindex/ChordFlow.build/Debug-iphoneos/ChordFlowAUv3.build/Objects-normal/arm64/ChordFlowAUv3-primary.dia",
+    "emit-module-dependencies" : "/Users/nwf/.local/build/chord-progressions/.xcodebuild/Build/Intermediates.noindex/ChordFlow.build/Debug-iphoneos/ChordFlowAUv3.build/Objects-normal/arm64/ChordFlowAUv3-primary-emit-module.d",
+    "emit-module-diagnostics" : "/Users/nwf/.local/build/chord-progressions/.xcodebuild/Build/Intermediates.noindex/ChordFlow.build/Debug-iphoneos/ChordFlowAUv3.build/Objects-normal/arm64/ChordFlowAUv3-primary-emit-module.dia",
+    "pch" : "/Users/nwf/.local/build/chord-progressions/.xcodebuild/Build/Intermediates.noindex/ChordFlow.build/Debug-iphoneos/ChordFlowAUv3.build/Objects-normal/arm64/ChordFlowAUv3-primary-Bridging-header.pch",
+    "swift-dependencies" : "/Users/nwf/.local/build/chord-progressions/.xcodebuild/Build/Intermediates.noindex/ChordFlow.build/Debug-iphoneos/ChordFlowAUv3.build/Objects-normal/arm64/ChordFlowAUv3-primary.swiftdeps"
+  },
+  "/Users/nwf/.local/build/chord-progressions/Xcode/ChordFlowAUv3/ChordFlowAudioUnitFactory.swift" : {
+    "const-values" : "/Users/nwf/.local/build/chord-progressions/.xcodebuild/Build/Intermediates.noindex/ChordFlow.build/Debug-iphoneos/ChordFlowAUv3.build/Objects-normal/arm64/ChordFlowAudioUnitFactory.swiftconstvalues",
+    "dependencies" : "/Users/nwf/.local/build/chord-progressions/.xcodebuild/Build/Intermediates.noindex/ChordFlow.build/Debug-iphoneos/ChordFlowAUv3.build/Objects-normal/arm64/ChordFlowAudioUnitFactory.d",
+    "diagnostics" : "/Users/nwf/.local/build/chord-progressions/.xcodebuild/Build/Intermediates.noindex/ChordFlow.build/Debug-iphoneos/ChordFlowAUv3.build/Objects-normal/arm64/ChordFlowAudioUnitFactory.dia",
+    "index-unit-output-path" : "/ChordFlow.build/Debug-iphoneos/ChordFlowAUv3.build/Objects-normal/arm64/ChordFlowAudioUnitFactory.o",
+    "llvm-bc" : "/Users/nwf/.local/build/chord-progressions/.xcodebuild/Build/Intermediates.noindex/ChordFlow.build/Debug-iphoneos/ChordFlowAUv3.build/Objects-normal/arm64/ChordFlowAudioUnitFactory.bc",
+    "object" : "/Users/nwf/.local/build/chord-progressions/.xcodebuild/Build/Intermediates.noindex/ChordFlow.build/Debug-iphoneos/ChordFlowAUv3.build/Objects-normal/arm64/ChordFlowAudioUnitFactory.o",
+    "swift-dependencies" : "/Users/nwf/.local/build/chord-progressions/.xcodebuild/Build/Intermediates.noindex/ChordFlow.build/Debug-iphoneos/ChordFlowAUv3.build/Objects-normal/arm64/ChordFlowAudioUnitFactory.swiftdeps",
+    "swiftmodule" : "/Users/nwf/.local/build/chord-progressions/.xcodebuild/Build/Intermediates.noindex/ChordFlow.build/Debug-iphoneos/ChordFlowAUv3.build/Objects-normal/arm64/ChordFlowAudioUnitFactory~partial.swiftmodule"
+  },
+  "/Users/nwf/.local/build/chord-progressions/Xcode/ChordFlowAUv3/ChordFlowMIDIProcessorAudioUnit.swift" : {
+    "const-values" : "/Users/nwf/.local/build/chord-progressions/.xcodebuild/Build/Intermediates.noindex/ChordFlow.build/Debug-iphoneos/ChordFlowAUv3.build/Objects-normal/arm64/ChordFlowMIDIProcessorAudioUnit.swiftconstvalues",
+    "dependencies" : "/Users/nwf/.local/build/chord-progressions/.xcodebuild/Build/Intermediates.noindex/ChordFlow.build/Debug-iphoneos/ChordFlowAUv3.build/Objects-normal/arm64/ChordFlowMIDIProcessorAudioUnit.d",
+    "diagnostics" : "/Users/nwf/.local/build/chord-progressions/.xcodebuild/Build/Intermediates.noindex/ChordFlow.build/Debug-iphoneos/ChordFlowAUv3.build/Objects-normal/arm64/ChordFlowMIDIProcessorAudioUnit.dia",
+    "index-unit-output-path" : "/ChordFlow.build/Debug-iphoneos/ChordFlowAUv3.build/Objects-normal/arm64/ChordFlowMIDIProcessorAudioUnit.o",
+    "llvm-bc" : "/Users/nwf/.local/build/chord-progressions/.xcodebuild/Build/Intermediates.noindex/ChordFlow.build/Debug-iphoneos/ChordFlowAUv3.build/Objects-normal/arm64/ChordFlowMIDIProcessorAudioUnit.bc",
+    "object" : "/Users/nwf/.local/build/chord-progressions/.xcodebuild/Build/Intermediates.noindex/ChordFlow.build/Debug-iphoneos/ChordFlowAUv3.build/Objects-normal/arm64/ChordFlowMIDIProcessorAudioUnit.o",
+    "swift-dependencies" : "/Users/nwf/.local/build/chord-progressions/.xcodebuild/Build/Intermediates.noindex/ChordFlow.build/Debug-iphoneos/ChordFlowAUv3.build/Objects-normal/arm64/ChordFlowMIDIProcessorAudioUnit.swiftdeps",
+    "swiftmodule" : "/Users/nwf/.local/build/chord-progressions/.xcodebuild/Build/Intermediates.noindex/ChordFlow.build/Debug-iphoneos/ChordFlowAUv3.build/Objects-normal/arm64/ChordFlowMIDIProcessorAudioUnit~partial.swiftmodule"
+  }
+}

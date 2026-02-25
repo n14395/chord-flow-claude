@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>logFormatVersion</key>
+	<integer>12</integer>
+	<key>logs</key>
+	<dict>
+		<key>14987DD4-0659-4FEC-AFFA-CD1EB757DCDC</key>
+		<dict>
+			<key>auxiliaryLogUniqueIdentifier</key>
+			<string>E13FE42D-E171-4D58-9265-A49AE5A7DC5D</string>
+			<key>auxiliaryObservable</key>
+			<dict>
+				<key>highLevelStatus</key>
+				<string>S</string>
+				<key>totalNumberOfAnalyzerIssues</key>
+				<integer>0</integer>
+				<key>totalNumberOfErrors</key>
+				<integer>0</integer>
+				<key>totalNumberOfTestFailures</key>
+				<integer>0</integer>
+				<key>totalNumberOfWarnings</key>
+				<integer>0</integer>
+			</dict>
+			<key>className</key>
+			<string>IDESchemeActionsInvocationRecord</string>
+			<key>documentTypeString</key>
+			<string>&lt;nil&gt;</string>
+			<key>domainType</key>
+			<string>com.apple.dt.unit.cocoaUnitTest</string>
+			<key>fileName</key>
+			<string>Test-ChordFlowHostHarness-2026.02.25_13-33-15-+0100.xcresult</string>
+			<key>hasAuxiliaryLog</key>
+			<true/>
+			<key>hasPrimaryLog</key>
+			<true/>
+			<key>primaryObservable</key>
+			<dict>
+				<key>highLevelStatus</key>
+				<string>E</string>
+				<key>totalNumberOfAnalyzerIssues</key>
+				<integer>0</integer>
+				<key>totalNumberOfErrors</key>
+				<integer>1</integer>
+				<key>totalNumberOfTestFailures</key>
+				<integer>0</integer>
+				<key>totalNumberOfWarnings</key>
+				<integer>0</integer>
+			</dict>
+			<key>schemeIdentifier-containerName</key>
+			<string>ChordFlow project</string>
+			<key>schemeIdentifier-schemeName</key>
+			<string>ChordFlowHostHarness</string>
+			<key>schemeIdentifier-sharedScheme</key>
+			<integer>1</integer>
+			<key>signature</key>
+			<string>Test ChordFlowHostHarness</string>
+			<key>timeStartedRecording</key>
+			<real>793715595.63703799</real>
+			<key>timeStoppedRecording</key>
+			<real>793715598.24109304</real>
+			<key>title</key>
+			<string>Test ChordFlowHostHarness</string>
+			<key>uniqueIdentifier</key>
+			<string>14987DD4-0659-4FEC-AFFA-CD1EB757DCDC</string>
+		</dict>
+	</dict>
+</dict>
+</plist>

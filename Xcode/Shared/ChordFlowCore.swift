@@ -1,0 +1,127 @@
+import Foundation
+
+public enum CFNote: Int, CaseIterable, Codable {
+    case c = 0, cSharp, d, dSharp, e, f, fSharp, g, gSharp, a, aSharp, b
+
+    public func transposed(_ semitones: Int) -> CFNote {
+        let next = (rawValue + semitones % 12 + 12) % 12
+        return CFNote(rawValue: next) ?? .c
+    }
+
+    public func display() -> String {
+        ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"][rawValue]
+    }
+}
+
+public enum CFScaleMode: String, CaseIterable, Codable {
+    case major, minor, dorian, mixolydian
+}
+
+public enum CFChordQuality: String, CaseIterable, Codable {
+    case major, minor, diminished, dominant
+}
+
+public enum CFPattern: String, CaseIterable, Codable {
+    case block, arpUp, arpDown, strum
+}
+
+public struct CFKeyContext: Codable, Equatable {
+    public var tonic: CFNote
+    public var mode: CFScaleMode
+
+    public init(tonic: CFNote = .c, mode: CFScaleMode = .major) {
+        self.tonic = tonic
+        self.mode = mode
+    }
+}
+
+public struct CFChord: Codable, Equatable, Hashable {
+    public var root: CFNote
+    public var quality: CFChordQuality
+    public var add7: Bool
+    public var add9: Bool
+
+    public init(root: CFNote, quality: CFChordQuality, add7: Bool = false, add9: Bool = false) {
+        self.root = root
+        self.quality = quality
+        self.add7 = add7
+        self.add9 = add9
+    }
+
+    public func symbol() -> String {
+        let q = switch quality {
+        case .major: ""
+        case .minor: "m"
+        case .diminished: "dim"
+        case .dominant: "7"
+        }
+        let ext = (add7 && quality != .dominant ? "7" : "") + (add9 ? "9" : "")
+        return "\(root.display())\(q)\(ext)"
+    }
+}
+
+public struct CFSuggestion: Codable, Equatable {
+    public var chord: CFChord
+    public var confidence: Double
+    public var why: String
+}
+
+public struct CFSequenceBlock: Codable, Equatable, Identifiable {
+    public var id: UUID
+    public var barStart: Int
+    public var beatStart: Double
+    public var lengthBeats: Double
+    public var chord: CFChord
+    public var pattern: CFPattern
+
+    public init(
+        id: UUID = UUID(),
+        barStart: Int,
+        beatStart: Double,
+        lengthBeats: Double,
+        chord: CFChord,
+        pattern: CFPattern = .block
+    ) {
+        self.id = id
+        self.barStart = barStart
+        self.beatStart = beatStart
+        self.lengthBeats = lengthBeats
+        self.chord = chord
+        self.pattern = pattern
+    }
+}
+
+public struct CFMIDIEvent: Equatable {
+    public var startTick: Int
+    public var durationTicks: Int
+    public var status: UInt8
+    public var data1: UInt8
+    public var data2: UInt8
+}
+
+public struct CFChordButton: Equatable, Identifiable {
+    public var id: String { label + chord.root.display() }
+    public var chord: CFChord
+    public var label: String       // Roman numeral, e.g. "I", "ii", "bVII"
+    public var isBorrowed: Bool
+
+    public init(chord: CFChord, label: String, isBorrowed: Bool = false) {
+        self.chord = chord
+        self.label = label
+        self.isBorrowed = isBorrowed
+    }
+}
+
+public struct CFProjectDocument: Codable, Equatable {
+    public var schemaVersion: Int
+    public var tempo: Double
+    public var key: CFKeyContext
+    public var blocks: [CFSequenceBlock]
+
+    public init(schemaVersion: Int = 1, tempo: Double = 120, key: CFKeyContext = CFKeyContext(), blocks: [CFSequenceBlock] = []) {
+        self.schemaVersion = schemaVersion
+        self.tempo = tempo
+        self.key = key
+        self.blocks = blocks
+    }
+}

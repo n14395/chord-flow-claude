@@ -1,0 +1,4 @@
+framework module ChordFlowShared {
+  header "ChordFlowShared-Swift.h"
+  requires objc
+}

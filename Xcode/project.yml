@@ -1,0 +1,149 @@
+name: ChordFlow
+options:
+  bundleIdPrefix: com.nwf
+  deploymentTarget:
+    iOS: "17.0"
+    macOS: "14.0"
+configs:
+  Debug: debug
+  Release: release
+settings:
+  base:
+    PRODUCT_BUNDLE_IDENTIFIER: com.nwf.chordflow
+    SWIFT_VERSION: 5.0
+targets:
+  ChordFlowShared:
+    type: framework
+    platform: iOS
+    supportedDestinations: [iOS, macCatalyst]
+    sources:
+      - path: Shared
+        group: Xcode/Shared
+    info:
+      path: Shared/Info.plist
+      properties:
+        CFBundleShortVersionString: "1.0"
+        CFBundleVersion: "1"
+
+  ChordFlowApp:
+    type: application
+    platform: iOS
+    supportedDestinations: [iOS, macCatalyst]
+    sources:
+      - path: ChordFlowApp
+        group: Xcode/ChordFlowApp
+    settings:
+      base:
+        PRODUCT_NAME: ChordFlow
+        PRODUCT_BUNDLE_IDENTIFIER: com.nwf.chordflow
+        INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents: YES
+        SUPPORTS_MACCATALYST: YES
+        TARGETED_DEVICE_FAMILY: "1,2"
+        DEVELOPMENT_TEAM: ""
+        CODE_SIGN_STYLE: Manual
+        CODE_SIGN_IDENTITY: ""
+        PROVISIONING_PROFILE_SPECIFIER: ""
+        CODE_SIGNING_ALLOWED: NO
+        CODE_SIGNING_REQUIRED: NO
+    info:
+      path: ChordFlowApp/Info.plist
+      properties:
+        CFBundleDisplayName: ChordFlow
+        CFBundleShortVersionString: "1.0"
+        CFBundleVersion: "1"
+        UIApplicationSceneManifest:
+          UIApplicationSupportsMultipleScenes: false
+        UILaunchScreen: {}
+    dependencies:
+      - target: ChordFlowShared
+      - target: ChordFlowAUv3
+        embed: true
+        codeSign: false
+
+  ChordFlowAUv3:
+    type: app-extension
+    platform: iOS
+    supportedDestinations: [iOS, macCatalyst]
+    sources:
+      - path: ChordFlowAUv3
+        group: Xcode/ChordFlowAUv3
+    settings:
+      base:
+        PRODUCT_NAME: ChordFlow AUv3
+        PRODUCT_BUNDLE_IDENTIFIER: com.nwf.chordflow.auv3
+        INFOPLIST_KEY_NSHumanReadableCopyright: ""
+        SKIP_INSTALL: YES
+        SUPPORTS_MACCATALYST: YES
+        DEVELOPMENT_TEAM: ""
+        CODE_SIGN_STYLE: Manual
+        CODE_SIGN_IDENTITY: ""
+        PROVISIONING_PROFILE_SPECIFIER: ""
+        CODE_SIGNING_ALLOWED: NO
+        CODE_SIGNING_REQUIRED: NO
+    info:
+      path: ChordFlowAUv3/Info.plist
+      properties:
+        CFBundleDisplayName: ChordFlow AUv3
+        CFBundleShortVersionString: "1.0"
+        CFBundleVersion: "1"
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.AudioUnit
+          NSExtensionPrincipalClass: $(PRODUCT_MODULE_NAME).ChordFlowAudioUnitFactory
+          NSExtensionAttributes:
+            AudioComponents:
+              - type: aumi
+                subtype: chrd
+                manufacturer: NWF1
+                name: ChordFlow MIDI FX
+                description: Harmonic suggestion MIDI effect
+                version: 1
+                sandboxSafe: true
+                tags: [Effects, MIDI]
+    dependencies:
+      - target: ChordFlowShared
+
+  ChordFlowHostHarness:
+    type: tool
+    platform: macOS
+    sources:
+      - path: HostHarness
+        group: Xcode/HostHarness
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.nwf.chordflow.hostharness
+    info:
+      path: HostHarness/Info.plist
+      properties:
+        CFBundleShortVersionString: "1.0"
+        CFBundleVersion: "1"
+
+  ChordFlowHostHarnessTests:
+    type: bundle.unit-test
+    platform: macOS
+    sources:
+      - path: HostHarnessTests
+        group: Xcode/HostHarnessTests
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+        PRODUCT_BUNDLE_IDENTIFIER: com.nwf.chordflow.hostharness.tests
+        TEST_HOST: ""
+        BUNDLE_LOADER: ""
+schemes:
+  ChordFlowApp:
+    build:
+      targets:
+        ChordFlowApp: all
+    run:
+      config: Debug
+  ChordFlowAUv3:
+    build:
+      targets:
+        ChordFlowAUv3: all
+  ChordFlowHostHarness:
+    build:
+      targets:
+        ChordFlowHostHarness: all
+    test:
+      targets:
+        - name: ChordFlowHostHarnessTests
