@@ -1,0 +1,194 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 390 844" width="390" height="844">
+  <defs>
+    <clipPath id="screen-clip4">
+      <rect width="390" height="844" rx="40"/>
+    </clipPath>
+    <style>
+      text { font-family: -apple-system, 'SF Pro Rounded', 'Helvetica Neue', sans-serif; }
+    </style>
+  </defs>
+
+  <!-- Phone frame -->
+  <rect width="390" height="844" rx="40" fill="#1A1B2E" stroke="#3A3D5C" stroke-width="2"/>
+
+  <g clip-path="url(#screen-clip4)">
+
+  <!-- Status bar -->
+  <rect width="390" height="54" fill="#1A1B2E"/>
+  <text x="30" y="34" fill="#F0F0F5" font-size="14" font-weight="600">9:41</text>
+  <text x="340" y="34" fill="#F0F0F5" font-size="12" font-weight="500" text-anchor="end">100%</text>
+  <rect x="130" y="6" width="130" height="28" rx="14" fill="#0E0F1D"/>
+
+  <!-- ════════════════════════════════════════ -->
+  <!-- HEADER                                   -->
+  <!-- ════════════════════════════════════════ -->
+  <text x="20" y="84" fill="#F0F0F5" font-size="22" font-weight="700">Export</text>
+  <text x="20" y="104" fill="#8B8DA3" font-size="13">Share your progression in any format</text>
+
+  <!-- Project summary card -->
+  <g transform="translate(20, 120)">
+    <rect width="350" height="60" rx="12" fill="#252740" stroke="#3A3D5C" stroke-width="1"/>
+
+    <text x="16" y="22" fill="#F0F0F5" font-size="14" font-weight="600">C Major — 4 bars — 120 BPM</text>
+    <text x="16" y="42" fill="#8B8DA3" font-size="12">Cmaj7 &#x2192; Am7 &#x2192; Fmaj7 &#x2192; G7</text>
+
+    <!-- Edit button -->
+    <rect x="290" y="14" width="48" height="32" rx="8" fill="#3A3D5C"/>
+    <text x="314" y="34" fill="#F0F0F5" font-size="11" text-anchor="middle">Edit</text>
+  </g>
+
+  <line x1="20" y1="198" x2="370" y2="198" stroke="#3A3D5C" stroke-width="0.5"/>
+  <text x="20" y="222" fill="#8B8DA3" font-size="10" font-weight="500">EXPORT FORMAT</text>
+
+  <!-- ════════════════════════════════════════ -->
+  <!-- FORMAT CARDS                             -->
+  <!-- ════════════════════════════════════════ -->
+
+  <!-- Card 1: MIDI File -->
+  <g transform="translate(20, 238)">
+    <rect width="350" height="120" rx="16" fill="#252740" stroke="#4A90D9" stroke-width="1.5"/>
+
+    <!-- Icon area -->
+    <rect x="16" y="16" width="56" height="56" rx="14" fill="#4A90D9" opacity="0.12"/>
+    <!-- Piano keys icon -->
+    <rect x="26" y="28" width="8" height="32" rx="2" fill="#4A90D9" opacity="0.6"/>
+    <rect x="36" y="28" width="8" height="32" rx="2" fill="#4A90D9" opacity="0.6"/>
+    <rect x="46" y="28" width="8" height="32" rx="2" fill="#4A90D9" opacity="0.6"/>
+    <rect x="56" y="28" width="8" height="32" rx="2" fill="#4A90D9" opacity="0.6"/>
+    <!-- Black keys -->
+    <rect x="32" y="28" width="6" height="20" rx="1" fill="#4A90D9"/>
+    <rect x="48" y="28" width="6" height="20" rx="1" fill="#4A90D9"/>
+
+    <!-- Text -->
+    <text x="86" y="36" fill="#F0F0F5" font-size="17" font-weight="600">MIDI File</text>
+    <text x="86" y="54" fill="#8B8DA3" font-size="12">Standard MIDI (.mid) for any DAW</text>
+    <text x="86" y="72" fill="#6B6D82" font-size="11">Includes tempo, key, all chord voicings</text>
+
+    <!-- Export button -->
+    <rect x="86" y="84" width="100" height="28" rx="8" fill="#4A90D9"/>
+    <text x="136" y="102" fill="#F0F0F5" font-size="12" text-anchor="middle" font-weight="600">Export MIDI</text>
+
+    <!-- Share icon -->
+    <g transform="translate(320, 84)">
+      <rect x="-14" y="0" width="28" height="28" rx="8" fill="#3A3D5C"/>
+      <rect x="-5" y="6" width="10" height="8" rx="2" fill="none" stroke="#8B8DA3" stroke-width="1.5"/>
+      <line x1="0" y1="6" x2="0" y2="-1" stroke="#8B8DA3" stroke-width="1.5"/>
+      <polyline points="-3,2 0,-1 3,2" fill="none" stroke="#8B8DA3" stroke-width="1.5"/>
+    </g>
+  </g>
+
+  <!-- Card 2: Project JSON -->
+  <g transform="translate(20, 374)">
+    <rect width="350" height="120" rx="16" fill="#252740" stroke="#7ED321" stroke-width="1.5"/>
+
+    <!-- Icon area -->
+    <rect x="16" y="16" width="56" height="56" rx="14" fill="#7ED321" opacity="0.12"/>
+    <!-- JSON brackets icon -->
+    <text x="44" y="52" fill="#7ED321" font-size="24" text-anchor="middle" font-weight="300">{  }</text>
+
+    <!-- Text -->
+    <text x="86" y="36" fill="#F0F0F5" font-size="17" font-weight="600">Project JSON</text>
+    <text x="86" y="54" fill="#8B8DA3" font-size="12">Save &amp; reload your full progression</text>
+    <text x="86" y="72" fill="#6B6D82" font-size="11">Key, tempo, blocks, patterns, extensions</text>
+
+    <!-- Export button -->
+    <rect x="86" y="84" width="108" height="28" rx="8" fill="#7ED321"/>
+    <text x="140" y="102" fill="#1A1B2E" font-size="12" text-anchor="middle" font-weight="600">Save Project</text>
+
+    <!-- Share icon -->
+    <g transform="translate(320, 84)">
+      <rect x="-14" y="0" width="28" height="28" rx="8" fill="#3A3D5C"/>
+      <rect x="-5" y="6" width="10" height="8" rx="2" fill="none" stroke="#8B8DA3" stroke-width="1.5"/>
+      <line x1="0" y1="6" x2="0" y2="-1" stroke="#8B8DA3" stroke-width="1.5"/>
+      <polyline points="-3,2 0,-1 3,2" fill="none" stroke="#8B8DA3" stroke-width="1.5"/>
+    </g>
+  </g>
+
+  <!-- Card 3: AUv3 MIDI FX -->
+  <g transform="translate(20, 510)">
+    <rect width="350" height="120" rx="16" fill="#252740" stroke="#D94A8C" stroke-width="1.5"/>
+
+    <!-- Icon area -->
+    <rect x="16" y="16" width="56" height="56" rx="14" fill="#D94A8C" opacity="0.12"/>
+    <!-- Cable/plug icon -->
+    <circle cx="44" cy="38" r="10" fill="none" stroke="#D94A8C" stroke-width="2"/>
+    <circle cx="44" cy="38" r="4" fill="#D94A8C"/>
+    <line x1="44" y1="48" x2="44" y2="60" stroke="#D94A8C" stroke-width="2"/>
+    <line x1="38" y1="60" x2="50" y2="60" stroke="#D94A8C" stroke-width="2" stroke-linecap="round"/>
+
+    <!-- Text -->
+    <text x="86" y="36" fill="#F0F0F5" font-size="17" font-weight="600">AUv3 MIDI FX</text>
+    <text x="86" y="54" fill="#8B8DA3" font-size="12">Use as plugin in GarageBand, Logic, AUM</text>
+    <text x="86" y="72" fill="#6B6D82" font-size="11">Real-time MIDI generation from parameters</text>
+
+    <!-- Setup button -->
+    <rect x="86" y="84" width="120" height="28" rx="8" fill="#D94A8C"/>
+    <text x="146" y="102" fill="#F0F0F5" font-size="12" text-anchor="middle" font-weight="600">Configure AUv3</text>
+  </g>
+
+  <!-- ════════════════════════════════════════ -->
+  <!-- RECENT EXPORTS                           -->
+  <!-- ════════════════════════════════════════ -->
+  <line x1="20" y1="650" x2="370" y2="650" stroke="#3A3D5C" stroke-width="0.5"/>
+  <text x="20" y="674" fill="#8B8DA3" font-size="10" font-weight="500">RECENT</text>
+
+  <!-- Export 1 -->
+  <g transform="translate(20, 686)">
+    <rect width="350" height="48" rx="10" fill="#252740" stroke="#3A3D5C" stroke-width="0.5"/>
+
+    <rect x="10" y="10" width="28" height="28" rx="6" fill="#4A90D9" opacity="0.12"/>
+    <text x="24" y="29" fill="#4A90D9" font-size="9" text-anchor="middle" font-weight="700">.mid</text>
+
+    <text x="48" y="24" fill="#F0F0F5" font-size="12" font-weight="500">C-Major-Progression.mid</text>
+    <text x="48" y="38" fill="#6B6D82" font-size="10">Today, 2:34 PM — 2.1 KB</text>
+
+    <!-- Share button -->
+    <text x="330" y="28" fill="#8B8DA3" font-size="16">&#x2026;</text>
+  </g>
+
+  <!-- Export 2 -->
+  <g transform="translate(20, 740)">
+    <rect width="350" height="48" rx="10" fill="#252740" stroke="#3A3D5C" stroke-width="0.5"/>
+
+    <rect x="10" y="10" width="28" height="28" rx="6" fill="#7ED321" opacity="0.12"/>
+    <text x="24" y="29" fill="#7ED321" font-size="8" text-anchor="middle" font-weight="700">.json</text>
+
+    <text x="48" y="24" fill="#F0F0F5" font-size="12" font-weight="500">ChordFlow-Project.json</text>
+    <text x="48" y="38" fill="#6B6D82" font-size="10">Yesterday — 1.4 KB</text>
+
+    <text x="330" y="28" fill="#8B8DA3" font-size="16">&#x2026;</text>
+  </g>
+
+  <!-- ════════════════════════════════════════ -->
+  <!-- TAB BAR                                  -->
+  <!-- ════════════════════════════════════════ -->
+  <rect x="0" y="776" width="390" height="68" fill="#0E0F1D"/>
+  <line x1="0" y1="776" x2="390" y2="776" stroke="#3A3D5C" stroke-width="0.5"/>
+
+  <!-- Compose -->
+  <g transform="translate(65, 792)">
+    <circle cx="0" cy="0" r="10" fill="none" stroke="#6B6D82" stroke-width="1.5"/>
+    <circle cx="0" cy="0" r="4" fill="#6B6D82"/>
+    <text x="0" y="24" fill="#6B6D82" font-size="10" text-anchor="middle">Compose</text>
+  </g>
+
+  <!-- Suggest -->
+  <g transform="translate(195, 792)">
+    <circle cx="0" cy="-4" r="6" fill="none" stroke="#6B6D82" stroke-width="1.5"/>
+    <line x1="0" y1="2" x2="0" y2="8" stroke="#6B6D82" stroke-width="1.5"/>
+    <text x="0" y="24" fill="#6B6D82" font-size="10" text-anchor="middle">Suggest</text>
+  </g>
+
+  <!-- Export (active) -->
+  <g transform="translate(325, 792)">
+    <rect x="-7" y="-8" width="14" height="12" rx="2" fill="none" stroke="#F5A623" stroke-width="1.5"/>
+    <line x1="0" y1="-8" x2="0" y2="-16" stroke="#F5A623" stroke-width="1.5"/>
+    <polyline points="-4,-12 0,-16 4,-12" fill="none" stroke="#F5A623" stroke-width="1.5"/>
+    <text x="0" y="24" fill="#F5A623" font-size="10" text-anchor="middle" font-weight="600">Export</text>
+  </g>
+
+  </g>
+
+  <!-- Screen label -->
+  <text x="195" y="840" fill="#6B6D82" font-size="8" text-anchor="middle">04 — Export — iPhone</text>
+</svg>

@@ -1,0 +1,247 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1366" width="1024" height="1366">
+  <defs>
+    <clipPath id="ipad-clip4">
+      <rect width="1024" height="1366" rx="20"/>
+    </clipPath>
+    <style>
+      text { font-family: -apple-system, 'SF Pro Rounded', 'Helvetica Neue', sans-serif; }
+    </style>
+  </defs>
+
+  <rect width="1024" height="1366" rx="20" fill="#1A1B2E" stroke="#3A3D5C" stroke-width="2"/>
+
+  <g clip-path="url(#ipad-clip4)">
+
+  <!-- Status bar -->
+  <rect width="1024" height="48" fill="#1A1B2E"/>
+  <text x="40" y="32" fill="#F0F0F5" font-size="15" font-weight="600">9:41</text>
+  <text x="984" y="32" fill="#F0F0F5" font-size="13" font-weight="500" text-anchor="end">100%</text>
+
+  <!-- ════════════════════════════════════════ -->
+  <!-- HEADER                                   -->
+  <!-- ════════════════════════════════════════ -->
+  <text x="48" y="96" fill="#F0F0F5" font-size="26" font-weight="700">Export</text>
+  <text x="48" y="120" fill="#8B8DA3" font-size="14">Share your progression in any format</text>
+
+  <!-- Project summary bar -->
+  <g transform="translate(48, 140)">
+    <rect width="928" height="64" rx="14" fill="#252740" stroke="#3A3D5C" stroke-width="1"/>
+
+    <text x="20" y="26" fill="#F0F0F5" font-size="16" font-weight="600">C Major — 4 bars — 120 BPM</text>
+    <text x="20" y="48" fill="#8B8DA3" font-size="13">Cmaj7 &#x2192; Am7 &#x2192; Fmaj7 &#x2192; G7</text>
+
+    <!-- Progression mini-strip -->
+    <g transform="translate(500, 12)">
+      <rect width="80" height="40" rx="6" fill="#F5A623" opacity="0.1" stroke="#F5A623" stroke-width="1"/>
+      <text x="40" y="25" fill="#F5A623" font-size="11" text-anchor="middle" font-weight="500">Cmaj7</text>
+
+      <rect x="86" width="72" height="40" rx="6" fill="#F5A623" opacity="0.1" stroke="#F5A623" stroke-width="1"/>
+      <text x="122" y="25" fill="#F5A623" font-size="11" text-anchor="middle" font-weight="500">Am7</text>
+
+      <rect x="164" width="80" height="40" rx="6" fill="#7ED321" opacity="0.1" stroke="#7ED321" stroke-width="1"/>
+      <text x="204" y="25" fill="#7ED321" font-size="11" text-anchor="middle" font-weight="500">Fmaj7</text>
+
+      <rect x="250" width="56" height="40" rx="6" fill="#4A90D9" opacity="0.1" stroke="#4A90D9" stroke-width="1"/>
+      <text x="278" y="25" fill="#4A90D9" font-size="11" text-anchor="middle" font-weight="500">G7</text>
+    </g>
+
+    <!-- Edit button -->
+    <rect x="860" y="16" width="52" height="32" rx="8" fill="#3A3D5C"/>
+    <text x="886" y="36" fill="#F0F0F5" font-size="12" text-anchor="middle">Edit</text>
+  </g>
+
+  <line x1="48" y1="224" x2="976" y2="224" stroke="#3A3D5C" stroke-width="0.5"/>
+  <text x="48" y="252" fill="#8B8DA3" font-size="11" font-weight="500">EXPORT FORMAT</text>
+
+  <!-- ════════════════════════════════════════ -->
+  <!-- FORMAT CARDS (3-column grid on iPad)     -->
+  <!-- ════════════════════════════════════════ -->
+
+  <!-- Card 1: MIDI File -->
+  <g transform="translate(48, 270)">
+    <rect width="296" height="260" rx="18" fill="#252740" stroke="#4A90D9" stroke-width="1.5"/>
+
+    <!-- Icon area -->
+    <rect x="20" y="20" width="64" height="64" rx="16" fill="#4A90D9" opacity="0.12"/>
+    <!-- Piano keys -->
+    <rect x="30" y="34" width="10" height="38" rx="2" fill="#4A90D9" opacity="0.6"/>
+    <rect x="42" y="34" width="10" height="38" rx="2" fill="#4A90D9" opacity="0.6"/>
+    <rect x="54" y="34" width="10" height="38" rx="2" fill="#4A90D9" opacity="0.6"/>
+    <rect x="66" y="34" width="10" height="38" rx="2" fill="#4A90D9" opacity="0.6"/>
+    <rect x="37" y="34" width="8" height="24" rx="1" fill="#4A90D9"/>
+    <rect x="55" y="34" width="8" height="24" rx="1" fill="#4A90D9"/>
+
+    <text x="20" y="110" fill="#F0F0F5" font-size="20" font-weight="600">MIDI File</text>
+    <text x="20" y="130" fill="#8B8DA3" font-size="13">Standard MIDI (.mid)</text>
+    <text x="20" y="150" fill="#8B8DA3" font-size="13">for any DAW</text>
+
+    <line x1="20" y1="168" x2="276" y2="168" stroke="#3A3D5C" stroke-width="0.5"/>
+
+    <text x="20" y="192" fill="#6B6D82" font-size="12">Includes:</text>
+    <text x="20" y="210" fill="#6B6D82" font-size="12">&#x2022; Tempo &amp; time signature</text>
+    <text x="20" y="228" fill="#6B6D82" font-size="12">&#x2022; All chord voicings &amp; patterns</text>
+
+    <!-- Buttons -->
+    <rect x="20" y="242" width="120" height="0" rx="0" fill="none"/>
+  </g>
+
+  <!-- Export + Share buttons for MIDI -->
+  <g transform="translate(68, 544)">
+    <rect width="110" height="36" rx="10" fill="#4A90D9"/>
+    <text x="55" y="23" fill="#F0F0F5" font-size="13" text-anchor="middle" font-weight="600">Export MIDI</text>
+
+    <rect x="120" width="80" height="36" rx="10" fill="#3A3D5C"/>
+    <text x="160" y="23" fill="#F0F0F5" font-size="13" text-anchor="middle">Share</text>
+  </g>
+
+  <!-- Card 2: Project JSON -->
+  <g transform="translate(364, 270)">
+    <rect width="296" height="260" rx="18" fill="#252740" stroke="#7ED321" stroke-width="1.5"/>
+
+    <rect x="20" y="20" width="64" height="64" rx="16" fill="#7ED321" opacity="0.12"/>
+    <text x="52" y="60" fill="#7ED321" font-size="28" text-anchor="middle" font-weight="300">{  }</text>
+
+    <text x="20" y="110" fill="#F0F0F5" font-size="20" font-weight="600">Project JSON</text>
+    <text x="20" y="130" fill="#8B8DA3" font-size="13">Save &amp; reload your</text>
+    <text x="20" y="150" fill="#8B8DA3" font-size="13">full progression</text>
+
+    <line x1="20" y1="168" x2="276" y2="168" stroke="#3A3D5C" stroke-width="0.5"/>
+
+    <text x="20" y="192" fill="#6B6D82" font-size="12">Includes:</text>
+    <text x="20" y="210" fill="#6B6D82" font-size="12">&#x2022; Key, tempo, all blocks</text>
+    <text x="20" y="228" fill="#6B6D82" font-size="12">&#x2022; Patterns, extensions, lengths</text>
+  </g>
+
+  <g transform="translate(384, 544)">
+    <rect width="118" height="36" rx="10" fill="#7ED321"/>
+    <text x="59" y="23" fill="#1A1B2E" font-size="13" text-anchor="middle" font-weight="600">Save Project</text>
+
+    <rect x="128" width="80" height="36" rx="10" fill="#3A3D5C"/>
+    <text x="168" y="23" fill="#F0F0F5" font-size="13" text-anchor="middle">Share</text>
+  </g>
+
+  <!-- Card 3: AUv3 MIDI FX -->
+  <g transform="translate(680, 270)">
+    <rect width="296" height="260" rx="18" fill="#252740" stroke="#D94A8C" stroke-width="1.5"/>
+
+    <rect x="20" y="20" width="64" height="64" rx="16" fill="#D94A8C" opacity="0.12"/>
+    <circle cx="52" cy="44" r="14" fill="none" stroke="#D94A8C" stroke-width="2.5"/>
+    <circle cx="52" cy="44" r="5" fill="#D94A8C"/>
+    <line x1="52" y1="58" x2="52" y2="72" stroke="#D94A8C" stroke-width="2.5"/>
+    <line x1="44" y1="72" x2="60" y2="72" stroke="#D94A8C" stroke-width="2.5" stroke-linecap="round"/>
+
+    <text x="20" y="110" fill="#F0F0F5" font-size="20" font-weight="600">AUv3 MIDI FX</text>
+    <text x="20" y="130" fill="#8B8DA3" font-size="13">Use as plugin in</text>
+    <text x="20" y="150" fill="#8B8DA3" font-size="13">GarageBand, Logic, AUM</text>
+
+    <line x1="20" y1="168" x2="276" y2="168" stroke="#3A3D5C" stroke-width="0.5"/>
+
+    <text x="20" y="192" fill="#6B6D82" font-size="12">Features:</text>
+    <text x="20" y="210" fill="#6B6D82" font-size="12">&#x2022; Real-time MIDI generation</text>
+    <text x="20" y="228" fill="#6B6D82" font-size="12">&#x2022; 6 automatable parameters</text>
+  </g>
+
+  <g transform="translate(700, 544)">
+    <rect width="130" height="36" rx="10" fill="#D94A8C"/>
+    <text x="65" y="23" fill="#F0F0F5" font-size="13" text-anchor="middle" font-weight="600">Configure AUv3</text>
+
+    <rect x="140" width="80" height="36" rx="10" fill="#3A3D5C"/>
+    <text x="180" y="23" fill="#F0F0F5" font-size="13" text-anchor="middle">Help</text>
+  </g>
+
+  <!-- ════════════════════════════════════════ -->
+  <!-- RECENT EXPORTS                           -->
+  <!-- ════════════════════════════════════════ -->
+  <line x1="48" y1="608" x2="976" y2="608" stroke="#3A3D5C" stroke-width="0.5"/>
+  <text x="48" y="636" fill="#8B8DA3" font-size="11" font-weight="500">RECENT EXPORTS</text>
+
+  <!-- Table header -->
+  <g transform="translate(48, 652)">
+    <text x="0" y="0" fill="#6B6D82" font-size="10" font-weight="500">FORMAT</text>
+    <text x="120" y="0" fill="#6B6D82" font-size="10" font-weight="500">FILE NAME</text>
+    <text x="540" y="0" fill="#6B6D82" font-size="10" font-weight="500">DATE</text>
+    <text x="720" y="0" fill="#6B6D82" font-size="10" font-weight="500">SIZE</text>
+    <text x="860" y="0" fill="#6B6D82" font-size="10" font-weight="500">ACTIONS</text>
+  </g>
+
+  <line x1="48" y1="664" x2="976" y2="664" stroke="#252740" stroke-width="0.5"/>
+
+  <!-- Row 1 -->
+  <g transform="translate(48, 680)">
+    <rect width="928" height="48" rx="8" fill="#252740" stroke="#3A3D5C" stroke-width="0.5"/>
+
+    <rect x="12" y="10" width="36" height="28" rx="6" fill="#4A90D9" opacity="0.12"/>
+    <text x="30" y="29" fill="#4A90D9" font-size="9" text-anchor="middle" font-weight="700">.mid</text>
+
+    <text x="120" y="30" fill="#F0F0F5" font-size="13" font-weight="500">C-Major-Progression.mid</text>
+    <text x="540" y="30" fill="#8B8DA3" font-size="12">Today, 2:34 PM</text>
+    <text x="720" y="30" fill="#8B8DA3" font-size="12">2.1 KB</text>
+
+    <rect x="840" y="10" width="36" height="28" rx="6" fill="#3A3D5C"/>
+    <text x="858" y="29" fill="#8B8DA3" font-size="14" text-anchor="middle">&#x21E9;</text>
+
+    <rect x="882" y="10" width="36" height="28" rx="6" fill="#3A3D5C"/>
+    <text x="900" y="28" fill="#8B8DA3" font-size="14" text-anchor="middle">&#x2026;</text>
+  </g>
+
+  <!-- Row 2 -->
+  <g transform="translate(48, 736)">
+    <rect width="928" height="48" rx="8" fill="#252740" stroke="#3A3D5C" stroke-width="0.5"/>
+
+    <rect x="12" y="10" width="36" height="28" rx="6" fill="#7ED321" opacity="0.12"/>
+    <text x="30" y="29" fill="#7ED321" font-size="8" text-anchor="middle" font-weight="700">.json</text>
+
+    <text x="120" y="30" fill="#F0F0F5" font-size="13" font-weight="500">ChordFlow-Project.json</text>
+    <text x="540" y="30" fill="#8B8DA3" font-size="12">Yesterday</text>
+    <text x="720" y="30" fill="#8B8DA3" font-size="12">1.4 KB</text>
+
+    <rect x="840" y="10" width="36" height="28" rx="6" fill="#3A3D5C"/>
+    <text x="858" y="29" fill="#8B8DA3" font-size="14" text-anchor="middle">&#x21E9;</text>
+
+    <rect x="882" y="10" width="36" height="28" rx="6" fill="#3A3D5C"/>
+    <text x="900" y="28" fill="#8B8DA3" font-size="14" text-anchor="middle">&#x2026;</text>
+  </g>
+
+  <!-- Row 3 -->
+  <g transform="translate(48, 792)">
+    <rect width="928" height="48" rx="8" fill="#252740" stroke="#3A3D5C" stroke-width="0.5"/>
+
+    <rect x="12" y="10" width="36" height="28" rx="6" fill="#4A90D9" opacity="0.12"/>
+    <text x="30" y="29" fill="#4A90D9" font-size="9" text-anchor="middle" font-weight="700">.mid</text>
+
+    <text x="120" y="30" fill="#F0F0F5" font-size="13" font-weight="500">Dorian-Jam-Dm.mid</text>
+    <text x="540" y="30" fill="#8B8DA3" font-size="12">Feb 23, 2026</text>
+    <text x="720" y="30" fill="#8B8DA3" font-size="12">3.7 KB</text>
+
+    <rect x="840" y="10" width="36" height="28" rx="6" fill="#3A3D5C"/>
+    <text x="858" y="29" fill="#8B8DA3" font-size="14" text-anchor="middle">&#x21E9;</text>
+
+    <rect x="882" y="10" width="36" height="28" rx="6" fill="#3A3D5C"/>
+    <text x="900" y="28" fill="#8B8DA3" font-size="14" text-anchor="middle">&#x2026;</text>
+  </g>
+
+  <!-- TAB BAR -->
+  <rect x="0" y="1300" width="1024" height="66" fill="#0E0F1D"/>
+  <line x1="0" y1="1300" x2="1024" y2="1300" stroke="#3A3D5C" stroke-width="0.5"/>
+
+  <g transform="translate(380, 1318)">
+    <circle cx="0" cy="0" r="10" fill="none" stroke="#6B6D82" stroke-width="1.5"/>
+    <circle cx="0" cy="0" r="4" fill="#6B6D82"/>
+    <text x="0" y="24" fill="#6B6D82" font-size="10" text-anchor="middle">Compose</text>
+  </g>
+  <g transform="translate(512, 1318)">
+    <circle cx="0" cy="-4" r="6" fill="none" stroke="#6B6D82" stroke-width="1.5"/>
+    <line x1="0" y1="2" x2="0" y2="8" stroke="#6B6D82" stroke-width="1.5"/>
+    <text x="0" y="24" fill="#6B6D82" font-size="10" text-anchor="middle">Suggest</text>
+  </g>
+  <g transform="translate(644, 1318)">
+    <rect x="-7" y="-8" width="14" height="12" rx="2" fill="none" stroke="#F5A623" stroke-width="1.5"/>
+    <line x1="0" y1="-8" x2="0" y2="-16" stroke="#F5A623" stroke-width="1.5"/>
+    <polyline points="-4,-12 0,-16 4,-12" fill="none" stroke="#F5A623" stroke-width="1.5"/>
+    <text x="0" y="24" fill="#F5A623" font-size="10" text-anchor="middle" font-weight="600">Export</text>
+  </g>
+
+  </g>
+
+  <text x="512" y="1362" fill="#6B6D82" font-size="9" text-anchor="middle">04 — Export — iPad</text>
+</svg>

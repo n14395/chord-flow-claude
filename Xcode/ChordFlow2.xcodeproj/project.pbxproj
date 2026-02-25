@@ -1,0 +1,887 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 63;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		06A9318E1A86442A54ED933E /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3112A4B5EF407C146ED90066 /* RootView.swift */; };
+		0D8952BA1A9429AB11266317 /* ChordFlowShared.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C21FFB8CB0C34360450136A3 /* ChordFlowShared.framework */; };
+		1565EFCE599B17FABEBE08D3 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD8F7245296F96C8E3012B22 /* main.swift */; };
+		20C1712474E97BED9E6AF06F /* ExportScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4156FA601940D69FDC658829 /* ExportScreen.swift */; };
+		2201D79B75445F8171B62A19 /* KnobView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C364D28B7AE03B0CFFAFA7A3 /* KnobView.swift */; };
+		27A22C035A44BC39B11F61E8 /* TimelineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADB10229D29051E45CFDFDDC /* TimelineView.swift */; };
+		3E44DB608090BB59515F3379 /* SuggestScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07741CB781828BC724C71C6C /* SuggestScreen.swift */; };
+		3ED0B3A12221343E084EF5EC /* ComposeScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDEC4BE9436C5B7AEA7F72F3 /* ComposeScreen.swift */; };
+		3F9DCC02417213CBE7DF4E59 /* ChordFlowCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB75877EB00543EC152F0A9B /* ChordFlowCore.swift */; };
+		3FDA3F1221BCF9E35C92D4B3 /* ChordDetailSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 629AB9327790394B8695C4F7 /* ChordDetailSheet.swift */; };
+		4382C04DB4DCDDF3314F8F35 /* ProgressionPlaybackEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 835D5E76D3976F196247D401 /* ProgressionPlaybackEngine.swift */; };
+		44B7FFAB150032154F8233FC /* ChordFlowShared.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C21FFB8CB0C34360450136A3 /* ChordFlowShared.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		54ECC8F24C0BE7E629C157D6 /* ChordFlowAudioUnitFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 170121B735BF5273944F8292 /* ChordFlowAudioUnitFactory.swift */; };
+		5856A2C52518204E20D50907 /* ChordFlowApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B161D922C69887355BCB1919 /* ChordFlowApp.swift */; };
+		75040512641A3B879D730DEA /* ChordFlowMIDIProcessorAudioUnit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71E8FF4031C60D12F18519F0 /* ChordFlowMIDIProcessorAudioUnit.swift */; };
+		76B07C9093E7E9CB537B6822 /* SuggestionCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAB324D72E46955FE5C752D9 /* SuggestionCardView.swift */; };
+		86A272037603ACEBBF82CA48 /* HostHarnessCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C41217A021FA3473DDB900C /* HostHarnessCore.swift */; };
+		953E095CCA1EDFC9A53E40DB /* DesignTokens.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58156C553D0F76B8B1DDBCA4 /* DesignTokens.swift */; };
+		96EE8C665F3F0D8665CA063D /* AppViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A37A91AD1A46A6655269749B /* AppViewModel.swift */; };
+		9F41798E9A32E4A655CDCA81 /* ChordFlowShared.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C21FFB8CB0C34360450136A3 /* ChordFlowShared.framework */; };
+		B414B420BCFAC7A577E71D1A /* ChordFlowEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A1800A3C5E1948588B10394 /* ChordFlowEngine.swift */; };
+		BC575126EAE671B50650F95E /* ChordFlow AUv3.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = F391EF4AFBA678FA74A60050 /* ChordFlow AUv3.appex */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		BC63C671375E6D07B562D152 /* MIDIFileWriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EF172A8ACD7ECB0D09309AF /* MIDIFileWriter.swift */; };
+		BCA8F5513E9D218E948AAC7D /* CircleOfFifthsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 060B09294888B9972D2944AF /* CircleOfFifthsView.swift */; };
+		CB0D65B73D413A3455EE5D46 /* PlaybackBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 530DDEDB41331498E4122933 /* PlaybackBarView.swift */; };
+		CE38E68B326386914206CC64 /* HostHarnessTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E35F4131737A00F17AF8E67 /* HostHarnessTests.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		611F6D96FBEC2C48CBA4592C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 4E36931FE05A537820FBA995 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = C957DF9C78A99EA16BB85547;
+			remoteInfo = ChordFlowAUv3;
+		};
+		CADBBA3A36281E7D5CE87548 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 4E36931FE05A537820FBA995 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 24D6DBC09011C0A53DB186DA;
+			remoteInfo = ChordFlowShared;
+		};
+		EB4B8F7987870BF24462D66E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 4E36931FE05A537820FBA995 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 24D6DBC09011C0A53DB186DA;
+			remoteInfo = ChordFlowShared;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		8C4150F5DE4C1186C163F52C /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				BC575126EAE671B50650F95E /* ChordFlow AUv3.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B7CBDD0A96A0DA24B0251F14 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				44B7FFAB150032154F8233FC /* ChordFlowShared.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		0325985AD047A96A525A480D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		060B09294888B9972D2944AF /* CircleOfFifthsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircleOfFifthsView.swift; sourceTree = "<group>"; };
+		07741CB781828BC724C71C6C /* SuggestScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuggestScreen.swift; sourceTree = "<group>"; };
+		170121B735BF5273944F8292 /* ChordFlowAudioUnitFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChordFlowAudioUnitFactory.swift; sourceTree = "<group>"; };
+		1D91A5946A5B4F72D94D6908 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		22F298A5AD181F67E1B6C6BC /* ChordFlow.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ChordFlow.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		3112A4B5EF407C146ED90066 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
+		4156FA601940D69FDC658829 /* ExportScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportScreen.swift; sourceTree = "<group>"; };
+		435BABE1510CA2A3CE969C46 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		442F08B399EFA935D037E01E /* ChordFlowHostHarness */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = ChordFlowHostHarness; sourceTree = BUILT_PRODUCTS_DIR; };
+		4A1800A3C5E1948588B10394 /* ChordFlowEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChordFlowEngine.swift; sourceTree = "<group>"; };
+		4E45454F23C1921A384788D4 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		530DDEDB41331498E4122933 /* PlaybackBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaybackBarView.swift; sourceTree = "<group>"; };
+		58156C553D0F76B8B1DDBCA4 /* DesignTokens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignTokens.swift; sourceTree = "<group>"; };
+		5E35F4131737A00F17AF8E67 /* HostHarnessTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HostHarnessTests.swift; sourceTree = "<group>"; };
+		629AB9327790394B8695C4F7 /* ChordDetailSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChordDetailSheet.swift; sourceTree = "<group>"; };
+		71E8FF4031C60D12F18519F0 /* ChordFlowMIDIProcessorAudioUnit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChordFlowMIDIProcessorAudioUnit.swift; sourceTree = "<group>"; };
+		7276B6E91134D6076E115FF8 /* ChordFlowHostHarnessTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ChordFlowHostHarnessTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		835D5E76D3976F196247D401 /* ProgressionPlaybackEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressionPlaybackEngine.swift; sourceTree = "<group>"; };
+		8EF172A8ACD7ECB0D09309AF /* MIDIFileWriter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MIDIFileWriter.swift; sourceTree = "<group>"; };
+		9C41217A021FA3473DDB900C /* HostHarnessCore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HostHarnessCore.swift; sourceTree = "<group>"; };
+		A37A91AD1A46A6655269749B /* AppViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppViewModel.swift; sourceTree = "<group>"; };
+		AB75877EB00543EC152F0A9B /* ChordFlowCore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChordFlowCore.swift; sourceTree = "<group>"; };
+		AD8F7245296F96C8E3012B22 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
+		ADB10229D29051E45CFDFDDC /* TimelineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelineView.swift; sourceTree = "<group>"; };
+		B161D922C69887355BCB1919 /* ChordFlowApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChordFlowApp.swift; sourceTree = "<group>"; };
+		BAB324D72E46955FE5C752D9 /* SuggestionCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuggestionCardView.swift; sourceTree = "<group>"; };
+		C21FFB8CB0C34360450136A3 /* ChordFlowShared.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ChordFlowShared.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		C364D28B7AE03B0CFFAFA7A3 /* KnobView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KnobView.swift; sourceTree = "<group>"; };
+		F391EF4AFBA678FA74A60050 /* ChordFlow AUv3.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "ChordFlow AUv3.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+		FDEC4BE9436C5B7AEA7F72F3 /* ComposeScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComposeScreen.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		49E0D3BADE4C67DC3CED40AB /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0D8952BA1A9429AB11266317 /* ChordFlowShared.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A41049325C93CF99FCFB071C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9F41798E9A32E4A655CDCA81 /* ChordFlowShared.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		01C9A9F8B9F5EE8970300463 /* ChordFlowApp */ = {
+			isa = PBXGroup;
+			children = (
+				A37A91AD1A46A6655269749B /* AppViewModel.swift */,
+				629AB9327790394B8695C4F7 /* ChordDetailSheet.swift */,
+				B161D922C69887355BCB1919 /* ChordFlowApp.swift */,
+				060B09294888B9972D2944AF /* CircleOfFifthsView.swift */,
+				FDEC4BE9436C5B7AEA7F72F3 /* ComposeScreen.swift */,
+				58156C553D0F76B8B1DDBCA4 /* DesignTokens.swift */,
+				4156FA601940D69FDC658829 /* ExportScreen.swift */,
+				4E45454F23C1921A384788D4 /* Info.plist */,
+				C364D28B7AE03B0CFFAFA7A3 /* KnobView.swift */,
+				530DDEDB41331498E4122933 /* PlaybackBarView.swift */,
+				835D5E76D3976F196247D401 /* ProgressionPlaybackEngine.swift */,
+				3112A4B5EF407C146ED90066 /* RootView.swift */,
+				BAB324D72E46955FE5C752D9 /* SuggestionCardView.swift */,
+				07741CB781828BC724C71C6C /* SuggestScreen.swift */,
+				ADB10229D29051E45CFDFDDC /* TimelineView.swift */,
+			);
+			name = ChordFlowApp;
+			path = ../ChordFlowApp;
+			sourceTree = "<group>";
+		};
+		158A95BE838905908F19C1BD /* HostHarnessTests */ = {
+			isa = PBXGroup;
+			children = (
+				3DBAFD9DBB9CE0C46E1FE54B /* HostHarnessTests */,
+			);
+			name = HostHarnessTests;
+			sourceTree = "<group>";
+		};
+		27B2CBC3A4FE818B7F81DFD6 = {
+			isa = PBXGroup;
+			children = (
+				70DCB5436A691C9E57623D88 /* Xcode */,
+				8E6C5EC31237106BFE79EBCB /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		3DBAFD9DBB9CE0C46E1FE54B /* HostHarnessTests */ = {
+			isa = PBXGroup;
+			children = (
+				5E35F4131737A00F17AF8E67 /* HostHarnessTests.swift */,
+			);
+			name = HostHarnessTests;
+			path = ../HostHarnessTests;
+			sourceTree = "<group>";
+		};
+		4DF965AD86EC5A302D7517E5 /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				E66B9C8287692FCE6EE7FAA5 /* Shared */,
+			);
+			name = Shared;
+			sourceTree = "<group>";
+		};
+		682585E92D2A578E9BA66798 /* HostHarness */ = {
+			isa = PBXGroup;
+			children = (
+				B4906DB7066FAA0FD04073D8 /* HostHarness */,
+			);
+			path = HostHarness;
+			sourceTree = "<group>";
+		};
+		70DCB5436A691C9E57623D88 /* Xcode */ = {
+			isa = PBXGroup;
+			children = (
+				B42B8EC72FA01958A7286CC4 /* ChordFlowApp */,
+				FB0A0BC09A39B427E302A337 /* ChordFlowAUv3 */,
+				682585E92D2A578E9BA66798 /* HostHarness */,
+				158A95BE838905908F19C1BD /* HostHarnessTests */,
+				4DF965AD86EC5A302D7517E5 /* Shared */,
+			);
+			path = Xcode;
+			sourceTree = "<group>";
+		};
+		7C7A4F47B54CCF531F568493 /* ChordFlowAUv3 */ = {
+			isa = PBXGroup;
+			children = (
+				170121B735BF5273944F8292 /* ChordFlowAudioUnitFactory.swift */,
+				71E8FF4031C60D12F18519F0 /* ChordFlowMIDIProcessorAudioUnit.swift */,
+				0325985AD047A96A525A480D /* Info.plist */,
+			);
+			name = ChordFlowAUv3;
+			path = ../ChordFlowAUv3;
+			sourceTree = "<group>";
+		};
+		8E6C5EC31237106BFE79EBCB /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				22F298A5AD181F67E1B6C6BC /* ChordFlow.app */,
+				F391EF4AFBA678FA74A60050 /* ChordFlow AUv3.appex */,
+				442F08B399EFA935D037E01E /* ChordFlowHostHarness */,
+				7276B6E91134D6076E115FF8 /* ChordFlowHostHarnessTests.xctest */,
+				C21FFB8CB0C34360450136A3 /* ChordFlowShared.framework */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		B42B8EC72FA01958A7286CC4 /* ChordFlowApp */ = {
+			isa = PBXGroup;
+			children = (
+				01C9A9F8B9F5EE8970300463 /* ChordFlowApp */,
+			);
+			name = ChordFlowApp;
+			sourceTree = "<group>";
+		};
+		B4906DB7066FAA0FD04073D8 /* HostHarness */ = {
+			isa = PBXGroup;
+			children = (
+				9C41217A021FA3473DDB900C /* HostHarnessCore.swift */,
+				1D91A5946A5B4F72D94D6908 /* Info.plist */,
+				AD8F7245296F96C8E3012B22 /* main.swift */,
+			);
+			name = HostHarness;
+			path = ../../HostHarness;
+			sourceTree = "<group>";
+		};
+		E66B9C8287692FCE6EE7FAA5 /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				AB75877EB00543EC152F0A9B /* ChordFlowCore.swift */,
+				4A1800A3C5E1948588B10394 /* ChordFlowEngine.swift */,
+				435BABE1510CA2A3CE969C46 /* Info.plist */,
+				8EF172A8ACD7ECB0D09309AF /* MIDIFileWriter.swift */,
+			);
+			name = Shared;
+			path = ../Shared;
+			sourceTree = "<group>";
+		};
+		FB0A0BC09A39B427E302A337 /* ChordFlowAUv3 */ = {
+			isa = PBXGroup;
+			children = (
+				7C7A4F47B54CCF531F568493 /* ChordFlowAUv3 */,
+			);
+			name = ChordFlowAUv3;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		24D6DBC09011C0A53DB186DA /* ChordFlowShared */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AB8B21656314445276711DE6 /* Build configuration list for PBXNativeTarget "ChordFlowShared" */;
+			buildPhases = (
+				EC9663287A0671A206065DB9 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = ChordFlowShared;
+			packageProductDependencies = (
+			);
+			productName = ChordFlowShared;
+			productReference = C21FFB8CB0C34360450136A3 /* ChordFlowShared.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+		6A95A0A6BF9A0B5C12F3FF65 /* ChordFlowApp */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 872DC4F038300130A3E51EAE /* Build configuration list for PBXNativeTarget "ChordFlowApp" */;
+			buildPhases = (
+				ADD4EE4CE46227257B5149B0 /* Sources */,
+				49E0D3BADE4C67DC3CED40AB /* Frameworks */,
+				8C4150F5DE4C1186C163F52C /* Embed Foundation Extensions */,
+				B7CBDD0A96A0DA24B0251F14 /* Embed Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				4DD3583B30039798A5AC115C /* PBXTargetDependency */,
+				008279BC2066712B9D3AD05D /* PBXTargetDependency */,
+			);
+			name = ChordFlowApp;
+			packageProductDependencies = (
+			);
+			productName = ChordFlowApp;
+			productReference = 22F298A5AD181F67E1B6C6BC /* ChordFlow.app */;
+			productType = "com.apple.product-type.application";
+		};
+		9EDD2E893322B28B983B283F /* ChordFlowHostHarness */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = FFBF9931578A59030344AA85 /* Build configuration list for PBXNativeTarget "ChordFlowHostHarness" */;
+			buildPhases = (
+				D293356C5C0EF4A1D9F94377 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = ChordFlowHostHarness;
+			packageProductDependencies = (
+			);
+			productName = ChordFlowHostHarness;
+			productReference = 442F08B399EFA935D037E01E /* ChordFlowHostHarness */;
+			productType = "com.apple.product-type.tool";
+		};
+		BC2956CA43C8819499AAEB47 /* ChordFlowHostHarnessTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E1DDE26EA813573138615DCE /* Build configuration list for PBXNativeTarget "ChordFlowHostHarnessTests" */;
+			buildPhases = (
+				D7E30799B2AB3A5811373410 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = ChordFlowHostHarnessTests;
+			packageProductDependencies = (
+			);
+			productName = ChordFlowHostHarnessTests;
+			productReference = 7276B6E91134D6076E115FF8 /* ChordFlowHostHarnessTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		C957DF9C78A99EA16BB85547 /* ChordFlowAUv3 */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 01B14A56A55E8E98C830596B /* Build configuration list for PBXNativeTarget "ChordFlowAUv3" */;
+			buildPhases = (
+				6A6F29E038B980E1B010E461 /* Sources */,
+				A41049325C93CF99FCFB071C /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				76DF1C813C9560363A765C32 /* PBXTargetDependency */,
+			);
+			name = ChordFlowAUv3;
+			packageProductDependencies = (
+			);
+			productName = ChordFlowAUv3;
+			productReference = F391EF4AFBA678FA74A60050 /* ChordFlow AUv3.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		4E36931FE05A537820FBA995 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					6A95A0A6BF9A0B5C12F3FF65 = {
+						DevelopmentTeam = P52946XHRJ;
+						ProvisioningStyle = Automatic;
+					};
+					C957DF9C78A99EA16BB85547 = {
+						DevelopmentTeam = P52946XHRJ;
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = 2DBF3DC0ACBBC239282C6546 /* Build configuration list for PBXProject "ChordFlow" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 27B2CBC3A4FE818B7F81DFD6;
+			minimizedProjectReferenceProxies = 1;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				C957DF9C78A99EA16BB85547 /* ChordFlowAUv3 */,
+				6A95A0A6BF9A0B5C12F3FF65 /* ChordFlowApp */,
+				9EDD2E893322B28B983B283F /* ChordFlowHostHarness */,
+				BC2956CA43C8819499AAEB47 /* ChordFlowHostHarnessTests */,
+				24D6DBC09011C0A53DB186DA /* ChordFlowShared */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		6A6F29E038B980E1B010E461 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				54ECC8F24C0BE7E629C157D6 /* ChordFlowAudioUnitFactory.swift in Sources */,
+				75040512641A3B879D730DEA /* ChordFlowMIDIProcessorAudioUnit.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		ADD4EE4CE46227257B5149B0 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				96EE8C665F3F0D8665CA063D /* AppViewModel.swift in Sources */,
+				3FDA3F1221BCF9E35C92D4B3 /* ChordDetailSheet.swift in Sources */,
+				5856A2C52518204E20D50907 /* ChordFlowApp.swift in Sources */,
+				BCA8F5513E9D218E948AAC7D /* CircleOfFifthsView.swift in Sources */,
+				3ED0B3A12221343E084EF5EC /* ComposeScreen.swift in Sources */,
+				953E095CCA1EDFC9A53E40DB /* DesignTokens.swift in Sources */,
+				20C1712474E97BED9E6AF06F /* ExportScreen.swift in Sources */,
+				2201D79B75445F8171B62A19 /* KnobView.swift in Sources */,
+				CB0D65B73D413A3455EE5D46 /* PlaybackBarView.swift in Sources */,
+				4382C04DB4DCDDF3314F8F35 /* ProgressionPlaybackEngine.swift in Sources */,
+				06A9318E1A86442A54ED933E /* RootView.swift in Sources */,
+				3E44DB608090BB59515F3379 /* SuggestScreen.swift in Sources */,
+				76B07C9093E7E9CB537B6822 /* SuggestionCardView.swift in Sources */,
+				27A22C035A44BC39B11F61E8 /* TimelineView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D293356C5C0EF4A1D9F94377 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				86A272037603ACEBBF82CA48 /* HostHarnessCore.swift in Sources */,
+				1565EFCE599B17FABEBE08D3 /* main.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D7E30799B2AB3A5811373410 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CE38E68B326386914206CC64 /* HostHarnessTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		EC9663287A0671A206065DB9 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3F9DCC02417213CBE7DF4E59 /* ChordFlowCore.swift in Sources */,
+				B414B420BCFAC7A577E71D1A /* ChordFlowEngine.swift in Sources */,
+				BC63C671375E6D07B562D152 /* MIDIFileWriter.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		008279BC2066712B9D3AD05D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = C957DF9C78A99EA16BB85547 /* ChordFlowAUv3 */;
+			targetProxy = 611F6D96FBEC2C48CBA4592C /* PBXContainerItemProxy */;
+		};
+		4DD3583B30039798A5AC115C /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 24D6DBC09011C0A53DB186DA /* ChordFlowShared */;
+			targetProxy = EB4B8F7987870BF24462D66E /* PBXContainerItemProxy */;
+		};
+		76DF1C813C9560363A765C32 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 24D6DBC09011C0A53DB186DA /* ChordFlowShared */;
+			targetProxy = CADBBA3A36281E7D5CE87548 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		0FFEEC5C5A58E02B6D50B1BC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = HostHarness/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.nwf.chordflow2.hostharness;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		134CFC00489E9EEF2B65545C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = P52946XHRJ;
+				INFOPLIST_FILE = ChordFlowAUv3/Info.plist;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.nwf.chordflow2.auv3;
+				PRODUCT_NAME = "ChordFlow AUv3";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = YES;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		4685F5C431B9460D54D87836 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "";
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.nwf.chordflow2.hostharness.tests;
+				SDKROOT = macosx;
+				TEST_HOST = "";
+			};
+			name = Release;
+		};
+		51869129745A3156FE3D8DB6 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = P52946XHRJ;
+				INFOPLIST_FILE = ChordFlowApp/Info.plist;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.nwf.chordflow2;
+				PRODUCT_NAME = ChordFlow;
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = YES;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		623DD8D034E40CB880CEF4C3 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = HostHarness/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.nwf.chordflow2.hostharness;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		6EAE031EF1412A2DA9F5A349 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.nwf.chordflow;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		9D9F313828981719AF5284B7 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "";
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.nwf.chordflow2.hostharness.tests;
+				SDKROOT = macosx;
+				TEST_HOST = "";
+			};
+			name = Debug;
+		};
+		C25D914B2D161D98BF892538 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "";
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				INFOPLIST_FILE = Shared/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.nwf.chordflow2.shared;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = YES;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+			};
+			name = Debug;
+		};
+		D0BA56F247A052092570CB12 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.nwf.chordflow;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		D30A70C5EBCF29708C28FFE5 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = P52946XHRJ;
+				INFOPLIST_FILE = ChordFlowApp/Info.plist;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.nwf.chordflow2;
+				PRODUCT_NAME = ChordFlow;
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = YES;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		E62756DB84D2546C76791575 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "";
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				INFOPLIST_FILE = Shared/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.nwf.chordflow2.shared;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = YES;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+			};
+			name = Release;
+		};
+		E9289AD7AAF6C5CF2A7C6C7B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = P52946XHRJ;
+				INFOPLIST_FILE = ChordFlowAUv3/Info.plist;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.nwf.chordflow2.auv3;
+				PRODUCT_NAME = "ChordFlow AUv3";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = YES;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		01B14A56A55E8E98C830596B /* Build configuration list for PBXNativeTarget "ChordFlowAUv3" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				134CFC00489E9EEF2B65545C /* Debug */,
+				E9289AD7AAF6C5CF2A7C6C7B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		2DBF3DC0ACBBC239282C6546 /* Build configuration list for PBXProject "ChordFlow" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D0BA56F247A052092570CB12 /* Debug */,
+				6EAE031EF1412A2DA9F5A349 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		872DC4F038300130A3E51EAE /* Build configuration list for PBXNativeTarget "ChordFlowApp" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D30A70C5EBCF29708C28FFE5 /* Debug */,
+				51869129745A3156FE3D8DB6 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		AB8B21656314445276711DE6 /* Build configuration list for PBXNativeTarget "ChordFlowShared" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C25D914B2D161D98BF892538 /* Debug */,
+				E62756DB84D2546C76791575 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		E1DDE26EA813573138615DCE /* Build configuration list for PBXNativeTarget "ChordFlowHostHarnessTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9D9F313828981719AF5284B7 /* Debug */,
+				4685F5C431B9460D54D87836 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		FFBF9931578A59030344AA85 /* Build configuration list for PBXNativeTarget "ChordFlowHostHarness" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				623DD8D034E40CB880CEF4C3 /* Debug */,
+				0FFEEC5C5A58E02B6D50B1BC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 4E36931FE05A537820FBA995 /* Project object */;
+}

@@ -1,0 +1,329 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 390 844" width="390" height="844">
+  <defs>
+    <radialGradient id="glow-key" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#F5A623" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#F5A623" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glow-center" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#F5A623" stop-opacity="0.08"/>
+      <stop offset="100%" stop-color="#1A1B2E" stop-opacity="0"/>
+    </radialGradient>
+    <clipPath id="screen-clip">
+      <rect width="390" height="844" rx="40"/>
+    </clipPath>
+    <style>
+      text { font-family: -apple-system, 'SF Pro Rounded', 'Helvetica Neue', sans-serif; }
+    </style>
+  </defs>
+
+  <!-- Phone frame -->
+  <rect width="390" height="844" rx="40" fill="#1A1B2E" stroke="#3A3D5C" stroke-width="2"/>
+
+  <g clip-path="url(#screen-clip)">
+
+  <!-- Status bar -->
+  <rect width="390" height="54" fill="#1A1B2E"/>
+  <text x="30" y="34" fill="#F0F0F5" font-size="14" font-weight="600">9:41</text>
+  <text x="340" y="34" fill="#F0F0F5" font-size="12" font-weight="500" text-anchor="end">100%</text>
+  <!-- Notch hint -->
+  <rect x="130" y="6" width="130" height="28" rx="14" fill="#0E0F1D"/>
+
+  <!-- ════════════════════════════════════════ -->
+  <!-- CIRCLE OF FIFTHS                         -->
+  <!-- Center: (195, 248), Outer note ring r=130 -->
+  <!-- Inner diatonic ring r=80                 -->
+  <!-- ════════════════════════════════════════ -->
+
+  <!-- Subtle center glow -->
+  <circle cx="195" cy="248" r="150" fill="url(#glow-center)"/>
+
+  <!-- Outer ring track -->
+  <circle cx="195" cy="248" r="130" fill="none" stroke="#252740" stroke-width="1"/>
+
+  <!-- Inner ring track -->
+  <circle cx="195" cy="248" r="80" fill="none" stroke="#252740" stroke-width="0.5" stroke-dasharray="4 6"/>
+
+  <!-- ── Outer Note Ring (12 notes, Circle of Fifths order) ── -->
+  <!-- C (0°) — SELECTED KEY — with glow -->
+  <circle cx="195" cy="118" r="26" fill="url(#glow-key)"/>
+  <circle cx="195" cy="118" r="18" fill="#F5A623" opacity="0.25" stroke="#F5A623" stroke-width="2"/>
+  <text x="195" y="123" fill="#F5A623" font-size="13" text-anchor="middle" font-weight="700">C</text>
+
+  <!-- G (30°) -->
+  <circle cx="260" cy="135.4" r="15" fill="#252740" stroke="#3A3D5C" stroke-width="1"/>
+  <text x="260" y="140" fill="#8B8DA3" font-size="11" text-anchor="middle" font-weight="600">G</text>
+
+  <!-- D (60°) -->
+  <circle cx="307.6" cy="183" r="15" fill="#252740" stroke="#3A3D5C" stroke-width="1"/>
+  <text x="307.6" y="187.5" fill="#8B8DA3" font-size="11" text-anchor="middle" font-weight="600">D</text>
+
+  <!-- A (90°) -->
+  <circle cx="325" cy="248" r="15" fill="#252740" stroke="#3A3D5C" stroke-width="1"/>
+  <text x="325" y="252.5" fill="#8B8DA3" font-size="11" text-anchor="middle" font-weight="600">A</text>
+
+  <!-- E (120°) -->
+  <circle cx="307.6" cy="313" r="15" fill="#252740" stroke="#3A3D5C" stroke-width="1"/>
+  <text x="307.6" y="317.5" fill="#8B8DA3" font-size="11" text-anchor="middle" font-weight="600">E</text>
+
+  <!-- B (150°) -->
+  <circle cx="260" cy="360.6" r="15" fill="#252740" stroke="#3A3D5C" stroke-width="1"/>
+  <text x="260" y="365" fill="#8B8DA3" font-size="11" text-anchor="middle" font-weight="600">B</text>
+
+  <!-- F# (180°) -->
+  <circle cx="195" cy="378" r="15" fill="#252740" stroke="#3A3D5C" stroke-width="1"/>
+  <text x="195" y="382.5" fill="#6B6D82" font-size="11" text-anchor="middle" font-weight="600">F#</text>
+
+  <!-- Db (210°) -->
+  <circle cx="130" cy="360.6" r="15" fill="#252740" stroke="#3A3D5C" stroke-width="1"/>
+  <text x="130" y="365" fill="#6B6D82" font-size="11" text-anchor="middle" font-weight="600">Db</text>
+
+  <!-- Ab (240°) -->
+  <circle cx="82.4" cy="313" r="15" fill="#252740" stroke="#3A3D5C" stroke-width="1"/>
+  <text x="82.4" y="317.5" fill="#6B6D82" font-size="11" text-anchor="middle" font-weight="600">Ab</text>
+
+  <!-- Eb (270°) -->
+  <circle cx="65" cy="248" r="15" fill="#252740" stroke="#3A3D5C" stroke-width="1"/>
+  <text x="65" y="252.5" fill="#6B6D82" font-size="11" text-anchor="middle" font-weight="600">Eb</text>
+
+  <!-- Bb (300°) -->
+  <circle cx="82.4" cy="183" r="15" fill="#252740" stroke="#3A3D5C" stroke-width="1"/>
+  <text x="82.4" y="187.5" fill="#8B8DA3" font-size="11" text-anchor="middle" font-weight="600">Bb</text>
+
+  <!-- F (330°) -->
+  <circle cx="130" cy="135.4" r="15" fill="#252740" stroke="#3A3D5C" stroke-width="1"/>
+  <text x="130" y="140" fill="#8B8DA3" font-size="11" text-anchor="middle" font-weight="600">F</text>
+
+  <!-- ── Inner Diatonic Chord Ring (C Major: I ii iii IV V vi vii°) ── -->
+
+  <!-- I - C (Tonic, 0°) — amber, selected state -->
+  <circle cx="195" cy="168" r="24" fill="#F5A623" opacity="0.3" stroke="#F5A623" stroke-width="2"/>
+  <text x="195" y="164" fill="#F5A623" font-size="9" text-anchor="middle" font-weight="700">I</text>
+  <text x="195" y="177" fill="#F5A623" font-size="10" text-anchor="middle" font-weight="600">Cmaj7</text>
+
+  <!-- V - G (Dominant, 30°) — blue -->
+  <circle cx="235" cy="178.7" r="22" fill="#4A90D9" opacity="0.15" stroke="#4A90D9" stroke-width="1.5"/>
+  <text x="235" y="175" fill="#4A90D9" font-size="9" text-anchor="middle" font-weight="700">V</text>
+  <text x="235" y="187" fill="#4A90D9" font-size="9" text-anchor="middle" font-weight="600">G7</text>
+
+  <!-- ii - D (Subdominant, 60°) — green -->
+  <circle cx="264.3" cy="208" r="22" fill="#7ED321" opacity="0.15" stroke="#7ED321" stroke-width="1.5"/>
+  <text x="264.3" y="204" fill="#7ED321" font-size="9" text-anchor="middle" font-weight="700">ii</text>
+  <text x="264.3" y="216" fill="#7ED321" font-size="9" text-anchor="middle" font-weight="600">Dm7</text>
+
+  <!-- vi - A (Tonic, 90°) — amber -->
+  <circle cx="275" cy="248" r="22" fill="#F5A623" opacity="0.15" stroke="#F5A623" stroke-width="1.5"/>
+  <text x="275" y="244" fill="#F5A623" font-size="9" text-anchor="middle" font-weight="700">vi</text>
+  <text x="275" y="256" fill="#F5A623" font-size="9" text-anchor="middle" font-weight="600">Am7</text>
+
+  <!-- iii - E (Tonic, 120°) — amber -->
+  <circle cx="264.3" cy="288" r="22" fill="#F5A623" opacity="0.15" stroke="#F5A623" stroke-width="1.5"/>
+  <text x="264.3" y="284" fill="#F5A623" font-size="9" text-anchor="middle" font-weight="700">iii</text>
+  <text x="264.3" y="296" fill="#F5A623" font-size="9" text-anchor="middle" font-weight="600">Em7</text>
+
+  <!-- vii° - B (Dominant, 150°) — blue -->
+  <circle cx="235" cy="317.3" r="22" fill="#4A90D9" opacity="0.15" stroke="#4A90D9" stroke-width="1.5"/>
+  <text x="235" y="313" fill="#4A90D9" font-size="9" text-anchor="middle" font-weight="700">vii°</text>
+  <text x="235" y="325" fill="#4A90D9" font-size="8" text-anchor="middle" font-weight="600">Bdim</text>
+
+  <!-- IV - F (Subdominant, 330°) — green -->
+  <circle cx="155" cy="178.7" r="22" fill="#7ED321" opacity="0.15" stroke="#7ED321" stroke-width="1.5"/>
+  <text x="155" y="175" fill="#7ED321" font-size="9" text-anchor="middle" font-weight="700">IV</text>
+  <text x="155" y="187" fill="#7ED321" font-size="9" text-anchor="middle" font-weight="600">Fmaj7</text>
+
+  <!-- ── Borrowed chord hints (outer, dim, dashed) ── -->
+  <!-- bIII at Eb position, r=155 -->
+  <circle cx="50" cy="248" r="16" fill="#D94A8C" opacity="0.06" stroke="#D94A8C" stroke-width="1" stroke-dasharray="3 3"/>
+  <text x="50" y="245" fill="#D94A8C" font-size="8" text-anchor="middle" opacity="0.5" font-weight="600">bIII</text>
+  <text x="50" y="255" fill="#D94A8C" font-size="7" text-anchor="middle" opacity="0.4">Eb</text>
+
+  <!-- bVI at Ab position -->
+  <circle cx="68" cy="313" r="16" fill="#D94A8C" opacity="0.06" stroke="#D94A8C" stroke-width="1" stroke-dasharray="3 3"/>
+  <text x="68" y="310" fill="#D94A8C" font-size="8" text-anchor="middle" opacity="0.5" font-weight="600">bVI</text>
+  <text x="68" y="320" fill="#D94A8C" font-size="7" text-anchor="middle" opacity="0.4">Ab</text>
+
+  <!-- bVII at Bb position -->
+  <circle cx="68" cy="183" r="16" fill="#D94A8C" opacity="0.06" stroke="#D94A8C" stroke-width="1" stroke-dasharray="3 3"/>
+  <text x="68" y="180" fill="#D94A8C" font-size="8" text-anchor="middle" opacity="0.5" font-weight="600">bVII</text>
+  <text x="68" y="190" fill="#D94A8C" font-size="7" text-anchor="middle" opacity="0.4">Bb</text>
+
+  <!-- Center label — key + mode, tappable -->
+  <text x="195" y="244" fill="#F0F0F5" font-size="22" text-anchor="middle" font-weight="700">C Major</text>
+  <text x="195" y="262" fill="#8B8DA3" font-size="11" text-anchor="middle">Tap to change mode</text>
+
+  <!-- ════════════════════════════════════════ -->
+  <!-- CONTROLS STRIP                           -->
+  <!-- ════════════════════════════════════════ -->
+  <line x1="20" y1="408" x2="370" y2="408" stroke="#3A3D5C" stroke-width="0.5"/>
+
+  <!-- Tension knob -->
+  <g transform="translate(50, 424)">
+    <circle cx="0" cy="0" r="22" fill="#252740" stroke="#3A3D5C" stroke-width="1.5"/>
+    <path d="M -12.7 15.6 A 22 22 0 1 1 6 21.2" fill="none" stroke="#F5A623" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M 6 21.2 A 22 22 0 0 1 12.7 15.6" fill="none" stroke="#3A3D5C" stroke-width="2.5" stroke-linecap="round"/>
+    <text x="0" y="4" fill="#F0F0F5" font-size="10" text-anchor="middle" font-weight="600">0.6</text>
+    <text x="0" y="36" fill="#8B8DA3" font-size="9" text-anchor="middle" font-weight="500">TENSION</text>
+  </g>
+
+  <!-- Swing knob -->
+  <g transform="translate(145, 424)">
+    <circle cx="0" cy="0" r="22" fill="#252740" stroke="#3A3D5C" stroke-width="1.5"/>
+    <path d="M -12.7 15.6 A 22 22 0 0 1 -18 -12" fill="none" stroke="#4A90D9" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M -18 -12 A 22 22 0 0 1 12.7 15.6" fill="none" stroke="#3A3D5C" stroke-width="2.5" stroke-linecap="round"/>
+    <text x="0" y="4" fill="#F0F0F5" font-size="10" text-anchor="middle" font-weight="600">0.2</text>
+    <text x="0" y="36" fill="#8B8DA3" font-size="9" text-anchor="middle" font-weight="500">SWING</text>
+  </g>
+
+  <!-- Tempo knob -->
+  <g transform="translate(240, 424)">
+    <circle cx="0" cy="0" r="22" fill="#252740" stroke="#3A3D5C" stroke-width="1.5"/>
+    <path d="M -12.7 15.6 A 22 22 0 1 1 0 -22" fill="none" stroke="#7ED321" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M 0 -22 A 22 22 0 0 1 12.7 15.6" fill="none" stroke="#3A3D5C" stroke-width="2.5" stroke-linecap="round"/>
+    <text x="0" y="4" fill="#F0F0F5" font-size="10" text-anchor="middle" font-weight="600">120</text>
+    <text x="0" y="36" fill="#8B8DA3" font-size="9" text-anchor="middle" font-weight="500">BPM</text>
+  </g>
+
+  <!-- Borrowed preset pill -->
+  <g transform="translate(302, 412)">
+    <rect x="0" y="0" width="68" height="24" rx="12" fill="#D94A8C" opacity="0.15" stroke="#D94A8C" stroke-width="1"/>
+    <text x="34" y="16" fill="#D94A8C" font-size="10" text-anchor="middle" font-weight="600">Jazz</text>
+    <text x="34" y="36" fill="#6B6D82" font-size="8" text-anchor="middle">BORROWED</text>
+  </g>
+
+  <!-- ════════════════════════════════════════ -->
+  <!-- TIMELINE SECTION                         -->
+  <!-- ════════════════════════════════════════ -->
+  <text x="20" y="488" fill="#8B8DA3" font-size="10" font-weight="500">PROGRESSION</text>
+  <text x="370" y="488" fill="#6B6D82" font-size="10" text-anchor="end">4 bars</text>
+
+  <!-- Timeline background with beat grid -->
+  <rect x="12" y="498" width="366" height="110" rx="10" fill="#0E0F1D" stroke="#252740" stroke-width="1"/>
+
+  <!-- Beat grid lines (4 bars × 4 beats, ~22px per beat) -->
+  <!-- Bar lines (thicker) -->
+  <line x1="103" y1="498" x2="103" y2="608" stroke="#3A3D5C" stroke-width="1"/>
+  <line x1="194" y1="498" x2="194" y2="608" stroke="#3A3D5C" stroke-width="1"/>
+  <line x1="285" y1="498" x2="285" y2="608" stroke="#3A3D5C" stroke-width="1"/>
+  <!-- Beat subdivisions -->
+  <line x1="34.8" y1="498" x2="34.8" y2="608" stroke="#1A1B2E" stroke-width="0.5"/>
+  <line x1="57.5" y1="498" x2="57.5" y2="608" stroke="#1A1B2E" stroke-width="0.5"/>
+  <line x1="80.3" y1="498" x2="80.3" y2="608" stroke="#1A1B2E" stroke-width="0.5"/>
+  <line x1="125.8" y1="498" x2="125.8" y2="608" stroke="#1A1B2E" stroke-width="0.5"/>
+  <line x1="148.5" y1="498" x2="148.5" y2="608" stroke="#1A1B2E" stroke-width="0.5"/>
+  <line x1="171.3" y1="498" x2="171.3" y2="608" stroke="#1A1B2E" stroke-width="0.5"/>
+  <line x1="216.8" y1="498" x2="216.8" y2="608" stroke="#1A1B2E" stroke-width="0.5"/>
+  <line x1="239.5" y1="498" x2="239.5" y2="608" stroke="#1A1B2E" stroke-width="0.5"/>
+  <line x1="262.3" y1="498" x2="262.3" y2="608" stroke="#1A1B2E" stroke-width="0.5"/>
+  <line x1="307.8" y1="498" x2="307.8" y2="608" stroke="#1A1B2E" stroke-width="0.5"/>
+  <line x1="330.5" y1="498" x2="330.5" y2="608" stroke="#1A1B2E" stroke-width="0.5"/>
+  <line x1="353.3" y1="498" x2="353.3" y2="608" stroke="#1A1B2E" stroke-width="0.5"/>
+
+  <!-- Bar numbers -->
+  <text x="57" y="516" fill="#6B6D82" font-size="8" text-anchor="middle">1</text>
+  <text x="148" y="516" fill="#6B6D82" font-size="8" text-anchor="middle">2</text>
+  <text x="239" y="516" fill="#6B6D82" font-size="8" text-anchor="middle">3</text>
+  <text x="330" y="516" fill="#6B6D82" font-size="8" text-anchor="middle">4</text>
+
+  <!-- Chord blocks — I → vi → IV → V -->
+  <!-- Bar 1: Cmaj7 (Tonic/amber) -->
+  <rect x="16" y="524" width="83" height="56" rx="8" fill="#F5A623" opacity="0.12" stroke="#F5A623" stroke-width="1.5"/>
+  <text x="57.5" y="549" fill="#F5A623" font-size="14" text-anchor="middle" font-weight="600">Cmaj7</text>
+  <text x="57.5" y="566" fill="#F5A623" font-size="9" text-anchor="middle" opacity="0.5">I</text>
+
+  <!-- Bar 2: Am7 (Tonic/amber) -->
+  <rect x="107" y="524" width="83" height="56" rx="8" fill="#F5A623" opacity="0.12" stroke="#F5A623" stroke-width="1.5"/>
+  <text x="148.5" y="549" fill="#F5A623" font-size="14" text-anchor="middle" font-weight="600">Am7</text>
+  <text x="148.5" y="566" fill="#F5A623" font-size="9" text-anchor="middle" opacity="0.5">vi</text>
+
+  <!-- Bar 3: Fmaj7 (Subdominant/green) -->
+  <rect x="198" y="524" width="83" height="56" rx="8" fill="#7ED321" opacity="0.12" stroke="#7ED321" stroke-width="1.5"/>
+  <text x="239.5" y="549" fill="#7ED321" font-size="14" text-anchor="middle" font-weight="600">Fmaj7</text>
+  <text x="239.5" y="566" fill="#7ED321" font-size="9" text-anchor="middle" opacity="0.5">IV</text>
+
+  <!-- Bar 4: G7 (Dominant/blue) -->
+  <rect x="289" y="524" width="83" height="56" rx="8" fill="#4A90D9" opacity="0.12" stroke="#4A90D9" stroke-width="1.5"/>
+  <text x="330.5" y="549" fill="#4A90D9" font-size="14" text-anchor="middle" font-weight="600">G7</text>
+  <text x="330.5" y="566" fill="#4A90D9" font-size="9" text-anchor="middle" opacity="0.5">V</text>
+
+  <!-- Playback cursor (at bar 3, beat 2) -->
+  <line x1="248" y1="520" x2="248" y2="584" stroke="#F0F0F5" stroke-width="2" opacity="0.9"/>
+  <circle cx="248" cy="520" r="3" fill="#F0F0F5" opacity="0.9"/>
+
+  <!-- ── Pattern indicators below timeline ── -->
+  <g transform="translate(12, 618)">
+    <text x="45.5" y="12" fill="#F5A623" font-size="8" text-anchor="middle" opacity="0.5">BLOCK</text>
+    <text x="136.5" y="12" fill="#F5A623" font-size="8" text-anchor="middle" opacity="0.5">BLOCK</text>
+    <text x="227.5" y="12" fill="#7ED321" font-size="8" text-anchor="middle" opacity="0.5">ARP UP</text>
+    <text x="318.5" y="12" fill="#4A90D9" font-size="8" text-anchor="middle" opacity="0.5">BLOCK</text>
+  </g>
+
+  <!-- ════════════════════════════════════════ -->
+  <!-- SUGGESTION HINT (mini-bar)               -->
+  <!-- ════════════════════════════════════════ -->
+  <g transform="translate(12, 642)">
+    <rect width="366" height="42" rx="10" fill="#252740" stroke="#3A3D5C" stroke-width="1"/>
+    <!-- Lightbulb icon -->
+    <circle cx="28" cy="21" r="8" fill="none" stroke="#F5A623" stroke-width="1.5" opacity="0.6"/>
+    <line x1="28" y1="14" x2="28" y2="10" stroke="#F5A623" stroke-width="1" opacity="0.4"/>
+    <text x="46" y="18" fill="#8B8DA3" font-size="10" font-weight="500">Next suggestion:</text>
+    <text x="150" y="18" fill="#F5A623" font-size="12" font-weight="600">Cmaj7</text>
+    <text x="198" y="18" fill="#F5A623" font-size="9" opacity="0.6">strong resolution</text>
+    <text x="46" y="33" fill="#6B6D82" font-size="9">Tap for more suggestions</text>
+    <!-- Arrow right -->
+    <text x="346" y="24" fill="#6B6D82" font-size="14">&#x203A;</text>
+  </g>
+
+  <!-- ════════════════════════════════════════ -->
+  <!-- PLAYBACK BAR                             -->
+  <!-- ════════════════════════════════════════ -->
+  <rect x="0" y="696" width="390" height="68" fill="#0E0F1D"/>
+  <line x1="0" y1="696" x2="390" y2="696" stroke="#3A3D5C" stroke-width="0.5"/>
+
+  <!-- Progress bar -->
+  <rect x="20" y="702" width="350" height="3" rx="1.5" fill="#252740"/>
+  <rect x="20" y="702" width="196" height="3" rx="1.5" fill="#F5A623" opacity="0.7"/>
+  <circle cx="216" cy="703.5" r="5" fill="#F5A623"/>
+
+  <!-- Stop button (playing state) -->
+  <circle cx="44" cy="738" r="22" fill="#E8435A"/>
+  <rect x="35" y="729" width="18" height="18" rx="3" fill="#F0F0F5"/>
+
+  <!-- Status text -->
+  <text x="78" y="732" fill="#F5A623" font-size="14" font-weight="600">Playing</text>
+  <text x="78" y="748" fill="#8B8DA3" font-size="11">Bar 3 of 4</text>
+
+  <!-- BPM -->
+  <text x="354" y="742" fill="#F5A623" font-size="14" text-anchor="end" font-weight="500" font-family="'SF Mono', monospace">120 BPM</text>
+
+  <!-- ════════════════════════════════════════ -->
+  <!-- TAB BAR                                  -->
+  <!-- ════════════════════════════════════════ -->
+  <rect x="0" y="776" width="390" height="68" fill="#0E0F1D"/>
+  <line x1="0" y1="776" x2="390" y2="776" stroke="#3A3D5C" stroke-width="0.5"/>
+
+  <!-- Compose (active) -->
+  <g transform="translate(65, 792)">
+    <circle cx="0" cy="0" r="10" fill="none" stroke="#F5A623" stroke-width="1.5"/>
+    <circle cx="0" cy="0" r="4" fill="#F5A623"/>
+    <text x="0" y="24" fill="#F5A623" font-size="10" text-anchor="middle" font-weight="600">Compose</text>
+  </g>
+
+  <!-- Suggest -->
+  <g transform="translate(195, 792)">
+    <circle cx="0" cy="-4" r="6" fill="none" stroke="#6B6D82" stroke-width="1.5"/>
+    <line x1="0" y1="2" x2="0" y2="8" stroke="#6B6D82" stroke-width="1.5"/>
+    <text x="0" y="24" fill="#6B6D82" font-size="10" text-anchor="middle">Suggest</text>
+  </g>
+
+  <!-- Export -->
+  <g transform="translate(325, 792)">
+    <rect x="-7" y="-8" width="14" height="12" rx="2" fill="none" stroke="#6B6D82" stroke-width="1.5"/>
+    <line x1="0" y1="-8" x2="0" y2="-16" stroke="#6B6D82" stroke-width="1.5"/>
+    <polyline points="-4,-12 0,-16 4,-12" fill="none" stroke="#6B6D82" stroke-width="1.5"/>
+    <text x="0" y="24" fill="#6B6D82" font-size="10" text-anchor="middle">Export</text>
+  </g>
+
+  </g>
+
+  <!-- Screen label -->
+  <text x="195" y="840" fill="#6B6D82" font-size="8" text-anchor="middle">01 — Compose Main — iPhone</text>
+</svg>

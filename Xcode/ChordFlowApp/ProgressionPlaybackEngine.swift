@@ -3,30 +3,46 @@ import Foundation
 import ChordFlowShared
 
 private final class ActiveNoteStore {
+    private struct Voice {
+        var startedAt: TimeInterval
+        var releasedAt: TimeInterval?
+    }
+
     private let lock = NSLock()
-    private var notes: Set<UInt8> = []
+    private var voices: [UInt8: Voice] = [:]
 
     func noteOn(_ note: UInt8) {
+        let now = CFAbsoluteTimeGetCurrent()
         lock.lock()
-        notes.insert(note)
+        voices[note] = Voice(startedAt: now, releasedAt: nil)
         lock.unlock()
     }
 
     func noteOff(_ note: UInt8) {
+        let now = CFAbsoluteTimeGetCurrent()
         lock.lock()
-        notes.remove(note)
+        if var voice = voices[note] {
+            voice.releasedAt = now
+            voices[note] = voice
+        }
         lock.unlock()
     }
 
     func clear() {
         lock.lock()
-        notes.removeAll()
+        voices.removeAll()
         lock.unlock()
     }
 
-    func snapshot() -> [UInt8] {
+    func snapshot(now: TimeInterval) -> [(note: UInt8, startedAt: TimeInterval, releasedAt: TimeInterval?)] {
         lock.lock()
-        let current = Array(notes)
+        voices = voices.filter { _, voice in
+            guard let releasedAt = voice.releasedAt else { return true }
+            return now - releasedAt < 1.2
+        }
+        let current = voices.map { key, value in
+            (note: key, startedAt: value.startedAt, releasedAt: value.releasedAt)
+        }
         lock.unlock()
         return current
     }
@@ -120,29 +136,50 @@ final class ProgressionPlaybackEngine {
             }
 
             guard let noteStore else { return noErr }
-            let notes = noteStore.snapshot()
-            guard !notes.isEmpty else { return noErr }
+            let bufferStartTime = CFAbsoluteTimeGetCurrent()
+            let voices = noteStore.snapshot(now: bufferStartTime)
+            guard !voices.isEmpty else { return noErr }
 
-            let frequencies = notes.map { note -> Double in
-                440.0 * pow(2.0, Double(Int(note) - 69) / 12.0)
-            }
             let frameTotal = Int(frameCount)
             let channelTotal = max(1, bufferCount)
-            let gain = Float(0.2 / Double(max(1, frequencies.count)))
+            let gain = 0.24 / sqrt(Double(max(1, voices.count)))
 
             for frame in 0..<frameTotal {
-                var sample = Float(0)
-                for hz in frequencies {
+                let now = bufferStartTime + (Double(frame) / format.sampleRate)
+                var sample = 0.0
+
+                for voice in voices {
+                    let hz = 440.0 * pow(2.0, Double(Int(voice.note) - 69) / 12.0)
                     let angle = (2.0 * Double.pi * hz * sampleClock) / format.sampleRate
-                    sample += Float(sin(angle))
+
+                    let age = max(0, now - voice.startedAt)
+                    let attack = min(1.0, age / 0.008)
+                    let decay = 0.22 + 0.78 * exp(-age * 3.2)
+                    let release: Double
+                    if let releasedAt = voice.releasedAt {
+                        release = exp(-max(0, now - releasedAt) * 18.0)
+                    } else {
+                        release = 1.0
+                    }
+                    let envelope = attack * decay * release
+                    if envelope < 0.0001 { continue }
+
+                    let brightness = exp(-age * 6.5)
+                    let timbre = sin(angle)
+                        + (0.45 * brightness * sin(angle * 2.01))
+                        + (0.22 * brightness * sin(angle * 3.98))
+                        + (0.12 * brightness * sin(angle * 6.02))
+
+                    sample += timbre * envelope
                 }
-                sample *= gain
+
+                let mixed = Float(max(-1.0, min(1.0, sample * gain)))
                 sampleClock += 1
 
                 for channel in 0..<channelTotal {
                     guard let mData = buffers[channel].mData else { continue }
                     let channelData = mData.assumingMemoryBound(to: Float.self)
-                    channelData[frame] = sample
+                    channelData[frame] = mixed
                 }
             }
 

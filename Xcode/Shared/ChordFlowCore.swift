@@ -14,7 +14,81 @@ public enum CFNote: Int, CaseIterable, Codable {
 }
 
 public enum CFScaleMode: String, CaseIterable, Codable {
-    case major, minor, dorian, mixolydian
+    case major
+    case minor
+    case ionian
+    case dorian
+    case phrygian
+    case lydian
+    case mixolydian
+    case aeolian
+    case locrian
+    case melodicMinor
+    case harmonicMinor
+    case harmonicMajor
+    case doubleHarmonic
+    case phrygianDominant
+    case lydianDominant
+    case lydianAugmented
+    case locrianSharp2
+    case superLocrian
+    case neapolitanMinor
+    case neapolitanMajor
+    case hungarianMinor
+    case romanianMinor
+    case persian
+    case enigmatic
+
+    public func displayName() -> String {
+        switch self {
+        case .major: return "Major"
+        case .minor: return "Minor"
+        case .ionian: return "Ionian"
+        case .dorian: return "Dorian"
+        case .phrygian: return "Phrygian"
+        case .lydian: return "Lydian"
+        case .mixolydian: return "Mixolydian"
+        case .aeolian: return "Aeolian"
+        case .locrian: return "Locrian"
+        case .melodicMinor: return "Melodic Minor"
+        case .harmonicMinor: return "Harmonic Minor"
+        case .harmonicMajor: return "Harmonic Major"
+        case .doubleHarmonic: return "Double Harmonic"
+        case .phrygianDominant: return "Phrygian Dominant"
+        case .lydianDominant: return "Lydian Dominant"
+        case .lydianAugmented: return "Lydian Augmented"
+        case .locrianSharp2: return "Locrian #2"
+        case .superLocrian: return "Super Locrian"
+        case .neapolitanMinor: return "Neapolitan Minor"
+        case .neapolitanMajor: return "Neapolitan Major"
+        case .hungarianMinor: return "Hungarian Minor"
+        case .romanianMinor: return "Romanian Minor"
+        case .persian: return "Persian"
+        case .enigmatic: return "Enigmatic"
+        }
+    }
+}
+
+public enum CFBorrowedChordPreset: String, CaseIterable, Codable {
+    case diatonicOnly
+    case conservative
+    case colorful
+    case cinematic
+    case jazz
+    case experimental
+    case everything
+
+    public func displayName() -> String {
+        switch self {
+        case .diatonicOnly: return "Diatonic Only"
+        case .conservative: return "Conservative"
+        case .colorful: return "Colorful"
+        case .cinematic: return "Cinematic"
+        case .jazz: return "Jazz"
+        case .experimental: return "Experimental"
+        case .everything: return "Everything"
+        }
+    }
 }
 
 public enum CFChordQuality: String, CaseIterable, Codable {

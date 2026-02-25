@@ -71,7 +71,7 @@ public final class ChordFlowMIDIProcessorAudioUnit: AUAudioUnit {
             unit: .indexed,
             unitName: nil,
             flags: [.flag_IsWritable, .flag_IsReadable],
-            valueStrings: CFScaleMode.allCases.map(\ .rawValue),
+            valueStrings: CFScaleMode.allCases.map { $0.displayName() },
             dependentParameters: nil
         )
 

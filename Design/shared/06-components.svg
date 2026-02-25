@@ -1,0 +1,468 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1400" width="1200" height="1400">
+  <defs>
+    <radialGradient id="glow-tonic" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#F5A623" stop-opacity="0.5"/>
+      <stop offset="100%" stop-color="#F5A623" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glow-dom" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#4A90D9" stop-opacity="0.5"/>
+      <stop offset="100%" stop-color="#4A90D9" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glow-sub" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#7ED321" stop-opacity="0.5"/>
+      <stop offset="100%" stop-color="#7ED321" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glow-bor" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#D94A8C" stop-opacity="0.5"/>
+      <stop offset="100%" stop-color="#D94A8C" stop-opacity="0"/>
+    </radialGradient>
+    <style>
+      text { font-family: -apple-system, 'SF Pro Rounded', 'Helvetica Neue', sans-serif; }
+    </style>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="1400" fill="#131425"/>
+
+  <!-- Title -->
+  <text x="40" y="52" fill="#F0F0F5" font-size="28" font-weight="700">Component Library</text>
+  <text x="40" y="76" fill="#8B8DA3" font-size="14" font-weight="500">Reusable elements for Harmonic Orbit UI</text>
+  <line x1="40" y1="96" x2="1160" y2="96" stroke="#3A3D5C" stroke-width="1"/>
+
+  <!-- ════════════════════════════════════════ -->
+  <!-- SECTION 1: Chord Nodes (Circle of Fifths) -->
+  <!-- ════════════════════════════════════════ -->
+  <text x="40" y="136" fill="#F0F0F5" font-size="18" font-weight="600">Chord Nodes</text>
+  <text x="195" y="136" fill="#6B6D82" font-size="12">Used on the Circle of Fifths — inner ring for diatonic, outer ring for notes</text>
+
+  <!-- Tonic nodes -->
+  <g transform="translate(60, 160)">
+    <text x="28" y="0" fill="#8B8DA3" font-size="10" text-anchor="middle" font-weight="500">TONIC</text>
+
+    <!-- Default -->
+    <circle cx="28" cy="38" r="24" fill="#F5A623" opacity="0.15" stroke="#F5A623" stroke-width="1.5"/>
+    <text x="28" y="34" fill="#F5A623" font-size="10" text-anchor="middle" font-weight="700">I</text>
+    <text x="28" y="48" fill="#F5A623" font-size="9" text-anchor="middle">Cmaj7</text>
+    <text x="28" y="80" fill="#6B6D82" font-size="9" text-anchor="middle">Default</text>
+
+    <!-- Selected -->
+    <circle cx="100" cy="38" r="32" fill="url(#glow-tonic)"/>
+    <circle cx="100" cy="38" r="24" fill="#F5A623" opacity="0.3" stroke="#F5A623" stroke-width="2"/>
+    <text x="100" y="34" fill="#F5A623" font-size="10" text-anchor="middle" font-weight="700">I</text>
+    <text x="100" y="48" fill="#F5A623" font-size="9" text-anchor="middle">Cmaj7</text>
+    <text x="100" y="80" fill="#6B6D82" font-size="9" text-anchor="middle">Selected</text>
+
+    <!-- Playing -->
+    <circle cx="172" cy="38" r="32" fill="url(#glow-tonic)"/>
+    <circle cx="172" cy="38" r="24" fill="#F5A623" stroke="#F5A623" stroke-width="2"/>
+    <text x="172" y="34" fill="#1A1B2E" font-size="10" text-anchor="middle" font-weight="700">I</text>
+    <text x="172" y="48" fill="#1A1B2E" font-size="9" text-anchor="middle">Cmaj7</text>
+    <text x="172" y="80" fill="#6B6D82" font-size="9" text-anchor="middle">Playing</text>
+  </g>
+
+  <!-- Dominant nodes -->
+  <g transform="translate(310, 160)">
+    <text x="28" y="0" fill="#8B8DA3" font-size="10" text-anchor="middle" font-weight="500">DOMINANT</text>
+
+    <circle cx="28" cy="38" r="24" fill="#4A90D9" opacity="0.15" stroke="#4A90D9" stroke-width="1.5"/>
+    <text x="28" y="34" fill="#4A90D9" font-size="10" text-anchor="middle" font-weight="700">V</text>
+    <text x="28" y="48" fill="#4A90D9" font-size="9" text-anchor="middle">G7</text>
+    <text x="28" y="80" fill="#6B6D82" font-size="9" text-anchor="middle">Default</text>
+
+    <circle cx="100" cy="38" r="32" fill="url(#glow-dom)"/>
+    <circle cx="100" cy="38" r="24" fill="#4A90D9" opacity="0.3" stroke="#4A90D9" stroke-width="2"/>
+    <text x="100" y="34" fill="#4A90D9" font-size="10" text-anchor="middle" font-weight="700">V</text>
+    <text x="100" y="48" fill="#4A90D9" font-size="9" text-anchor="middle">G7</text>
+    <text x="100" y="80" fill="#6B6D82" font-size="9" text-anchor="middle">Selected</text>
+
+    <circle cx="172" cy="38" r="32" fill="url(#glow-dom)"/>
+    <circle cx="172" cy="38" r="24" fill="#4A90D9" stroke="#4A90D9" stroke-width="2"/>
+    <text x="172" y="34" fill="#1A1B2E" font-size="10" text-anchor="middle" font-weight="700">V</text>
+    <text x="172" y="48" fill="#1A1B2E" font-size="9" text-anchor="middle">G7</text>
+    <text x="172" y="80" fill="#6B6D82" font-size="9" text-anchor="middle">Playing</text>
+  </g>
+
+  <!-- Subdominant nodes -->
+  <g transform="translate(560, 160)">
+    <text x="28" y="0" fill="#8B8DA3" font-size="10" text-anchor="middle" font-weight="500">SUBDOMINANT</text>
+
+    <circle cx="28" cy="38" r="24" fill="#7ED321" opacity="0.15" stroke="#7ED321" stroke-width="1.5"/>
+    <text x="28" y="34" fill="#7ED321" font-size="10" text-anchor="middle" font-weight="700">IV</text>
+    <text x="28" y="48" fill="#7ED321" font-size="9" text-anchor="middle">Fmaj7</text>
+    <text x="28" y="80" fill="#6B6D82" font-size="9" text-anchor="middle">Default</text>
+
+    <circle cx="100" cy="38" r="32" fill="url(#glow-sub)"/>
+    <circle cx="100" cy="38" r="24" fill="#7ED321" opacity="0.3" stroke="#7ED321" stroke-width="2"/>
+    <text x="100" y="34" fill="#7ED321" font-size="10" text-anchor="middle" font-weight="700">IV</text>
+    <text x="100" y="48" fill="#7ED321" font-size="9" text-anchor="middle">Fmaj7</text>
+    <text x="100" y="80" fill="#6B6D82" font-size="9" text-anchor="middle">Selected</text>
+
+    <circle cx="172" cy="38" r="32" fill="url(#glow-sub)"/>
+    <circle cx="172" cy="38" r="24" fill="#7ED321" stroke="#7ED321" stroke-width="2"/>
+    <text x="172" y="34" fill="#1A1B2E" font-size="10" text-anchor="middle" font-weight="700">IV</text>
+    <text x="172" y="48" fill="#1A1B2E" font-size="9" text-anchor="middle">Fmaj7</text>
+    <text x="172" y="80" fill="#6B6D82" font-size="9" text-anchor="middle">Playing</text>
+  </g>
+
+  <!-- Borrowed nodes -->
+  <g transform="translate(810, 160)">
+    <text x="28" y="0" fill="#8B8DA3" font-size="10" text-anchor="middle" font-weight="500">BORROWED</text>
+
+    <circle cx="28" cy="38" r="24" fill="#D94A8C" opacity="0.1" stroke="#D94A8C" stroke-width="1" stroke-dasharray="4 3"/>
+    <text x="28" y="34" fill="#D94A8C" font-size="10" text-anchor="middle" font-weight="700">bVI</text>
+    <text x="28" y="48" fill="#D94A8C" font-size="9" text-anchor="middle" opacity="0.7">Ab</text>
+    <text x="28" y="80" fill="#6B6D82" font-size="9" text-anchor="middle">Default</text>
+
+    <circle cx="100" cy="38" r="32" fill="url(#glow-bor)"/>
+    <circle cx="100" cy="38" r="24" fill="#D94A8C" opacity="0.25" stroke="#D94A8C" stroke-width="2"/>
+    <text x="100" y="34" fill="#D94A8C" font-size="10" text-anchor="middle" font-weight="700">bVI</text>
+    <text x="100" y="48" fill="#D94A8C" font-size="9" text-anchor="middle">Ab</text>
+    <text x="100" y="80" fill="#6B6D82" font-size="9" text-anchor="middle">Selected</text>
+
+    <circle cx="172" cy="38" r="32" fill="url(#glow-bor)"/>
+    <circle cx="172" cy="38" r="24" fill="#D94A8C" stroke="#D94A8C" stroke-width="2"/>
+    <text x="172" y="34" fill="#F0F0F5" font-size="10" text-anchor="middle" font-weight="700">bVI</text>
+    <text x="172" y="48" fill="#F0F0F5" font-size="9" text-anchor="middle">Ab</text>
+    <text x="172" y="80" fill="#6B6D82" font-size="9" text-anchor="middle">Playing</text>
+  </g>
+
+  <!-- Note nodes (outer ring) -->
+  <g transform="translate(1030, 160)">
+    <text x="40" y="0" fill="#8B8DA3" font-size="10" text-anchor="middle" font-weight="500">NOTE RING</text>
+
+    <circle cx="15" cy="38" r="18" fill="#252740" stroke="#3A3D5C" stroke-width="1"/>
+    <text x="15" y="42" fill="#8B8DA3" font-size="11" text-anchor="middle" font-weight="600">G</text>
+    <text x="15" y="72" fill="#6B6D82" font-size="9" text-anchor="middle">Idle</text>
+
+    <circle cx="65" cy="38" r="18" fill="#F5A623" opacity="0.2" stroke="#F5A623" stroke-width="2"/>
+    <text x="65" y="42" fill="#F5A623" font-size="11" text-anchor="middle" font-weight="700">C</text>
+    <text x="65" y="72" fill="#6B6D82" font-size="9" text-anchor="middle">Active key</text>
+  </g>
+
+  <!-- ════════════════════════════════════════ -->
+  <!-- SECTION 2: Timeline Blocks               -->
+  <!-- ════════════════════════════════════════ -->
+  <line x1="40" y1="290" x2="1160" y2="290" stroke="#3A3D5C" stroke-width="0.5"/>
+  <text x="40" y="324" fill="#F0F0F5" font-size="18" font-weight="600">Timeline Blocks</text>
+  <text x="220" y="324" fill="#6B6D82" font-size="12">Width proportional to beat length. Background grid at 1-beat intervals.</text>
+
+  <!-- Beat grid reference -->
+  <g transform="translate(40, 344)">
+    <!-- Grid bg -->
+    <rect width="1100" height="70" rx="8" fill="#1A1B2E" stroke="#3A3D5C" stroke-width="1"/>
+    <!-- Beat lines (assuming 40px per beat) -->
+    <line x1="40" y1="0" x2="40" y2="70" stroke="#252740" stroke-width="1"/>
+    <line x1="80" y1="0" x2="80" y2="70" stroke="#252740" stroke-width="1"/>
+    <line x1="120" y1="0" x2="120" y2="70" stroke="#252740" stroke-width="1"/>
+    <line x1="160" y1="0" x2="160" y2="70" stroke="#3A3D5C" stroke-width="1"/>
+    <line x1="200" y1="0" x2="200" y2="70" stroke="#252740" stroke-width="1"/>
+    <line x1="240" y1="0" x2="240" y2="70" stroke="#252740" stroke-width="1"/>
+    <line x1="280" y1="0" x2="280" y2="70" stroke="#252740" stroke-width="1"/>
+    <line x1="320" y1="0" x2="320" y2="70" stroke="#3A3D5C" stroke-width="1"/>
+    <line x1="360" y1="0" x2="360" y2="70" stroke="#252740" stroke-width="1"/>
+    <line x1="400" y1="0" x2="400" y2="70" stroke="#252740" stroke-width="1"/>
+    <line x1="440" y1="0" x2="440" y2="70" stroke="#252740" stroke-width="1"/>
+    <line x1="480" y1="0" x2="480" y2="70" stroke="#3A3D5C" stroke-width="1"/>
+    <line x1="520" y1="0" x2="520" y2="70" stroke="#252740" stroke-width="1"/>
+    <line x1="560" y1="0" x2="560" y2="70" stroke="#252740" stroke-width="1"/>
+    <line x1="600" y1="0" x2="600" y2="70" stroke="#252740" stroke-width="1"/>
+    <line x1="640" y1="0" x2="640" y2="70" stroke="#3A3D5C" stroke-width="1"/>
+
+    <!-- 4-beat blocks -->
+    <rect x="4" y="8" width="152" height="54" rx="8" fill="#F5A623" opacity="0.12" stroke="#F5A623" stroke-width="1.5"/>
+    <text x="80" y="32" fill="#F5A623" font-size="14" text-anchor="middle" font-weight="600">Cmaj7</text>
+    <text x="80" y="48" fill="#F5A623" font-size="9" text-anchor="middle" opacity="0.6">I — 4 beats</text>
+
+    <rect x="164" y="8" width="152" height="54" rx="8" fill="#F5A623" opacity="0.12" stroke="#F5A623" stroke-width="1.5"/>
+    <text x="240" y="32" fill="#F5A623" font-size="14" text-anchor="middle" font-weight="600">Am7</text>
+    <text x="240" y="48" fill="#F5A623" font-size="9" text-anchor="middle" opacity="0.6">vi — 4 beats</text>
+
+    <rect x="324" y="8" width="152" height="54" rx="8" fill="#7ED321" opacity="0.12" stroke="#7ED321" stroke-width="1.5"/>
+    <text x="400" y="32" fill="#7ED321" font-size="14" text-anchor="middle" font-weight="600">Fmaj7</text>
+    <text x="400" y="48" fill="#7ED321" font-size="9" text-anchor="middle" opacity="0.6">IV — 4 beats</text>
+
+    <rect x="484" y="8" width="152" height="54" rx="8" fill="#4A90D9" opacity="0.12" stroke="#4A90D9" stroke-width="1.5"/>
+    <text x="560" y="32" fill="#4A90D9" font-size="14" text-anchor="middle" font-weight="600">G7</text>
+    <text x="560" y="48" fill="#4A90D9" font-size="9" text-anchor="middle" opacity="0.6">V — 4 beats</text>
+
+    <!-- Playback cursor -->
+    <line x1="380" y1="4" x2="380" y2="66" stroke="#F0F0F5" stroke-width="2" opacity="0.9"/>
+    <circle cx="380" cy="4" r="3" fill="#F0F0F5"/>
+  </g>
+
+  <!-- Variable widths -->
+  <g transform="translate(40, 440)">
+    <text x="0" y="0" fill="#8B8DA3" font-size="10" font-weight="500">VARIABLE BEAT LENGTHS</text>
+
+    <rect x="0" y="14" width="72" height="44" rx="8" fill="#F5A623" opacity="0.12" stroke="#F5A623" stroke-width="1.5"/>
+    <text x="36" y="38" fill="#F5A623" font-size="12" text-anchor="middle" font-weight="600">Cmaj7</text>
+    <text x="36" y="72" fill="#6B6D82" font-size="9" text-anchor="middle">2 beats</text>
+
+    <rect x="92" y="14" width="152" height="44" rx="8" fill="#7ED321" opacity="0.12" stroke="#7ED321" stroke-width="1.5"/>
+    <text x="168" y="38" fill="#7ED321" font-size="12" text-anchor="middle" font-weight="600">Fmaj7</text>
+    <text x="168" y="72" fill="#6B6D82" font-size="9" text-anchor="middle">4 beats</text>
+
+    <rect x="264" y="14" width="312" height="44" rx="8" fill="#4A90D9" opacity="0.12" stroke="#4A90D9" stroke-width="1.5"/>
+    <text x="420" y="38" fill="#4A90D9" font-size="12" text-anchor="middle" font-weight="600">G7</text>
+    <text x="420" y="72" fill="#6B6D82" font-size="9" text-anchor="middle">8 beats</text>
+
+    <!-- Borrowed block -->
+    <rect x="596" y="14" width="152" height="44" rx="8" fill="#D94A8C" opacity="0.1" stroke="#D94A8C" stroke-width="1.5" stroke-dasharray="6 3"/>
+    <text x="672" y="38" fill="#D94A8C" font-size="12" text-anchor="middle" font-weight="600">Abmaj7</text>
+    <text x="672" y="72" fill="#6B6D82" font-size="9" text-anchor="middle">Borrowed — 4 beats</text>
+  </g>
+
+  <!-- ════════════════════════════════════════ -->
+  <!-- SECTION 3: Controls                      -->
+  <!-- ════════════════════════════════════════ -->
+  <line x1="40" y1="530" x2="1160" y2="530" stroke="#3A3D5C" stroke-width="0.5"/>
+  <text x="40" y="564" fill="#F0F0F5" font-size="18" font-weight="600">Controls</text>
+
+  <!-- Knob control -->
+  <g transform="translate(60, 584)">
+    <text x="36" y="0" fill="#8B8DA3" font-size="10" text-anchor="middle" font-weight="500">KNOB</text>
+
+    <!-- Tension knob -->
+    <circle cx="36" cy="50" r="28" fill="#252740" stroke="#3A3D5C" stroke-width="1.5"/>
+    <!-- Arc track -->
+    <path d="M 16.2 70.2 A 28 28 0 1 1 55.8 70.2" fill="none" stroke="#3A3D5C" stroke-width="3" stroke-linecap="round"/>
+    <!-- Arc fill (about 60%) -->
+    <path d="M 16.2 70.2 A 28 28 0 1 1 49 25" fill="none" stroke="#F5A623" stroke-width="3" stroke-linecap="round"/>
+    <!-- Dot indicator -->
+    <circle cx="49" cy="25" r="4" fill="#F5A623"/>
+    <text x="36" y="54" fill="#F0F0F5" font-size="11" text-anchor="middle" font-weight="600">0.6</text>
+    <text x="36" y="96" fill="#8B8DA3" font-size="10" text-anchor="middle">TENSION</text>
+  </g>
+
+  <g transform="translate(170, 584)">
+    <!-- Swing knob -->
+    <circle cx="36" cy="50" r="28" fill="#252740" stroke="#3A3D5C" stroke-width="1.5"/>
+    <path d="M 16.2 70.2 A 28 28 0 1 1 55.8 70.2" fill="none" stroke="#3A3D5C" stroke-width="3" stroke-linecap="round"/>
+    <path d="M 16.2 70.2 A 28 28 0 0 1 22 30" fill="none" stroke="#4A90D9" stroke-width="3" stroke-linecap="round"/>
+    <circle cx="22" cy="30" r="4" fill="#4A90D9"/>
+    <text x="36" y="54" fill="#F0F0F5" font-size="11" text-anchor="middle" font-weight="600">0.2</text>
+    <text x="36" y="96" fill="#8B8DA3" font-size="10" text-anchor="middle">SWING</text>
+  </g>
+
+  <g transform="translate(280, 584)">
+    <!-- Tempo knob -->
+    <circle cx="36" cy="50" r="28" fill="#252740" stroke="#3A3D5C" stroke-width="1.5"/>
+    <path d="M 16.2 70.2 A 28 28 0 1 1 55.8 70.2" fill="none" stroke="#3A3D5C" stroke-width="3" stroke-linecap="round"/>
+    <path d="M 16.2 70.2 A 28 28 0 1 1 36 22" fill="none" stroke="#7ED321" stroke-width="3" stroke-linecap="round"/>
+    <circle cx="36" cy="22" r="4" fill="#7ED321"/>
+    <text x="36" y="54" fill="#F0F0F5" font-size="11" text-anchor="middle" font-weight="600">120</text>
+    <text x="36" y="96" fill="#8B8DA3" font-size="10" text-anchor="middle">BPM</text>
+  </g>
+
+  <!-- Borrowed preset selector -->
+  <g transform="translate(440, 584)">
+    <text x="0" y="0" fill="#8B8DA3" font-size="10" font-weight="500">PRESET PILLS</text>
+
+    <rect x="0" y="16" width="70" height="28" rx="14" fill="#D94A8C" opacity="0.2" stroke="#D94A8C" stroke-width="1.5"/>
+    <text x="35" y="34" fill="#D94A8C" font-size="11" text-anchor="middle" font-weight="600">Jazz</text>
+
+    <rect x="80" y="16" width="88" height="28" rx="14" fill="#252740" stroke="#3A3D5C" stroke-width="1"/>
+    <text x="124" y="34" fill="#8B8DA3" font-size="11" text-anchor="middle">Cinematic</text>
+
+    <rect x="178" y="16" width="72" height="28" rx="14" fill="#252740" stroke="#3A3D5C" stroke-width="1"/>
+    <text x="214" y="34" fill="#8B8DA3" font-size="11" text-anchor="middle">Pop</text>
+
+    <rect x="260" y="16" width="86" height="28" rx="14" fill="#252740" stroke="#3A3D5C" stroke-width="1"/>
+    <text x="303" y="34" fill="#8B8DA3" font-size="11" text-anchor="middle">Neo-Soul</text>
+
+    <text x="0" y="66" fill="#6B6D82" font-size="9">Active pill uses function color fill. Inactive uses surface + border.</text>
+  </g>
+
+  <!-- ════════════════════════════════════════ -->
+  <!-- SECTION 4: Buttons                       -->
+  <!-- ════════════════════════════════════════ -->
+  <line x1="40" y1="720" x2="1160" y2="720" stroke="#3A3D5C" stroke-width="0.5"/>
+  <text x="40" y="754" fill="#F0F0F5" font-size="18" font-weight="600">Buttons</text>
+
+  <g transform="translate(40, 774)">
+    <!-- Primary -->
+    <rect width="120" height="44" rx="12" fill="#F5A623"/>
+    <text x="60" y="27" fill="#1A1B2E" font-size="14" text-anchor="middle" font-weight="600">Add Chord</text>
+    <text x="60" y="60" fill="#6B6D82" font-size="9" text-anchor="middle">Primary</text>
+
+    <!-- Secondary -->
+    <rect x="140" width="120" height="44" rx="12" fill="#252740" stroke="#3A3D5C" stroke-width="1.5"/>
+    <text x="200" y="27" fill="#F0F0F5" font-size="14" text-anchor="middle" font-weight="500">Duplicate</text>
+    <text x="200" y="60" fill="#6B6D82" font-size="9" text-anchor="middle">Secondary</text>
+
+    <!-- Destructive -->
+    <rect x="280" width="120" height="44" rx="12" fill="#E8435A" opacity="0.15" stroke="#E8435A" stroke-width="1.5"/>
+    <text x="340" y="27" fill="#E8435A" font-size="14" text-anchor="middle" font-weight="500">Remove</text>
+    <text x="340" y="60" fill="#6B6D82" font-size="9" text-anchor="middle">Destructive</text>
+
+    <!-- Icon button -->
+    <rect x="420" width="44" height="44" rx="12" fill="#252740" stroke="#3A3D5C" stroke-width="1.5"/>
+    <!-- Speaker icon -->
+    <polygon points="432,790 438,786 438,802 432,798" fill="#8B8DA3" transform="translate(0,-774)"/>
+    <line x1="440" y1="788" x2="444" y2="788" stroke="#8B8DA3" stroke-width="1.5" stroke-linecap="round" transform="translate(0,-774)"/>
+    <line x1="440" y1="792" x2="446" y2="792" stroke="#8B8DA3" stroke-width="1.5" stroke-linecap="round" transform="translate(0,-774)"/>
+    <line x1="440" y1="796" x2="444" y2="796" stroke="#8B8DA3" stroke-width="1.5" stroke-linecap="round" transform="translate(0,-774)"/>
+    <text x="442" y="60" fill="#6B6D82" font-size="9" text-anchor="middle">Icon</text>
+  </g>
+
+  <!-- Play/Stop button -->
+  <g transform="translate(540, 774)">
+    <!-- Play -->
+    <circle cx="24" cy="22" r="22" fill="#F5A623"/>
+    <polygon points="18,12 18,32 34,22" fill="#1A1B2E"/>
+    <text x="24" y="60" fill="#6B6D82" font-size="9" text-anchor="middle">Play</text>
+
+    <!-- Stop -->
+    <circle cx="86" cy="22" r="22" fill="#E8435A"/>
+    <rect x="76" y="12" width="20" height="20" rx="3" fill="#F0F0F5"/>
+    <text x="86" y="60" fill="#6B6D82" font-size="9" text-anchor="middle">Stop</text>
+  </g>
+
+  <!-- Toggle pills -->
+  <g transform="translate(700, 774)">
+    <text x="0" y="0" fill="#8B8DA3" font-size="10" font-weight="500">EXTENSION TOGGLES</text>
+
+    <rect x="0" y="14" width="52" height="30" rx="8" fill="#F5A623" opacity="0.2" stroke="#F5A623" stroke-width="1.5"/>
+    <text x="26" y="34" fill="#F5A623" font-size="12" text-anchor="middle" font-weight="600">7th</text>
+
+    <rect x="62" y="14" width="52" height="30" rx="8" fill="#F5A623" opacity="0.2" stroke="#F5A623" stroke-width="1.5"/>
+    <text x="88" y="34" fill="#F5A623" font-size="12" text-anchor="middle" font-weight="600">9th</text>
+
+    <rect x="124" y="14" width="52" height="30" rx="8" fill="#252740" stroke="#3A3D5C" stroke-width="1"/>
+    <text x="150" y="34" fill="#6B6D82" font-size="12" text-anchor="middle">11th</text>
+
+    <rect x="186" y="14" width="52" height="30" rx="8" fill="#252740" stroke="#3A3D5C" stroke-width="1"/>
+    <text x="212" y="34" fill="#6B6D82" font-size="12" text-anchor="middle">13th</text>
+
+    <text x="0" y="66" fill="#6B6D82" font-size="9">Active = function color fill. Inactive = surface + border.</text>
+  </g>
+
+  <!-- ════════════════════════════════════════ -->
+  <!-- SECTION 5: Suggestion Card               -->
+  <!-- ════════════════════════════════════════ -->
+  <line x1="40" y1="870" x2="1160" y2="870" stroke="#3A3D5C" stroke-width="0.5"/>
+  <text x="40" y="904" fill="#F0F0F5" font-size="18" font-weight="600">Suggestion Card</text>
+  <text x="220" y="904" fill="#6B6D82" font-size="12">Ranked chord suggestions with multi-reason explanation</text>
+
+  <!-- Card 1 — top suggestion -->
+  <g transform="translate(40, 924)">
+    <rect width="340" height="110" rx="12" fill="#252740" stroke="#F5A623" stroke-width="1.5"/>
+    <!-- Rank badge -->
+    <circle cx="28" cy="28" r="14" fill="#F5A623" opacity="0.2"/>
+    <text x="28" y="33" fill="#F5A623" font-size="12" text-anchor="middle" font-weight="700">1</text>
+    <!-- Chord info -->
+    <text x="52" y="32" fill="#F5A623" font-size="17" font-weight="600">Cmaj7</text>
+    <text x="120" y="32" fill="#F5A623" font-size="12" opacity="0.6">I — Tonic</text>
+    <!-- Confidence bar -->
+    <rect x="52" y="44" width="270" height="4" rx="2" fill="#3A3D5C"/>
+    <rect x="52" y="44" width="248" height="4" rx="2" fill="#F5A623" opacity="0.6"/>
+    <!-- Reason pills -->
+    <rect x="52" y="60" width="110" height="22" rx="11" fill="#F5A623" opacity="0.1"/>
+    <text x="107" y="75" fill="#F5A623" font-size="10" text-anchor="middle">Strong resolution</text>
+    <rect x="170" y="60" width="120" height="22" rx="11" fill="#F5A623" opacity="0.1"/>
+    <text x="230" y="75" fill="#F5A623" font-size="10" text-anchor="middle">Smooth voice leading</text>
+
+    <text x="170" y="130" fill="#6B6D82" font-size="9" text-anchor="middle">Top-ranked suggestion — prominent border, full confidence bar</text>
+  </g>
+
+  <!-- Card 2 — secondary suggestion -->
+  <g transform="translate(420, 924)">
+    <rect width="340" height="110" rx="12" fill="#252740" stroke="#3A3D5C" stroke-width="1"/>
+    <circle cx="28" cy="28" r="14" fill="#3A3D5C"/>
+    <text x="28" y="33" fill="#8B8DA3" font-size="12" text-anchor="middle" font-weight="700">3</text>
+    <text x="52" y="32" fill="#7ED321" font-size="17" font-weight="600">Dm7</text>
+    <text x="108" y="32" fill="#7ED321" font-size="12" opacity="0.6">ii — Subdominant</text>
+    <rect x="52" y="44" width="270" height="4" rx="2" fill="#3A3D5C"/>
+    <rect x="52" y="44" width="162" height="4" rx="2" fill="#7ED321" opacity="0.6"/>
+    <rect x="52" y="60" width="98" height="22" rx="11" fill="#7ED321" opacity="0.1"/>
+    <text x="101" y="75" fill="#7ED321" font-size="10" text-anchor="middle">Passing chord</text>
+    <rect x="158" y="60" width="78" height="22" rx="11" fill="#7ED321" opacity="0.1"/>
+    <text x="197" y="75" fill="#7ED321" font-size="10" text-anchor="middle">Jazz idiom</text>
+
+    <text x="170" y="130" fill="#6B6D82" font-size="9" text-anchor="middle">Lower-ranked — default border, shorter confidence bar</text>
+  </g>
+
+  <!-- Borrowed suggestion -->
+  <g transform="translate(800, 924)">
+    <rect width="340" height="110" rx="12" fill="#252740" stroke="#D94A8C" stroke-width="1" stroke-dasharray="6 3"/>
+    <circle cx="28" cy="28" r="14" fill="#D94A8C" opacity="0.2"/>
+    <text x="28" y="33" fill="#D94A8C" font-size="12" text-anchor="middle" font-weight="700">5</text>
+    <text x="52" y="32" fill="#D94A8C" font-size="17" font-weight="600">Abmaj7</text>
+    <text x="132" y="32" fill="#D94A8C" font-size="12" opacity="0.6">bVI — Borrowed</text>
+    <rect x="52" y="44" width="270" height="4" rx="2" fill="#3A3D5C"/>
+    <rect x="52" y="44" width="108" height="4" rx="2" fill="#D94A8C" opacity="0.6"/>
+    <rect x="52" y="60" width="118" height="22" rx="11" fill="#D94A8C" opacity="0.1"/>
+    <text x="111" y="75" fill="#D94A8C" font-size="10" text-anchor="middle">Borrowed from minor</text>
+    <rect x="178" y="60" width="100" height="22" rx="11" fill="#D94A8C" opacity="0.1"/>
+    <text x="228" y="75" fill="#D94A8C" font-size="10" text-anchor="middle">Cinematic color</text>
+
+    <text x="170" y="130" fill="#6B6D82" font-size="9" text-anchor="middle">Borrowed suggestion — dashed border, magenta color</text>
+  </g>
+
+  <!-- ════════════════════════════════════════ -->
+  <!-- SECTION 6: Playback Bar + Tab Bar        -->
+  <!-- ════════════════════════════════════════ -->
+  <line x1="40" y1="1090" x2="1160" y2="1090" stroke="#3A3D5C" stroke-width="0.5"/>
+  <text x="40" y="1124" fill="#F0F0F5" font-size="18" font-weight="600">Playback Bar</text>
+
+  <!-- Stopped state -->
+  <g transform="translate(40, 1144)">
+    <rect width="340" height="56" rx="12" fill="#252740" stroke="#3A3D5C" stroke-width="1"/>
+    <!-- Play button -->
+    <circle cx="32" cy="28" r="18" fill="#F5A623"/>
+    <polygon points="27,18 27,38 41,28" fill="#1A1B2E"/>
+    <!-- Status -->
+    <text x="62" y="24" fill="#F0F0F5" font-size="13" font-weight="500">Ready</text>
+    <text x="62" y="40" fill="#8B8DA3" font-size="11">4 chords  |  16 beats</text>
+    <!-- BPM -->
+    <text x="310" y="32" fill="#8B8DA3" font-size="13" text-anchor="end" font-family="'SF Mono', monospace" font-weight="500">120 BPM</text>
+
+    <text x="170" y="74" fill="#6B6D82" font-size="9" text-anchor="middle">Stopped state</text>
+  </g>
+
+  <!-- Playing state -->
+  <g transform="translate(420, 1144)">
+    <rect width="340" height="56" rx="12" fill="#252740" stroke="#F5A623" stroke-width="1.5"/>
+    <!-- Stop button -->
+    <circle cx="32" cy="28" r="18" fill="#E8435A"/>
+    <rect x="23" y="19" width="18" height="18" rx="3" fill="#F0F0F5"/>
+    <!-- Status -->
+    <text x="62" y="24" fill="#F5A623" font-size="13" font-weight="500">Playing</text>
+    <text x="62" y="40" fill="#8B8DA3" font-size="11">Bar 3 of 4  |  Beat 2</text>
+    <!-- BPM -->
+    <text x="310" y="32" fill="#F5A623" font-size="13" text-anchor="end" font-family="'SF Mono', monospace" font-weight="500">120 BPM</text>
+
+    <text x="170" y="74" fill="#6B6D82" font-size="9" text-anchor="middle">Playing state — accent border, stop button</text>
+  </g>
+
+  <!-- ════════════════════════════════════════ -->
+  <!-- Tab Bar                                  -->
+  <!-- ════════════════════════════════════════ -->
+  <text x="40" y="1280" fill="#F0F0F5" font-size="18" font-weight="600">Tab Bar</text>
+
+  <g transform="translate(40, 1300)">
+    <rect width="390" height="60" rx="0" fill="#0E0F1D"/>
+    <line x1="0" y1="0" x2="390" y2="0" stroke="#3A3D5C" stroke-width="0.5"/>
+
+    <!-- Compose tab (active) -->
+    <circle cx="65" cy="22" r="10" fill="none" stroke="#F5A623" stroke-width="1.5"/>
+    <circle cx="65" cy="22" r="4" fill="#F5A623"/>
+    <text x="65" y="46" fill="#F5A623" font-size="10" text-anchor="middle" font-weight="600">Compose</text>
+
+    <!-- Suggest tab -->
+    <circle cx="195" cy="18" r="6" fill="none" stroke="#6B6D82" stroke-width="1.5"/>
+    <line x1="195" y1="24" x2="195" y2="30" stroke="#6B6D82" stroke-width="1.5"/>
+    <text x="195" y="46" fill="#6B6D82" font-size="10" text-anchor="middle">Suggest</text>
+
+    <!-- Export tab -->
+    <rect x="320" y="14" width="12" height="12" rx="2" fill="none" stroke="#6B6D82" stroke-width="1.5"/>
+    <line x1="326" y1="14" x2="326" y2="8" stroke="#6B6D82" stroke-width="1.5"/>
+    <polyline points="322,12 326,8 330,12" fill="none" stroke="#6B6D82" stroke-width="1.5"/>
+    <text x="326" y="46" fill="#6B6D82" font-size="10" text-anchor="middle">Export</text>
+  </g>
+
+  <!-- Footer -->
+  <line x1="40" y1="1376" x2="1160" y2="1376" stroke="#3A3D5C" stroke-width="1"/>
+  <text x="40" y="1394" fill="#6B6D82" font-size="11">ChordFlow — Harmonic Orbit Design System v1.0</text>
+  <text x="1160" y="1394" fill="#6B6D82" font-size="11" text-anchor="end">Page 6 of 6</text>
+</svg>
