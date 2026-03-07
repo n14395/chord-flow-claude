@@ -1,4 +1,5 @@
 import SwiftUI
+import Combine
 import ChordFlowShared
 
 @MainActor
@@ -13,6 +14,7 @@ final class AppViewModel: ObservableObject {
     @Published var swing: Double = 0.2
     @Published var isPlaying = false
     @Published var isPreviewing = false
+    @Published var playbackProgress: Double = 0
     @Published var status = "Ready"
     @Published var selectedBlockIndex: Int?
     @Published var suggestions: [CFSuggestion] = []
@@ -22,19 +24,44 @@ final class AppViewModel: ObservableObject {
 
     private let playbackEngine = ProgressionPlaybackEngine()
     private let previewEngine = ProgressionPlaybackEngine()
+    private var progressTimer: AnyCancellable?
 
     // MARK: - Init
 
     init() {
         playbackEngine.onPlaybackStateChange = { [weak self] playing in
-            self?.isPlaying = playing
-            if !playing { self?.status = "Ready" }
+            guard let self else { return }
+            self.isPlaying = playing
+            if playing {
+                self.startProgressTimer()
+            } else {
+                self.stopProgressTimer()
+                self.status = "Ready"
+            }
         }
         previewEngine.onPlaybackStateChange = { [weak self] playing in
             self?.isPreviewing = playing
         }
         refreshChordButtons()
         refreshSuggestions()
+    }
+
+    // MARK: - Progress Timer
+
+    private func startProgressTimer() {
+        playbackProgress = 0
+        progressTimer = Timer.publish(every: 1.0 / 30.0, on: .main, in: .common)
+            .autoconnect()
+            .sink { [weak self] _ in
+                guard let self else { return }
+                self.playbackProgress = self.playbackEngine.progress
+            }
+    }
+
+    private func stopProgressTimer() {
+        progressTimer?.cancel()
+        progressTimer = nil
+        playbackProgress = 0
     }
 
     // MARK: - Chord Management
@@ -173,6 +200,17 @@ final class AppViewModel: ObservableObject {
 
     var keyDisplayName: String {
         "\(project.key.tonic.display()) \(project.key.mode.displayName())"
+    }
+
+    var currentBar: Int {
+        guard totalBeats > 0 else { return 1 }
+        let currentBeat = playbackProgress * Double(totalBeats)
+        var accumulated: Double = 0
+        for (i, block) in project.blocks.enumerated() {
+            accumulated += block.lengthBeats
+            if currentBeat < accumulated { return i + 1 }
+        }
+        return barCount
     }
 
     // MARK: - Harmonic Function Resolution

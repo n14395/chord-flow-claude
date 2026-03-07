@@ -189,19 +189,19 @@ struct TimelineView: View {
 
     private var playbackCursor: some View {
         let beatWidth: CGFloat = 22
-        // Simple animated cursor at approximate position
-        let totalBeats = vm.totalBeats
-        let midX = CGFloat(totalBeats) * beatWidth * 0.6 + 4
+        let totalWidth = CGFloat(vm.totalBeats) * beatWidth
+        let cursorX = 4 + vm.playbackProgress * totalWidth
 
         return VStack(spacing: 0) {
             Circle()
-                .fill(Color.cfTextPrimary)
+                .fill(Color.cfTonic)
                 .frame(width: 6, height: 6)
             Rectangle()
-                .fill(Color.cfTextPrimary.opacity(0.9))
+                .fill(Color.cfTonic.opacity(0.9))
                 .frame(width: 2, height: blockHeight + barNumberHeight)
         }
-        .offset(x: midX, y: 4)
+        .offset(x: cursorX, y: 4)
+        .animation(.linear(duration: 1.0 / 30.0), value: vm.playbackProgress)
     }
 
     // MARK: - Pattern Indicators

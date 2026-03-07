@@ -52,6 +52,17 @@ private final class ActiveNoteStore {
 final class ProgressionPlaybackEngine {
     var onPlaybackStateChange: ((Bool) -> Void)?
 
+    // Timing info exposed for UI playhead
+    private(set) var startTime: CFAbsoluteTime = 0
+    private(set) var duration: Double = 0
+
+    /// Returns 0...1 progress fraction, or 0 when not playing.
+    var progress: Double {
+        guard duration > 0 else { return 0 }
+        let elapsed = CFAbsoluteTimeGetCurrent() - startTime
+        return min(max(elapsed / duration, 0), 1)
+    }
+
     private let audioEngine = AVAudioEngine()
     private let noteStore = ActiveNoteStore()
     private let schedulerQueue = DispatchQueue(label: "com.nwf.chordflow.playback", qos: .userInitiated)
@@ -64,8 +75,6 @@ final class ProgressionPlaybackEngine {
         guard !events.isEmpty else { return }
         prepareAudioIfNeeded()
         guard audioEngine.isRunning else { return }
-
-        onPlaybackStateChange?(true)
 
         let secondsPerTick = 60.0 / max(1.0, tempo) / Double(max(1, ppq))
         var longestEnd: Double = 0
@@ -88,10 +97,17 @@ final class ProgressionPlaybackEngine {
             schedulerQueue.asyncAfter(deadline: .now() + offTime, execute: noteOff)
         }
 
+        // Store timing info before firing state change
+        startTime = CFAbsoluteTimeGetCurrent()
+        duration = longestEnd
+
+        onPlaybackStateChange?(true)
+
         let finish = DispatchWorkItem { [weak self] in
             guard let self else { return }
             self.noteStore.clear()
             Task { @MainActor in
+                self.duration = 0
                 self.onPlaybackStateChange?(false)
             }
         }
@@ -105,6 +121,7 @@ final class ProgressionPlaybackEngine {
         }
         scheduledItems.removeAll()
         noteStore.clear()
+        duration = 0
         onPlaybackStateChange?(false)
     }
 

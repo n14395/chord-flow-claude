@@ -8,18 +8,20 @@ struct PlaybackBarView: View {
             // Progress bar
             if vm.isPlaying {
                 GeometryReader { geo in
+                    let barWidth = geo.size.width * vm.playbackProgress
                     ZStack(alignment: .leading) {
                         RoundedRectangle(cornerRadius: 1.5)
                             .fill(Color.cfSurface)
                             .frame(height: 3)
                         RoundedRectangle(cornerRadius: 1.5)
                             .fill(Color.cfTonic.opacity(0.7))
-                            .frame(width: geo.size.width * 0.56, height: 3)
+                            .frame(width: barWidth, height: 3)
                         Circle()
                             .fill(Color.cfTonic)
                             .frame(width: 10, height: 10)
-                            .offset(x: geo.size.width * 0.56 - 5)
+                            .offset(x: barWidth - 5)
                     }
+                    .animation(.linear(duration: 1.0 / 30.0), value: vm.playbackProgress)
                 }
                 .frame(height: 10)
                 .padding(.horizontal, CFSpacing.spacious)
@@ -85,7 +87,7 @@ struct PlaybackBarView: View {
             return "No chords"
         }
         if vm.isPlaying {
-            return "Bar \(vm.barCount) of \(vm.barCount)  |  \(vm.totalBeats) beats"
+            return "Bar \(vm.currentBar) of \(vm.barCount)  |  \(vm.totalBeats) beats"
         }
         return "\(vm.barCount) chords  |  \(vm.totalBeats) beats"
     }
