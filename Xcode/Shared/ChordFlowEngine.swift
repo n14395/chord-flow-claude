@@ -284,7 +284,8 @@ public enum ChordFlowEngine {
             let startBeat = Double(block.barStart * 4) + block.beatStart
             let startTick = Int(startBeat * Double(ppq))
             let duration = Int(block.lengthBeats * Double(ppq))
-            let tones = chordTones(block.chord)
+            let rawTones = chordTones(block.chord)
+            let tones = rawTones.map { UInt8(min(max(Int($0) + block.octaveShift * 12, 0), 127)) }
             switch block.pattern {
             case .block:
                 for tone in tones {

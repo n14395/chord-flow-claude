@@ -147,6 +147,7 @@ public struct CFSequenceBlock: Codable, Equatable, Identifiable {
     public var lengthBeats: Double
     public var chord: CFChord
     public var pattern: CFPattern
+    public var octaveShift: Int
 
     public init(
         id: UUID = UUID(),
@@ -154,7 +155,8 @@ public struct CFSequenceBlock: Codable, Equatable, Identifiable {
         beatStart: Double,
         lengthBeats: Double,
         chord: CFChord,
-        pattern: CFPattern = .block
+        pattern: CFPattern = .block,
+        octaveShift: Int = 0
     ) {
         self.id = id
         self.barStart = barStart
@@ -162,6 +164,7 @@ public struct CFSequenceBlock: Codable, Equatable, Identifiable {
         self.lengthBeats = lengthBeats
         self.chord = chord
         self.pattern = pattern
+        self.octaveShift = min(max(octaveShift, -3), 3)
     }
 }
 

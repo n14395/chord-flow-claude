@@ -28,6 +28,7 @@ struct ChordDetailPanel: View {
             patternSelector
             lengthSelector
             extensionToggles
+            octaveSelector
             voicingPreview
             actionButtons
         }
@@ -231,46 +232,101 @@ struct ChordDetailPanel: View {
 
     private var extensionToggles: some View {
         VStack(alignment: .leading, spacing: CFSpacing.tight) {
-            Text("EXTENSIONS")
+            Text("TENSION")
+                .font(.cfCaption)
+                .foregroundStyle(isActive ? Color.cfTextSecondary : Color.cfTextTertiary)
+                .textCase(.uppercase)
+
+            HStack(spacing: CFSpacing.tight) {
+                tensionPill("Triad", add7: false, add9: false)
+                tensionPill("7th", add7: true, add9: false)
+                tensionPill("9th", add7: true, add9: true)
+            }
+        }
+    }
+
+    private func tensionPill(_ label: String, add7: Bool, add9: Bool) -> some View {
+        let isSelected = block?.chord.add7 == add7 && block?.chord.add9 == add9
+        return Button {
+            guard isActive else { return }
+            vm.updateBlockExtensions(add7: add7, add9: add9, at: blockIndex)
+        } label: {
+            Text(label)
+                .font(.system(size: 11, weight: isSelected ? .semibold : .regular, design: .rounded))
+                .foregroundStyle(isActive && isSelected ? color : Color.cfTextTertiary)
+                .frame(maxWidth: .infinity)
+                .frame(height: 30)
+                .background(
+                    RoundedRectangle(cornerRadius: CFRadius.button)
+                        .fill(isActive && isSelected ? color.opacity(0.15) : Color.cfBackground)
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: CFRadius.button)
+                        .stroke(isActive && isSelected ? color : Color.cfBorder,
+                                lineWidth: isActive && isSelected ? 1.5 : 1)
+                )
+        }
+        .buttonStyle(.plain)
+        .disabled(!isActive)
+    }
+
+    // MARK: - Octave Selector
+
+    private var octaveSelector: some View {
+        VStack(alignment: .leading, spacing: CFSpacing.tight) {
+            Text("OCTAVE")
                 .font(.cfCaption)
                 .foregroundStyle(isActive ? Color.cfTextSecondary : Color.cfTextTertiary)
                 .textCase(.uppercase)
 
             HStack(spacing: CFSpacing.compact) {
-                extensionToggle("7th", isOn: block?.chord.add7 == true) {
-                    guard let block else { return }
-                    vm.updateBlockExtensions(add7: !block.chord.add7, add9: block.chord.add9, at: blockIndex)
+                Button {
+                    guard isActive, let block else { return }
+                    vm.updateBlockOctave(block.octaveShift - 1, at: blockIndex)
+                } label: {
+                    Image(systemName: "chevron.down")
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundStyle(isActive ? color : Color.cfTextTertiary)
+                        .frame(width: 40, height: 30)
+                        .background(
+                            RoundedRectangle(cornerRadius: CFRadius.button)
+                                .fill(isActive ? color.opacity(0.08) : Color.cfBackground)
+                                .strokeBorder(isActive ? color.opacity(0.5) : Color.cfBorder, lineWidth: 1)
+                        )
                 }
-                extensionToggle("9th", isOn: block?.chord.add9 == true) {
-                    guard let block else { return }
-                    vm.updateBlockExtensions(add7: block.chord.add7, add9: !block.chord.add9, at: blockIndex)
+                .buttonStyle(.plain)
+                .disabled(!isActive || (block?.octaveShift ?? 0) <= -3)
+
+                Text(octaveLabel)
+                    .font(.system(size: 13, weight: .semibold, design: .rounded))
+                    .foregroundStyle(isActive ? color : Color.cfTextTertiary)
+                    .frame(width: 48, height: 30)
+
+                Button {
+                    guard isActive, let block else { return }
+                    vm.updateBlockOctave(block.octaveShift + 1, at: blockIndex)
+                } label: {
+                    Image(systemName: "chevron.up")
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundStyle(isActive ? color : Color.cfTextTertiary)
+                        .frame(width: 40, height: 30)
+                        .background(
+                            RoundedRectangle(cornerRadius: CFRadius.button)
+                                .fill(isActive ? color.opacity(0.08) : Color.cfBackground)
+                                .strokeBorder(isActive ? color.opacity(0.5) : Color.cfBorder, lineWidth: 1)
+                        )
                 }
-                extensionToggle("11th", isOn: false) { }
-                    .opacity(0.5)
-                extensionToggle("13th", isOn: false) { }
-                    .opacity(0.5)
+                .buttonStyle(.plain)
+                .disabled(!isActive || (block?.octaveShift ?? 0) >= 3)
             }
         }
     }
 
-    private func extensionToggle(_ label: String, isOn: Bool, action: @escaping () -> Void) -> some View {
-        Button(action: action) {
-            Text(label)
-                .font(.system(size: 11, weight: isOn ? .semibold : .regular, design: .rounded))
-                .foregroundStyle(isActive && isOn ? color : Color.cfTextTertiary)
-                .frame(width: 48, height: 30)
-                .background(
-                    RoundedRectangle(cornerRadius: CFRadius.button)
-                        .fill(isActive && isOn ? color.opacity(0.15) : Color.cfBackground)
-                )
-                .overlay(
-                    RoundedRectangle(cornerRadius: CFRadius.button)
-                        .stroke(isActive && isOn ? color : Color.cfBorder,
-                                lineWidth: isActive && isOn ? 1.5 : 1)
-                )
-        }
-        .buttonStyle(.plain)
-        .disabled(!isActive)
+    private var octaveLabel: String {
+        guard let block else { return "0" }
+        let shift = block.octaveShift
+        if shift == 0 { return "0" }
+        return shift > 0 ? "+\(shift)" : "\(shift)"
     }
 
     // MARK: - Voicing Preview

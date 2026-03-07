@@ -9,9 +9,9 @@ final class AppViewModel: ObservableObject {
 
     @Published var project = CFProjectDocument()
     @Published var chordButtons: [CFChordButton] = []
-    @Published var tension: Double = 0.6
+    @Published var tension: Double = 0.5
+    @Published var defaultOctave: Int = 0
     @Published var borrowedPreset: CFBorrowedChordPreset = .jazz
-    @Published var swing: Double = 0.2
     @Published var isPlaying = false
     @Published var isPreviewing = false
     @Published var playbackProgress: Double = 0
@@ -80,7 +80,8 @@ final class AppViewModel: ObservableObject {
             beatStart: 0,
             lengthBeats: 4,
             chord: chord,
-            pattern: .block
+            pattern: .block,
+            octaveShift: defaultOctave
         )
         project.blocks.append(block)
         selectedBlockIndex = project.blocks.count - 1
@@ -128,6 +129,11 @@ final class AppViewModel: ObservableObject {
         project.blocks[index].chord.add9 = add9
     }
 
+    func updateBlockOctave(_ shift: Int, at index: Int) {
+        guard project.blocks.indices.contains(index) else { return }
+        project.blocks[index].octaveShift = min(max(shift, -3), 3)
+    }
+
     // MARK: - Suggestions
 
     func refreshSuggestions() {
@@ -154,7 +160,7 @@ final class AppViewModel: ObservableObject {
         var preview = block
         preview.barStart = 0
         preview.beatStart = 0
-        let events = ChordFlowEngine.render(blocks: [preview], swing: swing)
+        let events = ChordFlowEngine.render(blocks: [preview], swing: 0)
         previewEngine.play(events: events, tempo: project.tempo)
     }
 
@@ -168,7 +174,8 @@ final class AppViewModel: ObservableObject {
             status = "Add chords to play"
             return
         }
-        let events = ChordFlowEngine.render(blocks: project.blocks, swing: swing)
+        let sequenced = sequencedBlocks(project.blocks)
+        let events = ChordFlowEngine.render(blocks: sequenced, swing: 0)
         playbackEngine.play(events: events, tempo: project.tempo)
         status = "Playing \(project.blocks.count) chord(s) at \(Int(project.tempo.rounded())) BPM"
     }
@@ -176,7 +183,7 @@ final class AppViewModel: ObservableObject {
     // MARK: - Export
 
     func exportMIDI() {
-        let events = ChordFlowEngine.render(blocks: project.blocks, swing: swing)
+        let events = ChordFlowEngine.render(blocks: sequencedBlocks(project.blocks), swing: 0)
         let data = MIDIFileWriter.export(events: events)
         let url = URL.documentsDirectory.appending(path: "ChordFlow-Export.mid")
         do {
@@ -198,6 +205,22 @@ final class AppViewModel: ObservableObject {
     }
 
     // MARK: - Computed Helpers
+
+    /// Recalculates barStart/beatStart so blocks are sequenced consecutively
+    /// based on their actual lengthBeats, instead of assuming 4 beats per bar.
+    private func sequencedBlocks(_ blocks: [CFSequenceBlock]) -> [CFSequenceBlock] {
+        var result: [CFSequenceBlock] = []
+        var currentBeat: Double = 0
+        for var block in blocks {
+            let bar = Int(currentBeat / 4)
+            let beat = currentBeat - Double(bar * 4)
+            block.barStart = bar
+            block.beatStart = beat
+            result.append(block)
+            currentBeat += block.lengthBeats
+        }
+        return result
+    }
 
     var totalBeats: Int {
         project.blocks.reduce(0) { $0 + Int($1.lengthBeats) }

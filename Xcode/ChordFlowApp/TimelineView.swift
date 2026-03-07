@@ -7,6 +7,8 @@ struct TimelineView: View {
 
     private let blockHeight: CGFloat = 56
     private let barNumberHeight: CGFloat = 18
+    private let barsBeforeScroll = 6
+    private let gridPadding: CGFloat = 8
 
     var body: some View {
         VStack(alignment: .leading, spacing: CFSpacing.tight) {
@@ -27,14 +29,28 @@ struct TimelineView: View {
             if vm.project.blocks.isEmpty {
                 emptyState
             } else {
-                timelineContent
+                GeometryReader { geo in
+                    let beatWidth = beatWidth(for: geo.size.width)
+                    timelineContent(beatWidth: beatWidth)
+                }
+                .frame(height: blockHeight + barNumberHeight + 24)
             }
 
             // Pattern indicators
             if !vm.project.blocks.isEmpty {
-                patternIndicators
+                GeometryReader { geo in
+                    let beatWidth = beatWidth(for: geo.size.width)
+                    patternIndicators(beatWidth: beatWidth)
+                }
+                .frame(height: 14)
             }
         }
+    }
+
+    /// Compute beat width so that `barsBeforeScroll` bars (each 4 beats) fit the available width.
+    private func beatWidth(for availableWidth: CGFloat) -> CGFloat {
+        let targetBeats = CGFloat(barsBeforeScroll * 4)
+        return max(16, (availableWidth - gridPadding) / targetBeats)
     }
 
     // MARK: - Empty State
@@ -53,19 +69,15 @@ struct TimelineView: View {
 
     // MARK: - Timeline Content
 
-    private var timelineContent: some View {
+    private func timelineContent(beatWidth: CGFloat) -> some View {
         ScrollViewReader { proxy in
             ScrollView(.horizontal, showsIndicators: false) {
                 ZStack(alignment: .topLeading) {
-                    // Background with beat grid
-                    beatGrid
+                    beatGrid(beatWidth: beatWidth)
+                    chordBlocks(beatWidth: beatWidth)
 
-                    // Chord blocks
-                    chordBlocks
-
-                    // Playback cursor (when playing)
                     if vm.isPlaying {
-                        playbackCursor
+                        playbackCursor(beatWidth: beatWidth)
                     }
                 }
                 .padding(.vertical, 4)
@@ -80,10 +92,9 @@ struct TimelineView: View {
 
     // MARK: - Beat Grid
 
-    private var beatGrid: some View {
-        let totalBeats = max(vm.totalBeats, 16)
-        let beatWidth: CGFloat = 22
-        let totalWidth = CGFloat(totalBeats) * beatWidth + 8
+    private func beatGrid(beatWidth: CGFloat) -> some View {
+        let totalBeats = max(vm.totalBeats, barsBeforeScroll * 4)
+        let totalWidth = CGFloat(totalBeats) * beatWidth + gridPadding
 
         return ZStack(alignment: .topLeading) {
             RoundedRectangle(cornerRadius: 10)
@@ -114,8 +125,7 @@ struct TimelineView: View {
 
     // MARK: - Chord Blocks
 
-    private var chordBlocks: some View {
-        let beatWidth: CGFloat = 22
+    private func chordBlocks(beatWidth: CGFloat) -> some View {
         return ForEach(Array(vm.project.blocks.enumerated()), id: \.element.id) { index, block in
             let function = vm.harmonicFunction(forBlockAt: index)
             let color = function.color
@@ -126,11 +136,10 @@ struct TimelineView: View {
             let width = CGFloat(beats) * beatWidth - blockPad * 2
             let isBorrowed = function == .borrowed
 
-            ZStack(alignment: .topTrailing) {
+            ZStack {
                 // Background
                 RoundedRectangle(cornerRadius: CFRadius.button)
                     .fill(color.opacity(0.12))
-                    .frame(width: width, height: blockHeight)
                 RoundedRectangle(cornerRadius: CFRadius.button)
                     .stroke(
                         color,
@@ -138,46 +147,48 @@ struct TimelineView: View {
                             ? StrokeStyle(lineWidth: 1.5, dash: [6, 3])
                             : StrokeStyle(lineWidth: 1.5)
                     )
-                    .frame(width: width, height: blockHeight)
 
-                // Chord label (bottom half, centered)
-                VStack(spacing: 2) {
-                    Text(block.chord.symbol())
-                        .font(.system(size: 14, weight: .semibold, design: .rounded))
-                        .foregroundStyle(color)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.6)
-                    Text(vm.romanNumeral(for: block.chord))
-                        .font(.system(size: 9, weight: .regular, design: .rounded))
-                        .foregroundStyle(color.opacity(0.5))
-                }
-                .frame(width: width, height: blockHeight)
-                .padding(.top, 6)
+                VStack(spacing: 0) {
+                    // Top half: play button on right, empty tap area on left
+                    HStack(spacing: 0) {
+                        Color.clear
+                            .contentShape(Rectangle())
+                            .onTapGesture { onBlockTap?(index) }
 
-                // Play button (top-right, top half)
-                Button {
-                    vm.previewBlock(block)
-                } label: {
-                    Image(systemName: "play.fill")
-                        .font(.system(size: 10))
-                        .foregroundStyle(color.opacity(0.7))
-                        .frame(width: width / 2, height: blockHeight / 2)
-                        .background(color.opacity(0.08))
+                        Button {
+                            vm.previewBlock(block)
+                        } label: {
+                            Image(systemName: "play.fill")
+                                .font(.system(size: 10))
+                                .foregroundStyle(color.opacity(0.7))
+                                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                                .background(color.opacity(0.08))
+                                .contentShape(Rectangle())
+                        }
+                        .buttonStyle(.plain)
+                    }
+                    .frame(height: blockHeight / 2)
+
+                    // Bottom half: chord label, taps for selection
+                    VStack(spacing: 2) {
+                        Text(block.chord.symbol())
+                            .font(.system(size: 14, weight: .semibold, design: .rounded))
+                            .foregroundStyle(color)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.6)
+                        Text(vm.romanNumeral(for: block.chord))
+                            .font(.system(size: 9, weight: .regular, design: .rounded))
+                            .foregroundStyle(color.opacity(0.5))
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .contentShape(Rectangle())
+                    .onTapGesture { onBlockTap?(index) }
                 }
-                .buttonStyle(.plain)
-                .clipShape(UnevenRoundedRectangle(
-                    topLeadingRadius: 0,
-                    bottomLeadingRadius: CFRadius.button,
-                    bottomTrailingRadius: 0,
-                    topTrailingRadius: CFRadius.button
-                ))
             }
             .frame(width: width, height: blockHeight)
+            .clipShape(RoundedRectangle(cornerRadius: CFRadius.button))
             .id(block.id)
             .offset(x: x, y: barNumberHeight + 8)
-            .onTapGesture {
-                onBlockTap?(index)
-            }
             .contextMenu {
                 Button(role: .destructive) {
                     vm.removeBlock(at: index)
@@ -195,8 +206,7 @@ struct TimelineView: View {
 
     // MARK: - Playback Cursor
 
-    private var playbackCursor: some View {
-        let beatWidth: CGFloat = 22
+    private func playbackCursor(beatWidth: CGFloat) -> some View {
         let totalWidth = CGFloat(vm.totalBeats) * beatWidth
         let cursorX = 4 + vm.playbackProgress * totalWidth
 
@@ -214,9 +224,8 @@ struct TimelineView: View {
 
     // MARK: - Pattern Indicators
 
-    private var patternIndicators: some View {
-        let beatWidth: CGFloat = 22
-        return HStack(spacing: 0) {
+    private func patternIndicators(beatWidth: CGFloat) -> some View {
+        HStack(spacing: 0) {
             ForEach(Array(vm.project.blocks.enumerated()), id: \.element.id) { index, block in
                 let function = vm.harmonicFunction(forBlockAt: index)
                 let width = CGFloat(Int(block.lengthBeats)) * beatWidth - 4
