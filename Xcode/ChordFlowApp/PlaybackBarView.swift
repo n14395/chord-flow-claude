@@ -6,29 +6,6 @@ struct PlaybackBarView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            // Progress bar
-            if vm.isPlaying {
-                GeometryReader { geo in
-                    let barWidth = geo.size.width * vm.playbackProgress
-                    ZStack(alignment: .leading) {
-                        RoundedRectangle(cornerRadius: 1.5)
-                            .fill(Color.cfSurface)
-                            .frame(height: 3)
-                        RoundedRectangle(cornerRadius: 1.5)
-                            .fill(Color.cfTonic.opacity(0.7))
-                            .frame(width: barWidth, height: 3)
-                        Circle()
-                            .fill(Color.cfTonic)
-                            .frame(width: 10, height: 10)
-                            .offset(x: barWidth - 5)
-                    }
-                    .animation(.linear(duration: 1.0 / 30.0), value: vm.playbackProgress)
-                }
-                .frame(height: 10)
-                .padding(.horizontal, CFSpacing.spacious)
-                .padding(.top, CFSpacing.tight)
-            }
-
             // Main bar
             HStack(spacing: CFSpacing.compact) {
                 // Play / Stop button

@@ -7,6 +7,7 @@ struct TimelineView: View {
 
     private let blockHeight: CGFloat = 56
     private let barNumberHeight: CGFloat = 18
+    private let patternHeight: CGFloat = 14
     private let handleWidth: CGFloat = 20
     private let barsBeforeScroll: Double = 5.33
     private let gridPadding: CGFloat = 8
@@ -39,16 +40,7 @@ struct TimelineView: View {
                     let beatWidth = beatWidth(for: geo.size.width)
                     timelineContent(beatWidth: beatWidth)
                 }
-                .frame(height: blockHeight + barNumberHeight + 24)
-            }
-
-            // Pattern indicators
-            if !vm.project.blocks.isEmpty {
-                GeometryReader { geo in
-                    let beatWidth = beatWidth(for: geo.size.width)
-                    patternIndicators(beatWidth: beatWidth)
-                }
-                .frame(height: 14)
+                .frame(height: blockHeight + barNumberHeight + patternHeight + 28)
             }
         }
     }
@@ -78,20 +70,25 @@ struct TimelineView: View {
     private func timelineContent(beatWidth: CGFloat) -> some View {
         ScrollViewReader { proxy in
             ScrollView(.horizontal, showsIndicators: false) {
-                ZStack(alignment: .topLeading) {
-                    beatGrid(beatWidth: beatWidth)
+                VStack(spacing: 0) {
+                    ZStack(alignment: .topLeading) {
+                        beatGrid(beatWidth: beatWidth)
 
-                    // Invisible scroll anchors in an HStack so ScrollViewReader
-                    // can resolve each block's actual layout position.
-                    scrollAnchors(beatWidth: beatWidth)
+                        // Invisible scroll anchors in an HStack so ScrollViewReader
+                        // can resolve each block's actual layout position.
+                        scrollAnchors(beatWidth: beatWidth)
 
-                    chordBlocks(beatWidth: beatWidth)
+                        chordBlocks(beatWidth: beatWidth)
 
-                    if vm.isPlaying {
-                        playbackCursor(beatWidth: beatWidth)
+                        if vm.isPlaying {
+                            playbackCursor(beatWidth: beatWidth)
+                        }
                     }
+                    .padding(.vertical, 4)
+
+                    patternIndicators(beatWidth: beatWidth)
+                        .frame(height: patternHeight)
                 }
-                .padding(.vertical, 4)
             }
             .scrollDisabled(draggingBlockID != nil)
             .onChange(of: vm.project.blocks.count) { oldCount, newCount in
