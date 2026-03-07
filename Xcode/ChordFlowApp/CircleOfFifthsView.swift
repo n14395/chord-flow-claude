@@ -11,9 +11,12 @@ struct CircleOfFifthsView: View {
         GeometryReader { geo in
             let size = min(geo.size.width, geo.size.height)
             let center = CGPoint(x: geo.size.width / 2, y: size / 2)
-            let outerR = size * 0.38
-            let innerR = size * 0.20
-            let borrowedR = size * 0.50
+            // Radii scaled so borrowed ring + expanded plus button fits within size/2 from center.
+            // Borrowed max extent: borrowedR + nodeR(28) + plusOffset(18) + plusR(24) = borrowedR + 70
+            // Must be ≤ size/2, so borrowedR ≤ size * 0.5 - 70. For safety, use size * 0.38.
+            let outerR = size * 0.30
+            let innerR = size * 0.16
+            let borrowedR = size * 0.38
 
             ZStack {
                 // Subtle center glow
@@ -44,7 +47,7 @@ struct CircleOfFifthsView: View {
                 borrowedHints(center: center, radius: borrowedR)
 
                 // Center label
-                centerLabel(center: center)
+                centerLabel(center: center, innerRadius: innerR)
 
                 // Background tap to dismiss expanded chord
                 Color.clear
@@ -57,6 +60,7 @@ struct CircleOfFifthsView: View {
                         }
                     }
                     .allowsHitTesting(expandedChordID != nil)
+                    .zIndex(-1)
             }
         }
         .aspectRatio(1, contentMode: .fit)
@@ -71,7 +75,7 @@ struct CircleOfFifthsView: View {
             let angleDeg = CircleOfFifths.angle(for: position)
             let point = CircleOfFifths.point(center: center, radius: radius, angleDegrees: angleDeg)
             let isKey = note == vm.project.key.tonic
-            let nodeR: CGFloat = isKey ? 30 : 26
+            let nodeR: CGFloat = isKey ? 24 : 20
 
             ZStack {
                 if isKey {
@@ -91,7 +95,7 @@ struct CircleOfFifthsView: View {
                     .frame(width: nodeR * 2, height: nodeR * 2)
 
                 Text(CircleOfFifths.displayNames[position])
-                    .font(.system(size: isKey ? 22 : 18, weight: isKey ? .bold : .semibold, design: .rounded))
+                    .font(.system(size: isKey ? 17 : 14, weight: isKey ? .bold : .semibold, design: .rounded))
                     .foregroundStyle(isKey ? Color.cfTonic : noteTextColor(position: position))
             }
             .position(point)
@@ -112,23 +116,20 @@ struct CircleOfFifthsView: View {
             let notePosition = CircleOfFifths.position(for: button.chord.root.rawValue)
             let angleDeg = CircleOfFifths.angle(for: notePosition)
             let point = CircleOfFifths.point(center: center, radius: radius, angleDegrees: angleDeg)
-            let nodeR: CGFloat = 36
+            let nodeR: CGFloat = 26
             let color = function.color
             let isExpanded = expandedChordID == button.id
 
-            // Compute the inward offset direction for expansion
             let angleRad = angleDeg * .pi / 180
             let expandOffset: CGFloat = isExpanded ? nodeR * 0.7 : 0
             let expandX = -expandOffset * CGFloat(sin(angleRad))
             let expandY = expandOffset * CGFloat(cos(angleRad))
 
-            // Outward direction for the + button position
-            let plusOffset = nodeR + 20
+            let plusOffset = nodeR + 16
             let plusX = plusOffset * CGFloat(sin(angleRad))
             let plusY = -plusOffset * CGFloat(cos(angleRad))
 
             ZStack {
-                // The chord circle
                 Circle()
                     .fill(color.opacity(isExpanded ? 0.25 : 0.15))
                     .frame(width: nodeR * 2, height: nodeR * 2)
@@ -136,15 +137,14 @@ struct CircleOfFifthsView: View {
                     .stroke(color, lineWidth: isExpanded ? 2.5 : 2)
                     .frame(width: nodeR * 2, height: nodeR * 2)
 
-                VStack(spacing: 2) {
+                VStack(spacing: 1) {
                     Text(button.label)
-                        .font(.system(size: 15, weight: .bold, design: .rounded))
+                        .font(.system(size: 12, weight: .bold, design: .rounded))
                     Text(button.chord.symbol())
-                        .font(.system(size: 14, weight: .semibold, design: .rounded))
+                        .font(.system(size: 11, weight: .semibold, design: .rounded))
                 }
                 .foregroundStyle(color)
 
-                // + button (visible when expanded)
                 if isExpanded {
                     Button {
                         onChordTap?(button.chord)
@@ -155,9 +155,9 @@ struct CircleOfFifthsView: View {
                         ZStack {
                             Circle()
                                 .fill(color)
-                                .frame(width: 48, height: 48)
+                                .frame(width: 36, height: 36)
                             Image(systemName: "plus")
-                                .font(.system(size: 26, weight: .bold))
+                                .font(.system(size: 20, weight: .bold))
                                 .foregroundStyle(Color.cfBase)
                         }
                     }
@@ -167,7 +167,6 @@ struct CircleOfFifthsView: View {
                 }
             }
             .position(x: point.x + expandX, y: point.y + expandY)
-            .zIndex(isExpanded ? 10 : 0)
             .animation(.spring(response: 0.3, dampingFraction: 0.8), value: isExpanded)
             .onTapGesture {
                 if isExpanded {
@@ -181,6 +180,7 @@ struct CircleOfFifthsView: View {
                     }
                 }
             }
+            .zIndex(isExpanded ? 10 : 1)
         }
     }
 
@@ -247,7 +247,6 @@ struct CircleOfFifthsView: View {
                 }
             }
             .position(x: point.x + expandX, y: point.y + expandY)
-            .zIndex(isExpanded ? 10 : 0)
             .animation(.spring(response: 0.3, dampingFraction: 0.8), value: isExpanded)
             .onTapGesture {
                 if isExpanded {
@@ -261,20 +260,29 @@ struct CircleOfFifthsView: View {
                     }
                 }
             }
+            .zIndex(isExpanded ? 10 : 1)
         }
     }
 
     // MARK: - Center Label
 
-    private func centerLabel(center: CGPoint) -> some View {
-        VStack(spacing: 3) {
-            Text(vm.keyDisplayName)
-                .font(.system(size: 26, weight: .bold, design: .rounded))
+    private func centerLabel(center: CGPoint, innerRadius: CGFloat) -> some View {
+        let maxWidth = innerRadius * 1.5 // safe diameter within the inner chord ring
+        return VStack(spacing: 2) {
+            Text(vm.project.key.tonic.display())
+                .font(.system(size: 22, weight: .bold, design: .rounded))
                 .foregroundStyle(Color.cfTextPrimary)
+            Text(vm.project.key.mode.displayName())
+                .font(.system(size: 13, weight: .semibold, design: .rounded))
+                .foregroundStyle(Color.cfTextPrimary.opacity(0.85))
+                .multilineTextAlignment(.center)
+                .lineLimit(2)
+                .minimumScaleFactor(0.7)
             Text("Tap to change mode")
-                .font(.system(size: 13, weight: .regular, design: .rounded))
+                .font(.system(size: 10, weight: .regular, design: .rounded))
                 .foregroundStyle(Color.cfTextSecondary)
         }
+        .frame(maxWidth: maxWidth)
         .position(center)
         .onTapGesture {
             vm.showModeSheet = true

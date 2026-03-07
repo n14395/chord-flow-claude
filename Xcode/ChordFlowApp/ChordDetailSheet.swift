@@ -238,18 +238,21 @@ struct ChordDetailPanel: View {
                 .textCase(.uppercase)
 
             HStack(spacing: CFSpacing.tight) {
-                tensionPill("Triad", add7: false, add9: false)
-                tensionPill("7th", add7: true, add9: false)
-                tensionPill("9th", add7: true, add9: true)
+                tensionPill("Triad", add7: false, add9: false, add11: false, add13: false)
+                tensionPill("7th", add7: true, add9: false, add11: false, add13: false)
+                tensionPill("9th", add7: true, add9: true, add11: false, add13: false)
+                tensionPill("11th", add7: true, add9: true, add11: true, add13: false)
+                tensionPill("13th", add7: true, add9: true, add11: true, add13: true)
             }
         }
     }
 
-    private func tensionPill(_ label: String, add7: Bool, add9: Bool) -> some View {
+    private func tensionPill(_ label: String, add7: Bool, add9: Bool, add11: Bool, add13: Bool) -> some View {
         let isSelected = block?.chord.add7 == add7 && block?.chord.add9 == add9
+            && block?.chord.add11 == add11 && block?.chord.add13 == add13
         return Button {
             guard isActive else { return }
-            vm.updateBlockExtensions(add7: add7, add9: add9, at: blockIndex)
+            vm.updateBlockExtensions(add7: add7, add9: add9, add11: add11, add13: add13, at: blockIndex)
         } label: {
             Text(label)
                 .font(.system(size: 11, weight: isSelected ? .semibold : .regular, design: .rounded))

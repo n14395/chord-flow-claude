@@ -1,0 +1,159 @@
+{
+  "" : {
+    "diagnostics" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/ChordFlowApp-primary.dia",
+    "emit-module-dependencies" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/ChordFlowApp-primary-emit-module.d",
+    "emit-module-diagnostics" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/ChordFlowApp-primary-emit-module.dia",
+    "pch" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/ChordFlowApp-primary-Bridging-header.pch",
+    "swift-dependencies" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/ChordFlowApp-primary.swiftdeps"
+  },
+  "/Users/nwf/build/chord-flow-claude/Xcode/ChordFlowApp/AppViewModel.swift" : {
+    "const-values" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/AppViewModel.swiftconstvalues",
+    "dependencies" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/AppViewModel.d",
+    "diagnostics" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/AppViewModel.dia",
+    "index-unit-output-path" : "/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/AppViewModel.o",
+    "llvm-bc" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/AppViewModel.bc",
+    "object" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/AppViewModel.o",
+    "swift-dependencies" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/AppViewModel.swiftdeps",
+    "swiftmodule" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/AppViewModel~partial.swiftmodule"
+  },
+  "/Users/nwf/build/chord-flow-claude/Xcode/ChordFlowApp/ChordDetailSheet.swift" : {
+    "const-values" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/ChordDetailSheet.swiftconstvalues",
+    "dependencies" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/ChordDetailSheet.d",
+    "diagnostics" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/ChordDetailSheet.dia",
+    "index-unit-output-path" : "/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/ChordDetailSheet.o",
+    "llvm-bc" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/ChordDetailSheet.bc",
+    "object" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/ChordDetailSheet.o",
+    "swift-dependencies" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/ChordDetailSheet.swiftdeps",
+    "swiftmodule" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/ChordDetailSheet~partial.swiftmodule"
+  },
+  "/Users/nwf/build/chord-flow-claude/Xcode/ChordFlowApp/ChordFlowApp.swift" : {
+    "const-values" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/ChordFlowApp.swiftconstvalues",
+    "dependencies" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/ChordFlowApp.d",
+    "diagnostics" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/ChordFlowApp.dia",
+    "index-unit-output-path" : "/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/ChordFlowApp.o",
+    "llvm-bc" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/ChordFlowApp.bc",
+    "object" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/ChordFlowApp.o",
+    "swift-dependencies" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/ChordFlowApp.swiftdeps",
+    "swiftmodule" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/ChordFlowApp~partial.swiftmodule"
+  },
+  "/Users/nwf/build/chord-flow-claude/Xcode/ChordFlowApp/CircleOfFifthsView.swift" : {
+    "const-values" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/CircleOfFifthsView.swiftconstvalues",
+    "dependencies" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/CircleOfFifthsView.d",
+    "diagnostics" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/CircleOfFifthsView.dia",
+    "index-unit-output-path" : "/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/CircleOfFifthsView.o",
+    "llvm-bc" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/CircleOfFifthsView.bc",
+    "object" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/CircleOfFifthsView.o",
+    "swift-dependencies" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/CircleOfFifthsView.swiftdeps",
+    "swiftmodule" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/CircleOfFifthsView~partial.swiftmodule"
+  },
+  "/Users/nwf/build/chord-flow-claude/Xcode/ChordFlowApp/ComposeScreen.swift" : {
+    "const-values" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/ComposeScreen.swiftconstvalues",
+    "dependencies" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/ComposeScreen.d",
+    "diagnostics" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/ComposeScreen.dia",
+    "index-unit-output-path" : "/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/ComposeScreen.o",
+    "llvm-bc" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/ComposeScreen.bc",
+    "object" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/ComposeScreen.o",
+    "swift-dependencies" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/ComposeScreen.swiftdeps",
+    "swiftmodule" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/ComposeScreen~partial.swiftmodule"
+  },
+  "/Users/nwf/build/chord-flow-claude/Xcode/ChordFlowApp/DesignTokens.swift" : {
+    "const-values" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/DesignTokens.swiftconstvalues",
+    "dependencies" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/DesignTokens.d",
+    "diagnostics" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/DesignTokens.dia",
+    "index-unit-output-path" : "/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/DesignTokens.o",
+    "llvm-bc" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/DesignTokens.bc",
+    "object" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/DesignTokens.o",
+    "swift-dependencies" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/DesignTokens.swiftdeps",
+    "swiftmodule" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/DesignTokens~partial.swiftmodule"
+  },
+  "/Users/nwf/build/chord-flow-claude/Xcode/ChordFlowApp/ExportScreen.swift" : {
+    "const-values" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/ExportScreen.swiftconstvalues",
+    "dependencies" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/ExportScreen.d",
+    "diagnostics" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/ExportScreen.dia",
+    "index-unit-output-path" : "/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/ExportScreen.o",
+    "llvm-bc" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/ExportScreen.bc",
+    "object" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/ExportScreen.o",
+    "swift-dependencies" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/ExportScreen.swiftdeps",
+    "swiftmodule" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/ExportScreen~partial.swiftmodule"
+  },
+  "/Users/nwf/build/chord-flow-claude/Xcode/ChordFlowApp/KnobView.swift" : {
+    "const-values" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/KnobView.swiftconstvalues",
+    "dependencies" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/KnobView.d",
+    "diagnostics" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/KnobView.dia",
+    "index-unit-output-path" : "/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/KnobView.o",
+    "llvm-bc" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/KnobView.bc",
+    "object" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/KnobView.o",
+    "swift-dependencies" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/KnobView.swiftdeps",
+    "swiftmodule" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/KnobView~partial.swiftmodule"
+  },
+  "/Users/nwf/build/chord-flow-claude/Xcode/ChordFlowApp/PlaybackBarView.swift" : {
+    "const-values" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/PlaybackBarView.swiftconstvalues",
+    "dependencies" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/PlaybackBarView.d",
+    "diagnostics" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/PlaybackBarView.dia",
+    "index-unit-output-path" : "/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/PlaybackBarView.o",
+    "llvm-bc" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/PlaybackBarView.bc",
+    "object" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/PlaybackBarView.o",
+    "swift-dependencies" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/PlaybackBarView.swiftdeps",
+    "swiftmodule" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/PlaybackBarView~partial.swiftmodule"
+  },
+  "/Users/nwf/build/chord-flow-claude/Xcode/ChordFlowApp/ProgressionPlaybackEngine.swift" : {
+    "const-values" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/ProgressionPlaybackEngine.swiftconstvalues",
+    "dependencies" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/ProgressionPlaybackEngine.d",
+    "diagnostics" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/ProgressionPlaybackEngine.dia",
+    "index-unit-output-path" : "/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/ProgressionPlaybackEngine.o",
+    "llvm-bc" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/ProgressionPlaybackEngine.bc",
+    "object" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/ProgressionPlaybackEngine.o",
+    "swift-dependencies" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/ProgressionPlaybackEngine.swiftdeps",
+    "swiftmodule" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/ProgressionPlaybackEngine~partial.swiftmodule"
+  },
+  "/Users/nwf/build/chord-flow-claude/Xcode/ChordFlowApp/RootView.swift" : {
+    "const-values" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/RootView.swiftconstvalues",
+    "dependencies" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/RootView.d",
+    "diagnostics" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/RootView.dia",
+    "index-unit-output-path" : "/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/RootView.o",
+    "llvm-bc" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/RootView.bc",
+    "object" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/RootView.o",
+    "swift-dependencies" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/RootView.swiftdeps",
+    "swiftmodule" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/RootView~partial.swiftmodule"
+  },
+  "/Users/nwf/build/chord-flow-claude/Xcode/ChordFlowApp/RouteScreen.swift" : {
+    "const-values" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/RouteScreen.swiftconstvalues",
+    "dependencies" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/RouteScreen.d",
+    "diagnostics" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/RouteScreen.dia",
+    "index-unit-output-path" : "/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/RouteScreen.o",
+    "llvm-bc" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/RouteScreen.bc",
+    "object" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/RouteScreen.o",
+    "swift-dependencies" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/RouteScreen.swiftdeps",
+    "swiftmodule" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/RouteScreen~partial.swiftmodule"
+  },
+  "/Users/nwf/build/chord-flow-claude/Xcode/ChordFlowApp/SuggestScreen.swift" : {
+    "const-values" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/SuggestScreen.swiftconstvalues",
+    "dependencies" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/SuggestScreen.d",
+    "diagnostics" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/SuggestScreen.dia",
+    "index-unit-output-path" : "/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/SuggestScreen.o",
+    "llvm-bc" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/SuggestScreen.bc",
+    "object" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/SuggestScreen.o",
+    "swift-dependencies" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/SuggestScreen.swiftdeps",
+    "swiftmodule" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/SuggestScreen~partial.swiftmodule"
+  },
+  "/Users/nwf/build/chord-flow-claude/Xcode/ChordFlowApp/SuggestionCardView.swift" : {
+    "const-values" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/SuggestionCardView.swiftconstvalues",
+    "dependencies" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/SuggestionCardView.d",
+    "diagnostics" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/SuggestionCardView.dia",
+    "index-unit-output-path" : "/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/SuggestionCardView.o",
+    "llvm-bc" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/SuggestionCardView.bc",
+    "object" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/SuggestionCardView.o",
+    "swift-dependencies" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/SuggestionCardView.swiftdeps",
+    "swiftmodule" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/SuggestionCardView~partial.swiftmodule"
+  },
+  "/Users/nwf/build/chord-flow-claude/Xcode/ChordFlowApp/TimelineView.swift" : {
+    "const-values" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/TimelineView.swiftconstvalues",
+    "dependencies" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/TimelineView.d",
+    "diagnostics" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/TimelineView.dia",
+    "index-unit-output-path" : "/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/TimelineView.o",
+    "llvm-bc" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/TimelineView.bc",
+    "object" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/TimelineView.o",
+    "swift-dependencies" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/TimelineView.swiftdeps",
+    "swiftmodule" : "/Users/nwf/build/chord-flow-claude/Xcode/build/ChordFlow.build/Debug-iphoneos/ChordFlowApp.build/Objects-normal/arm64/TimelineView~partial.swiftmodule"
+  }
+}

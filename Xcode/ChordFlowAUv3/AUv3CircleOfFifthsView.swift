@@ -11,9 +11,9 @@ struct AUv3CircleOfFifthsView: View {
         GeometryReader { geo in
             let size = min(geo.size.width, geo.size.height)
             let center = CGPoint(x: geo.size.width / 2, y: size / 2)
-            let outerR = size * 0.38
-            let innerR = size * 0.20
-            let borrowedR = size * 0.50
+            let outerR = size * 0.30
+            let innerR = size * 0.16
+            let borrowedR = size * 0.38
 
             ZStack {
                 // Center glow

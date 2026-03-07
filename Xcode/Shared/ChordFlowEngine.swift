@@ -20,7 +20,7 @@ public enum ChordFlowEngine {
             if tension > 0.55 {
                 if chord.quality == .dominant { score += 0.06 }
             }
-            let adjusted = CFChord(root: chord.root, quality: chord.quality, add7: tension > 0.4, add9: tension > 0.7)
+            let adjusted = CFChord(root: chord.root, quality: chord.quality, add7: tension > 0.4, add9: tension > 0.55, add11: tension > 0.7, add13: tension > 0.85)
             return CFSuggestion(chord: adjusted, confidence: min(score, 1), why: reason(for: adjusted, key: key))
         }
         .sorted { $0.confidence > $1.confidence }
@@ -40,7 +40,7 @@ public enum ChordFlowEngine {
         var buttons: [CFChordButton] = triads.enumerated().map { idx, chord in
             let adjusted = CFChord(
                 root: chord.root, quality: chord.quality,
-                add7: tension > 0.4, add9: tension > 0.7
+                add7: tension > 0.4, add9: tension > 0.55, add11: tension > 0.7, add13: tension > 0.85
             )
             return CFChordButton(chord: adjusted, label: numerals[idx], isBorrowed: false)
         }
@@ -59,10 +59,12 @@ public enum ChordFlowEngine {
         preset: CFBorrowedChordPreset
     ) -> [CFChordButton] {
         let apply7 = tension > 0.4
-        let apply9 = tension > 0.7
+        let apply9 = tension > 0.55
+        let apply11 = tension > 0.7
+        let apply13 = tension > 0.85
         let make: (BorrowedSeed) -> CFChordButton = { seed in
             CFChordButton(
-                chord: CFChord(root: key.tonic.transposed(seed.offset), quality: seed.quality, add7: apply7, add9: apply9),
+                chord: CFChord(root: key.tonic.transposed(seed.offset), quality: seed.quality, add7: apply7, add9: apply9, add11: apply11, add13: apply13),
                 label: seed.label,
                 isBorrowed: true
             )
@@ -389,6 +391,8 @@ public enum ChordFlowEngine {
         }
         if chord.add7, !intervals.contains(10) { intervals.append(10) }
         if chord.add9 { intervals.append(14) }
+        if chord.add11 { intervals.append(17) }
+        if chord.add13 { intervals.append(21) }
         return intervals.map { UInt8(root + $0 + 60) }
     }
 
@@ -414,7 +418,18 @@ public enum ChordFlowEngine {
 
     private static func reason(for chord: CFChord, key: CFKeyContext) -> String {
         let function = romanFunction(chord: chord, key: key)
-        let color = chord.add9 ? "extended color" : (chord.add7 ? "classic seventh color" : "stable triad")
+        let color: String
+        if chord.add13 {
+            color = "rich thirteenth voicing"
+        } else if chord.add11 {
+            color = "suspended eleventh color"
+        } else if chord.add9 {
+            color = "extended color"
+        } else if chord.add7 {
+            color = "classic seventh color"
+        } else {
+            color = "stable triad"
+        }
         return "\(function) function with \(color)"
     }
 

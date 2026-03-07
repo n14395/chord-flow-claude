@@ -114,12 +114,16 @@ public struct CFChord: Codable, Equatable, Hashable {
     public var quality: CFChordQuality
     public var add7: Bool
     public var add9: Bool
+    public var add11: Bool
+    public var add13: Bool
 
-    public init(root: CFNote, quality: CFChordQuality, add7: Bool = false, add9: Bool = false) {
+    public init(root: CFNote, quality: CFChordQuality, add7: Bool = false, add9: Bool = false, add11: Bool = false, add13: Bool = false) {
         self.root = root
         self.quality = quality
         self.add7 = add7
         self.add9 = add9
+        self.add11 = add11
+        self.add13 = add13
     }
 
     public func symbol() -> String {
@@ -129,7 +133,19 @@ public struct CFChord: Codable, Equatable, Hashable {
         case .diminished: "dim"
         case .dominant: "7"
         }
-        let ext = (add7 && quality != .dominant ? "7" : "") + (add9 ? "9" : "")
+        // Show the highest extension as the chord label (e.g. Cmaj13 implies 7, 9, 11)
+        let ext: String
+        if add13 {
+            ext = (quality != .dominant ? "13" : "13")
+        } else if add11 {
+            ext = (quality != .dominant ? "11" : "11")
+        } else if add9 {
+            ext = (add7 && quality != .dominant ? "9" : "9")
+        } else if add7 && quality != .dominant {
+            ext = "7"
+        } else {
+            ext = ""
+        }
         return "\(root.display())\(q)\(ext)"
     }
 }

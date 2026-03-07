@@ -123,8 +123,10 @@ struct AUv3View: View {
     private var tensionSelector: some View {
         let levels: [(label: String, value: Float)] = [
             ("Triads", 0.2),
-            ("7ths", 0.5),
-            ("9ths", 0.8),
+            ("7ths", 0.45),
+            ("9ths", 0.6),
+            ("11ths", 0.75),
+            ("13ths", 0.9),
         ]
 
         return VStack(spacing: CFSpacing.micro) {

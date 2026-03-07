@@ -282,6 +282,8 @@ public final class ChordFlowMIDIProcessorAudioUnit: AUAudioUnit {
         }
         if chord.add7, !intervals.contains(10) { intervals.append(10) }
         if chord.add9 { intervals.append(14) }
+        if chord.add11 { intervals.append(17) }
+        if chord.add13 { intervals.append(21) }
         return intervals.map { UInt8(min(127, root + $0 + 60)) }
     }
 

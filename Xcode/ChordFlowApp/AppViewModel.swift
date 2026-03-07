@@ -182,10 +182,12 @@ final class AppViewModel: ObservableObject {
         autoSave()
     }
 
-    func updateBlockExtensions(add7: Bool, add9: Bool, at index: Int) {
+    func updateBlockExtensions(add7: Bool, add9: Bool, add11: Bool = false, add13: Bool = false, at index: Int) {
         guard project.blocks.indices.contains(index) else { return }
         project.blocks[index].chord.add7 = add7
         project.blocks[index].chord.add9 = add9
+        project.blocks[index].chord.add11 = add11
+        project.blocks[index].chord.add13 = add13
         autoSave()
     }
 
@@ -307,7 +309,16 @@ final class AppViewModel: ObservableObject {
         do {
             let data = try Data(contentsOf: Self.autoSaveURL)
             project = try ChordFlowEngine.decodeProject(data)
-            tension = project.blocks.isEmpty ? 0.5 : (project.blocks.first!.chord.add9 ? 0.8 : (project.blocks.first!.chord.add7 ? 0.5 : 0.2))
+            if project.blocks.isEmpty {
+                tension = 0.5
+            } else {
+                let c = project.blocks.first!.chord
+                if c.add13 { tension = 0.9 }
+                else if c.add11 { tension = 0.75 }
+                else if c.add9 { tension = 0.6 }
+                else if c.add7 { tension = 0.45 }
+                else { tension = 0.2 }
+            }
         } catch {
             status = "Could not restore session"
         }
@@ -495,6 +506,8 @@ final class AppViewModel: ObservableObject {
         }
         if chord.add7, !intervals.contains(10) { intervals.append(10) }
         if chord.add9 { intervals.append(14) }
+        if chord.add11 { intervals.append(17) }
+        if chord.add13 { intervals.append(21) }
         return intervals.map { UInt8(root + $0 + 60) }
     }
 
@@ -527,7 +540,11 @@ final class AppViewModel: ObservableObject {
         }
 
         // Extensions
-        if chord.add9 {
+        if chord.add13 {
+            pills.append("Rich thirteenth")
+        } else if chord.add11 {
+            pills.append("Eleventh color")
+        } else if chord.add9 {
             pills.append("Extended color")
         } else if chord.add7 {
             pills.append("Seventh color")

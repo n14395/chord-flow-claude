@@ -287,10 +287,12 @@ final class AUv3ViewModel: ObservableObject {
         syncProgressionToAU()
     }
 
-    func updateBlockExtensions(add7: Bool, add9: Bool, at index: Int) {
+    func updateBlockExtensions(add7: Bool, add9: Bool, add11: Bool = false, add13: Bool = false, at index: Int) {
         guard blocks.indices.contains(index) else { return }
         blocks[index].chord.add7 = add7
         blocks[index].chord.add9 = add9
+        blocks[index].chord.add11 = add11
+        blocks[index].chord.add13 = add13
         syncProgressionToAU()
     }
 
@@ -363,6 +365,8 @@ final class AUv3ViewModel: ObservableObject {
         }
         if chord.add7, !intervals.contains(10) { intervals.append(10) }
         if chord.add9 { intervals.append(14) }
+        if chord.add11 { intervals.append(17) }
+        if chord.add13 { intervals.append(21) }
         return intervals.map { UInt8(root + $0 + 60) }
     }
 
@@ -381,7 +385,9 @@ final class AUv3ViewModel: ObservableObject {
             if dist <= 2 { pills.append("Smooth voice leading") }
             if dist == 5 || dist == 7 { pills.append("Circle-of-fifths motion") }
         }
-        if chord.add9 { pills.append("Extended color") }
+        if chord.add13 { pills.append("Rich thirteenth") }
+        else if chord.add11 { pills.append("Eleventh color") }
+        else if chord.add9 { pills.append("Extended color") }
         else if chord.add7 { pills.append("Seventh color") }
         if suggestion.confidence > 0.8 { pills.append("Top resolution") }
         else if suggestion.confidence > 0.6 { pills.append("Voice leading") }

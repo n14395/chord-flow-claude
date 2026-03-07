@@ -7,7 +7,8 @@ struct TimelineView: View {
 
     private let blockHeight: CGFloat = 56
     private let barNumberHeight: CGFloat = 18
-    private let barsBeforeScroll = 6
+    private let handleWidth: CGFloat = 20
+    private let barsBeforeScroll = 4
     private let gridPadding: CGFloat = 8
 
     // Drag state
@@ -79,6 +80,11 @@ struct TimelineView: View {
             ScrollView(.horizontal, showsIndicators: false) {
                 ZStack(alignment: .topLeading) {
                     beatGrid(beatWidth: beatWidth)
+
+                    // Invisible scroll anchors in an HStack so ScrollViewReader
+                    // can resolve each block's actual layout position.
+                    scrollAnchors(beatWidth: beatWidth)
+
                     chordBlocks(beatWidth: beatWidth)
 
                     if vm.isPlaying {
@@ -93,6 +99,18 @@ struct TimelineView: View {
                 withAnimation { proxy.scrollTo(last.id, anchor: .trailing) }
             }
         }
+    }
+
+    private func scrollAnchors(beatWidth: CGFloat) -> some View {
+        HStack(spacing: 0) {
+            ForEach(vm.project.blocks) { block in
+                let beats = Int(block.lengthBeats)
+                Color.clear
+                    .frame(width: CGFloat(beats) * beatWidth, height: 1)
+                    .id(block.id)
+            }
+        }
+        .padding(.leading, 4)
     }
 
     // MARK: - Beat Grid
@@ -148,6 +166,8 @@ struct TimelineView: View {
                 index: index,
                 color: color,
                 width: width,
+                beatWidth: beatWidth,
+                blockPad: blockPad,
                 isBorrowed: isBorrowed
             )
             .frame(width: width, height: blockHeight)
@@ -155,89 +175,74 @@ struct TimelineView: View {
             .shadow(color: isDragging ? color.opacity(0.3) : .clear, radius: 8, x: 0, y: 4)
             .scaleEffect(isDragging ? 1.05 : 1.0)
             .opacity(isDragging ? 0.9 : 1.0)
-            .id(block.id)
             .offset(x: x + xOffset, y: barNumberHeight + 8)
             // Non-dragged blocks animate smoothly to new positions on reorder;
             // the dragged block must not animate (its position is driven by the gesture).
             .animation(isDragging ? nil : .interactiveSpring(response: 0.3, dampingFraction: 0.8), value: x)
             .zIndex(isDragging ? 100 : 0)
-            .gesture(
-                DragGesture(minimumDistance: 8)
-                    .onChanged { value in
-                        if draggingBlockID == nil {
-                            draggingBlockID = block.id
-                            dragSwapAccumulator = 0
-                        }
-                        guard draggingBlockID == block.id else { return }
+        }
+    }
 
-                        // The visual offset combines the raw gesture translation with
-                        // accumulated position shifts from past swaps.
-                        dragOffset = value.translation.width + dragSwapAccumulator
-
-                        // Find current index of the dragged block (may have shifted due to swaps)
-                        guard let currentIndex = vm.project.blocks.firstIndex(where: { $0.id == block.id }) else { return }
-
-                        // Compute the center x of the dragged block in its current position
-                        let currentStartBeat = vm.project.blocks[0..<currentIndex].reduce(0) { $0 + Int($1.lengthBeats) }
-                        let currentX = CGFloat(currentStartBeat) * beatWidth + 4 + blockPad
-                        let currentWidth = CGFloat(Int(vm.project.blocks[currentIndex].lengthBeats)) * beatWidth - blockPad * 2
-                        let draggedCenter = currentX + currentWidth / 2 + dragOffset
-
-                        // Check swap with left neighbor
-                        if currentIndex > 0 {
-                            let prevBeats = vm.project.blocks[0..<(currentIndex - 1)].reduce(0) { $0 + Int($1.lengthBeats) }
-                            let prevWidth = CGFloat(Int(vm.project.blocks[currentIndex - 1].lengthBeats)) * beatWidth - blockPad * 2
-                            let prevX = CGFloat(prevBeats) * beatWidth + 4 + blockPad
-                            let prevCenter = prevX + prevWidth / 2
-
-                            if draggedCenter < prevCenter {
-                                let prevBlockWidth = CGFloat(Int(vm.project.blocks[currentIndex - 1].lengthBeats)) * beatWidth
-                                vm.moveBlock(from: currentIndex, to: currentIndex - 1)
-                                // The block's "home" position shifted right by prevBlockWidth,
-                                // so compensate so the visual position stays under the finger.
-                                dragSwapAccumulator += prevBlockWidth
-                                dragOffset = value.translation.width + dragSwapAccumulator
-                                return
-                            }
-                        }
-
-                        // Check swap with right neighbor
-                        if currentIndex < vm.project.blocks.count - 1 {
-                            let nextStartBeat = vm.project.blocks[0..<(currentIndex + 1)].reduce(0) { $0 + Int($1.lengthBeats) }
-                            let nextWidth = CGFloat(Int(vm.project.blocks[currentIndex + 1].lengthBeats)) * beatWidth - blockPad * 2
-                            let nextX = CGFloat(nextStartBeat) * beatWidth + 4 + blockPad
-                            let nextCenter = nextX + nextWidth / 2
-
-                            if draggedCenter > nextCenter {
-                                let nextBlockWidth = CGFloat(Int(vm.project.blocks[currentIndex + 1].lengthBeats)) * beatWidth
-                                vm.moveBlock(from: currentIndex, to: currentIndex + 1)
-                                dragSwapAccumulator -= nextBlockWidth
-                                dragOffset = value.translation.width + dragSwapAccumulator
-                                return
-                            }
-                        }
-                    }
-                    .onEnded { _ in
-                        withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
-                            dragOffset = 0
-                            draggingBlockID = nil
-                        }
-                        dragSwapAccumulator = 0
-                    }
-            )
-            .contextMenu {
-                Button(role: .destructive) {
-                    vm.removeBlock(at: index)
-                } label: {
-                    Label("Remove", systemImage: "trash")
+    // Drag gesture for reordering, attached only to the handle area
+    private func reorderDragGesture(
+        block: CFSequenceBlock,
+        beatWidth: CGFloat,
+        blockPad: CGFloat
+    ) -> some Gesture {
+        DragGesture(minimumDistance: 8)
+            .onChanged { value in
+                if draggingBlockID == nil {
+                    draggingBlockID = block.id
+                    dragSwapAccumulator = 0
                 }
-                Button {
-                    vm.duplicateBlock(at: index)
-                } label: {
-                    Label("Duplicate", systemImage: "doc.on.doc")
+                guard draggingBlockID == block.id else { return }
+
+                dragOffset = value.translation.width + dragSwapAccumulator
+
+                guard let currentIndex = vm.project.blocks.firstIndex(where: { $0.id == block.id }) else { return }
+
+                let currentStartBeat = vm.project.blocks[0..<currentIndex].reduce(0) { $0 + Int($1.lengthBeats) }
+                let currentX = CGFloat(currentStartBeat) * beatWidth + 4 + blockPad
+                let currentWidth = CGFloat(Int(vm.project.blocks[currentIndex].lengthBeats)) * beatWidth - blockPad * 2
+                let draggedCenter = currentX + currentWidth / 2 + dragOffset
+
+                if currentIndex > 0 {
+                    let prevBeats = vm.project.blocks[0..<(currentIndex - 1)].reduce(0) { $0 + Int($1.lengthBeats) }
+                    let prevWidth = CGFloat(Int(vm.project.blocks[currentIndex - 1].lengthBeats)) * beatWidth - blockPad * 2
+                    let prevX = CGFloat(prevBeats) * beatWidth + 4 + blockPad
+                    let prevCenter = prevX + prevWidth / 2
+
+                    if draggedCenter < prevCenter {
+                        let prevBlockWidth = CGFloat(Int(vm.project.blocks[currentIndex - 1].lengthBeats)) * beatWidth
+                        vm.moveBlock(from: currentIndex, to: currentIndex - 1)
+                        dragSwapAccumulator += prevBlockWidth
+                        dragOffset = value.translation.width + dragSwapAccumulator
+                        return
+                    }
+                }
+
+                if currentIndex < vm.project.blocks.count - 1 {
+                    let nextStartBeat = vm.project.blocks[0..<(currentIndex + 1)].reduce(0) { $0 + Int($1.lengthBeats) }
+                    let nextWidth = CGFloat(Int(vm.project.blocks[currentIndex + 1].lengthBeats)) * beatWidth - blockPad * 2
+                    let nextX = CGFloat(nextStartBeat) * beatWidth + 4 + blockPad
+                    let nextCenter = nextX + nextWidth / 2
+
+                    if draggedCenter > nextCenter {
+                        let nextBlockWidth = CGFloat(Int(vm.project.blocks[currentIndex + 1].lengthBeats)) * beatWidth
+                        vm.moveBlock(from: currentIndex, to: currentIndex + 1)
+                        dragSwapAccumulator -= nextBlockWidth
+                        dragOffset = value.translation.width + dragSwapAccumulator
+                        return
+                    }
                 }
             }
-        }
+            .onEnded { _ in
+                withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                    dragOffset = 0
+                    draggingBlockID = nil
+                }
+                dragSwapAccumulator = 0
+            }
     }
 
     // MARK: - Chord Block View
@@ -247,9 +252,13 @@ struct TimelineView: View {
         index: Int,
         color: Color,
         width: CGFloat,
+        beatWidth: CGFloat,
+        blockPad: CGFloat,
         isBorrowed: Bool
     ) -> some View {
         let isDragging = draggingBlockID == block.id
+        let isNarrow = Int(block.lengthBeats) == 1
+        let playWidth: CGFloat = max(width * 0.28, 28)
         return ZStack {
             // Background
             RoundedRectangle(cornerRadius: CFRadius.button)
@@ -262,47 +271,115 @@ struct TimelineView: View {
                         : StrokeStyle(lineWidth: 1.5)
                 )
 
-            VStack(spacing: 0) {
-                // Top half: play button on right, empty tap area on left
+            if isNarrow {
+                // Narrow layout: handle | [play button (top half) / chord label (bottom half)]
                 HStack(spacing: 0) {
-                    Color.clear
+                    // Drag handle
+                    VStack(spacing: 3) {
+                        ForEach(0..<3, id: \.self) { _ in
+                            RoundedRectangle(cornerRadius: 0.5)
+                                .fill(color.opacity(0.35))
+                                .frame(width: 10, height: 1.5)
+                        }
+                    }
+                    .frame(width: handleWidth, height: blockHeight)
+                    .contentShape(Rectangle())
+                    .gesture(reorderDragGesture(block: block, beatWidth: beatWidth, blockPad: blockPad))
+
+                    // Stacked: play on top, label below
+                    VStack(spacing: 0) {
+                        Button {
+                            guard !isDragging else { return }
+                            vm.previewBlock(block)
+                        } label: {
+                            ZStack {
+                                UnevenRoundedRectangle(
+                                    topLeadingRadius: 0,
+                                    bottomLeadingRadius: 0,
+                                    bottomTrailingRadius: 0,
+                                    topTrailingRadius: CFRadius.button
+                                )
+                                .fill(color.opacity(0.6))
+                                Image(systemName: "waveform")
+                                    .font(.system(size: 11, weight: .medium))
+                                    .foregroundStyle(Color.cfBase.opacity(0.85))
+                            }
+                            .frame(maxWidth: .infinity)
+                            .frame(height: blockHeight / 2)
+                            .contentShape(Rectangle())
+                        }
+                        .buttonStyle(.plain)
+
+                        // Chord label squeezed below
+                        VStack(spacing: 0) {
+                            Text(block.chord.symbol())
+                                .font(.system(size: 11, weight: .semibold, design: .rounded))
+                                .foregroundStyle(color)
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.5)
+                        }
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
                         .contentShape(Rectangle())
                         .onTapGesture {
                             guard !isDragging else { return }
                             onBlockTap?(index)
                         }
+                    }
+                }
+            } else {
+                // Normal layout: handle | label | play strip
+                HStack(spacing: 0) {
+                    // Drag handle
+                    VStack(spacing: 3) {
+                        ForEach(0..<3, id: \.self) { _ in
+                            RoundedRectangle(cornerRadius: 0.5)
+                                .fill(color.opacity(0.35))
+                                .frame(width: 10, height: 1.5)
+                        }
+                    }
+                    .frame(width: handleWidth, height: blockHeight)
+                    .contentShape(Rectangle())
+                    .gesture(reorderDragGesture(block: block, beatWidth: beatWidth, blockPad: blockPad))
 
+                    // Chord label (centered, tappable for selection)
+                    VStack(spacing: 2) {
+                        Text(vm.romanNumeral(for: block.chord))
+                            .font(.system(size: 9, weight: .regular, design: .rounded))
+                            .foregroundStyle(color.opacity(0.5))
+                        Text(block.chord.symbol())
+                            .font(.system(size: 14, weight: .semibold, design: .rounded))
+                            .foregroundStyle(color)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.6)
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        guard !isDragging else { return }
+                        onBlockTap?(index)
+                    }
+
+                    // Play button — full-height strip on the right
                     Button {
                         guard !isDragging else { return }
                         vm.previewBlock(block)
                     } label: {
-                        Image(systemName: "play.fill")
-                            .font(.system(size: 10))
-                            .foregroundStyle(color.opacity(0.7))
-                            .frame(maxWidth: .infinity, maxHeight: .infinity)
-                            .background(color.opacity(0.08))
-                            .contentShape(Rectangle())
+                        ZStack {
+                            UnevenRoundedRectangle(
+                                topLeadingRadius: 0,
+                                bottomLeadingRadius: 0,
+                                bottomTrailingRadius: CFRadius.button,
+                                topTrailingRadius: CFRadius.button
+                            )
+                            .fill(color.opacity(0.6))
+                            Image(systemName: "waveform")
+                                .font(.system(size: 14, weight: .medium))
+                                .foregroundStyle(Color.cfBase.opacity(0.85))
+                        }
+                        .frame(width: playWidth, height: blockHeight)
+                        .contentShape(Rectangle())
                     }
                     .buttonStyle(.plain)
-                }
-                .frame(height: blockHeight / 2)
-
-                // Bottom half: chord label, taps for selection
-                VStack(spacing: 2) {
-                    Text(block.chord.symbol())
-                        .font(.system(size: 14, weight: .semibold, design: .rounded))
-                        .foregroundStyle(color)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.6)
-                    Text(vm.romanNumeral(for: block.chord))
-                        .font(.system(size: 9, weight: .regular, design: .rounded))
-                        .foregroundStyle(color.opacity(0.5))
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .contentShape(Rectangle())
-                .onTapGesture {
-                    guard !isDragging else { return }
-                    onBlockTap?(index)
                 }
             }
         }
