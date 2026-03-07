@@ -4,7 +4,6 @@ import ChordFlowShared
 struct ComposeScreen: View {
     @ObservedObject var vm: AppViewModel
     @Environment(\.horizontalSizeClass) private var sizeClass
-    @Binding var selectedTab: Int
 
     var body: some View {
         VStack(spacing: 0) {
@@ -15,12 +14,6 @@ struct ComposeScreen: View {
             }
         }
         .background(Color.cfBackground.ignoresSafeArea())
-        .sheet(item: $vm.selectedBlockIndex) { index in
-            ChordDetailSheet(vm: vm, blockIndex: index)
-                .presentationDetents([.medium, .large])
-                .presentationDragIndicator(.hidden)
-                .presentationBackground(Color.cfSurface)
-        }
         .sheet(isPresented: $vm.showModeSheet) {
             modePickerSheet
                 .presentationDetents([.medium])
@@ -47,15 +40,13 @@ struct ComposeScreen: View {
 
                     // Timeline
                     TimelineView(vm: vm) { index in
-                        vm.selectedBlockIndex = index
+                        vm.selectedBlockIndex = vm.selectedBlockIndex == index ? nil : index
                     }
                     .padding(.horizontal, CFSpacing.compact)
 
-                    // Suggestion hint
-                    SuggestionHintBar(suggestion: vm.suggestions.first) {
-                        selectedTab = 1
-                    }
-                    .padding(.horizontal, CFSpacing.compact)
+                    // Chord detail panel
+                    ChordDetailPanel(vm: vm)
+                        .padding(.horizontal, CFSpacing.compact)
                 }
                 .padding(.top, CFSpacing.compact)
                 .padding(.bottom, 100) // room for playback bar
@@ -74,32 +65,33 @@ struct ComposeScreen: View {
         VStack(spacing: 0) {
             HStack(alignment: .top, spacing: CFSpacing.spacious) {
                 // Left column: Circle + controls
-                VStack(spacing: CFSpacing.standard) {
-                    CircleOfFifthsView(vm: vm) { chord in
-                        vm.addChord(chord)
+                ScrollView {
+                    VStack(spacing: CFSpacing.standard) {
+                        CircleOfFifthsView(vm: vm) { chord in
+                            vm.addChord(chord)
+                        }
+
+                        controlsStrip
+
+                        borrowedPresetPills
                     }
-
-                    controlsStrip
-
-                    borrowedPresetPills
                 }
                 .frame(maxWidth: .infinity)
 
-                // Right column: Timeline + suggestions
-                VStack(spacing: CFSpacing.standard) {
-                    TimelineView(vm: vm) { index in
-                        vm.selectedBlockIndex = index
-                    }
+                // Right column: Timeline + chord detail
+                ScrollView {
+                    VStack(spacing: CFSpacing.standard) {
+                        TimelineView(vm: vm) { index in
+                            vm.selectedBlockIndex = vm.selectedBlockIndex == index ? nil : index
+                        }
 
-                    // Suggestions panel (iPad shows multiple)
-                    suggestionsPanel
+                        ChordDetailPanel(vm: vm)
+                    }
                 }
                 .frame(maxWidth: .infinity)
             }
             .padding(.horizontal, CFSpacing.spacious)
             .padding(.top, CFSpacing.standard)
-
-            Spacer()
 
             PlaybackBarView(vm: vm)
                 .padding(.horizontal, CFSpacing.spacious)
@@ -214,34 +206,6 @@ struct ComposeScreen: View {
         }
     }
 
-    // MARK: - Suggestions Panel (iPad)
-
-    private var suggestionsPanel: some View {
-        VStack(alignment: .leading, spacing: CFSpacing.tight) {
-            Text("SUGGESTIONS")
-                .font(.cfCaption)
-                .foregroundStyle(Color.cfTextSecondary)
-                .textCase(.uppercase)
-
-            ForEach(Array(vm.suggestions.prefix(6).enumerated()), id: \.offset) { index, suggestion in
-                let function = suggestionFunction(suggestion)
-                SuggestionCardView(
-                    suggestion: suggestion,
-                    rank: index + 1,
-                    function: function,
-                    reasons: AppViewModel.reasonPills(
-                        for: suggestion,
-                        key: vm.project.key,
-                        previous: vm.project.blocks.last?.chord
-                    ),
-                    isTopPick: index == 0
-                ) {
-                    vm.addChord(suggestion.chord)
-                }
-            }
-        }
-    }
-
     // MARK: - Mode Picker Sheet
 
     private var modePickerSheet: some View {
@@ -275,14 +239,6 @@ struct ComposeScreen: View {
         }
     }
 
-    // MARK: - Helpers
-
-    private func suggestionFunction(_ suggestion: CFSuggestion) -> HarmonicFunction {
-        if let btn = vm.chordButtons.first(where: { $0.chord.root == suggestion.chord.root && $0.chord.quality == suggestion.chord.quality }) {
-            return vm.harmonicFunction(for: btn)
-        }
-        return .tonic
-    }
 }
 
 // MARK: - Int Identifiable for sheet binding

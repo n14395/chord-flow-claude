@@ -9,7 +9,7 @@ struct RootView: View {
 
     var body: some View {
         TabView(selection: $selectedTab) {
-            ComposeScreen(vm: vm, selectedTab: $selectedTab)
+            ComposeScreen(vm: vm)
                 .tabItem {
                     Label("Compose", systemImage: "circle.circle")
                 }
