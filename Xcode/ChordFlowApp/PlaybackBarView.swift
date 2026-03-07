@@ -2,6 +2,7 @@ import SwiftUI
 
 struct PlaybackBarView: View {
     @ObservedObject var vm: AppViewModel
+    var onBlockTap: ((Int) -> Void)?
 
     var body: some View {
         VStack(spacing: 0) {
@@ -29,7 +30,7 @@ struct PlaybackBarView: View {
             }
 
             // Main bar
-            HStack(spacing: CFSpacing.standard) {
+            HStack(spacing: CFSpacing.compact) {
                 // Play / Stop button
                 Button {
                     vm.togglePlayback()
@@ -61,13 +62,11 @@ struct PlaybackBarView: View {
                         .font(.system(size: 11, weight: .regular, design: .rounded))
                         .foregroundStyle(Color.cfTextSecondary)
                 }
+                .fixedSize(horizontal: true, vertical: false)
 
-                Spacer()
-
-                // BPM
-                Text("\(Int(vm.project.tempo.rounded())) BPM")
-                    .font(.cfMono)
-                    .foregroundStyle(vm.isPlaying ? Color.cfTonic : Color.cfTextSecondary)
+                // Inline timeline (replaces Spacer + BPM)
+                TimelineView(vm: vm, onBlockTap: onBlockTap)
+                    .frame(maxWidth: .infinity)
             }
             .padding(.horizontal, CFSpacing.spacious)
             .padding(.vertical, CFSpacing.compact)

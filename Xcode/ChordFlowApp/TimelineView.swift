@@ -8,7 +8,7 @@ struct TimelineView: View {
     private let blockHeight: CGFloat = 56
     private let barNumberHeight: CGFloat = 18
     private let handleWidth: CGFloat = 20
-    private let barsBeforeScroll = 4
+    private let barsBeforeScroll: Double = 5.33
     private let gridPadding: CGFloat = 8
 
     // Drag state
@@ -55,7 +55,7 @@ struct TimelineView: View {
 
     /// Compute beat width so that `barsBeforeScroll` bars (each 4 beats) fit the available width.
     private func beatWidth(for availableWidth: CGFloat) -> CGFloat {
-        let targetBeats = CGFloat(barsBeforeScroll * 4)
+        let targetBeats = CGFloat(barsBeforeScroll * 4.0)
         return max(16, (availableWidth - gridPadding) / targetBeats)
     }
 
@@ -116,7 +116,7 @@ struct TimelineView: View {
     // MARK: - Beat Grid
 
     private func beatGrid(beatWidth: CGFloat) -> some View {
-        let totalBeats = max(vm.totalBeats, barsBeforeScroll * 4)
+        let totalBeats = max(vm.totalBeats, Int(barsBeforeScroll * 4))
         let totalWidth = CGFloat(totalBeats) * beatWidth + gridPadding
 
         return ZStack(alignment: .topLeading) {

@@ -38,12 +38,6 @@ struct ComposeScreen: View {
                     controlsStrip
                         .padding(.horizontal, CFSpacing.spacious)
 
-                    // Timeline
-                    TimelineView(vm: vm) { index in
-                        vm.selectedBlockIndex = vm.selectedBlockIndex == index ? nil : index
-                    }
-                    .padding(.horizontal, CFSpacing.compact)
-
                     // Chord detail panel
                     ChordDetailPanel(vm: vm)
                         .padding(.horizontal, CFSpacing.compact)
@@ -52,10 +46,12 @@ struct ComposeScreen: View {
                 .padding(.bottom, 100) // room for playback bar
             }
 
-            // Playback bar
-            PlaybackBarView(vm: vm)
-                .padding(.horizontal, CFSpacing.compact)
-                .padding(.bottom, CFSpacing.tight)
+            // Playback bar (includes inline timeline)
+            PlaybackBarView(vm: vm) { index in
+                vm.selectedBlockIndex = vm.selectedBlockIndex == index ? nil : index
+            }
+            .padding(.horizontal, CFSpacing.compact)
+            .padding(.bottom, CFSpacing.tight)
         }
     }
 
@@ -78,13 +74,9 @@ struct ComposeScreen: View {
                 }
                 .frame(maxWidth: .infinity)
 
-                // Right column: Timeline + chord detail
+                // Right column: Chord detail
                 ScrollView {
                     VStack(spacing: CFSpacing.standard) {
-                        TimelineView(vm: vm) { index in
-                            vm.selectedBlockIndex = vm.selectedBlockIndex == index ? nil : index
-                        }
-
                         ChordDetailPanel(vm: vm)
                     }
                 }
@@ -93,9 +85,12 @@ struct ComposeScreen: View {
             .padding(.horizontal, CFSpacing.spacious)
             .padding(.top, CFSpacing.standard)
 
-            PlaybackBarView(vm: vm)
-                .padding(.horizontal, CFSpacing.spacious)
-                .padding(.bottom, CFSpacing.compact)
+            // Playback bar (includes inline timeline)
+            PlaybackBarView(vm: vm) { index in
+                vm.selectedBlockIndex = vm.selectedBlockIndex == index ? nil : index
+            }
+            .padding(.horizontal, CFSpacing.spacious)
+            .padding(.bottom, CFSpacing.compact)
         }
     }
 
