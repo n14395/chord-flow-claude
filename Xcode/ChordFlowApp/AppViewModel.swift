@@ -83,6 +83,7 @@ final class AppViewModel: ObservableObject {
             pattern: .block
         )
         project.blocks.append(block)
+        selectedBlockIndex = project.blocks.count - 1
         refreshSuggestions()
     }
 
@@ -146,6 +147,14 @@ final class AppViewModel: ObservableObject {
             chord: chord, pattern: .block
         )
         let events = ChordFlowEngine.render(blocks: [block], swing: 0)
+        previewEngine.play(events: events, tempo: project.tempo)
+    }
+
+    func previewBlock(_ block: CFSequenceBlock) {
+        var preview = block
+        preview.barStart = 0
+        preview.beatStart = 0
+        let events = ChordFlowEngine.render(blocks: [preview], swing: swing)
         previewEngine.play(events: events, tempo: project.tempo)
     }
 

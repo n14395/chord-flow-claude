@@ -187,17 +187,19 @@ struct ChordDetailPanel: View {
                 .foregroundStyle(isActive ? Color.cfTextSecondary : Color.cfTextTertiary)
                 .textCase(.uppercase)
 
-            HStack(spacing: CFSpacing.compact) {
-                ForEach([2.0, 4.0, 8.0], id: \.self) { beats in
+            HStack(spacing: CFSpacing.tight) {
+                ForEach(lengthOptions, id: \.self) { beats in
                     let isSelected = block?.lengthBeats == beats
                     Button {
                         guard isActive else { return }
                         vm.updateBlockLength(beats, at: blockIndex)
                     } label: {
-                        Text("\(Int(beats))")
-                            .font(.system(size: 12, weight: isSelected ? .semibold : .medium, design: .rounded))
+                        Text(lengthLabel(beats))
+                            .font(.system(size: 11, weight: isSelected ? .semibold : .medium, design: .rounded))
                             .foregroundStyle(isActive && isSelected ? color : Color.cfTextTertiary)
-                            .frame(width: 52, height: 34)
+                            .frame(minWidth: 32, maxWidth: .infinity)
+                            .frame(height: 34)
+                            .padding(.horizontal, 4)
                             .background(
                                 RoundedRectangle(cornerRadius: CFRadius.button)
                                     .fill(isActive && isSelected ? color.opacity(0.12) : Color.cfBackground)
@@ -217,6 +219,12 @@ struct ChordDetailPanel: View {
                     .foregroundStyle(Color.cfTextTertiary)
             }
         }
+    }
+
+    private let lengthOptions: [Double] = [1, 2, 4, 8, 16]
+
+    private func lengthLabel(_ beats: Double) -> String {
+        return "\(Int(beats))"
     }
 
     // MARK: - Extension Toggles
@@ -290,7 +298,7 @@ struct ChordDetailPanel: View {
         HStack(spacing: CFSpacing.compact) {
             Button {
                 guard let block else { return }
-                vm.previewChord(block.chord)
+                vm.previewBlock(block)
             } label: {
                 Text("Preview")
                     .font(.system(size: 12, weight: .medium, design: .rounded))

@@ -126,7 +126,8 @@ struct TimelineView: View {
             let width = CGFloat(beats) * beatWidth - blockPad * 2
             let isBorrowed = function == .borrowed
 
-            ZStack {
+            ZStack(alignment: .topTrailing) {
+                // Background
                 RoundedRectangle(cornerRadius: CFRadius.button)
                     .fill(color.opacity(0.12))
                     .frame(width: width, height: blockHeight)
@@ -139,32 +140,39 @@ struct TimelineView: View {
                     )
                     .frame(width: width, height: blockHeight)
 
-                HStack(spacing: 0) {
-                    Spacer(minLength: 0)
-                    VStack(spacing: 2) {
-                        Text(block.chord.symbol())
-                            .font(.system(size: 14, weight: .semibold, design: .rounded))
-                            .foregroundStyle(color)
-                        Text(vm.romanNumeral(for: block.chord))
-                            .font(.system(size: 9, weight: .regular, design: .rounded))
-                            .foregroundStyle(color.opacity(0.5))
-                    }
-                    Spacer(minLength: 0)
-                    Button {
-                        vm.previewChord(block.chord)
-                    } label: {
-                        Image(systemName: "play.fill")
-                            .font(.system(size: 12))
-                            .foregroundStyle(color.opacity(0.7))
-                            .frame(width: 26, height: 26)
-                            .background(color.opacity(0.1))
-                            .clipShape(Circle())
-                    }
-                    .buttonStyle(.plain)
-                    .padding(.trailing, 4)
+                // Chord label (bottom half, centered)
+                VStack(spacing: 2) {
+                    Text(block.chord.symbol())
+                        .font(.system(size: 14, weight: .semibold, design: .rounded))
+                        .foregroundStyle(color)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.6)
+                    Text(vm.romanNumeral(for: block.chord))
+                        .font(.system(size: 9, weight: .regular, design: .rounded))
+                        .foregroundStyle(color.opacity(0.5))
                 }
                 .frame(width: width, height: blockHeight)
+                .padding(.top, 6)
+
+                // Play button (top-right, top half)
+                Button {
+                    vm.previewBlock(block)
+                } label: {
+                    Image(systemName: "play.fill")
+                        .font(.system(size: 10))
+                        .foregroundStyle(color.opacity(0.7))
+                        .frame(width: width / 2, height: blockHeight / 2)
+                        .background(color.opacity(0.08))
+                }
+                .buttonStyle(.plain)
+                .clipShape(UnevenRoundedRectangle(
+                    topLeadingRadius: 0,
+                    bottomLeadingRadius: CFRadius.button,
+                    bottomTrailingRadius: 0,
+                    topTrailingRadius: CFRadius.button
+                ))
             }
+            .frame(width: width, height: blockHeight)
             .id(block.id)
             .offset(x: x, y: barNumberHeight + 8)
             .onTapGesture {
