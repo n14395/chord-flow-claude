@@ -26,7 +26,7 @@ public final class ChordFlowAUViewController: AUViewController, AUAudioUnitFacto
 
     public override func viewDidLoad() {
         super.viewDidLoad()
-        preferredContentSize = CGSize(width: 400, height: 480)
+        preferredContentSize = CGSize(width: 440, height: 700)
         view.backgroundColor = UIColor(red: 0x0E / 255, green: 0x0F / 255, blue: 0x1D / 255, alpha: 1)
         connectUIIfReady()
     }

@@ -141,6 +141,8 @@ targets:
       base:
         GENERATE_INFOPLIST_FILE: YES
         PRODUCT_BUNDLE_IDENTIFIER: com.n14395.chordflow2.hostharness.tests
+        DEVELOPMENT_TEAM: P52946XHRJ
+        CODE_SIGN_STYLE: Automatic
         TEST_HOST: ""
         BUNDLE_LOADER: ""
 schemes:

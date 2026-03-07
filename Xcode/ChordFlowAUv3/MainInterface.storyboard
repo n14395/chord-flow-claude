@@ -8,7 +8,7 @@
             <objects>
                 <viewController id="MainVC" customClass="ChordFlowAUViewController" customModule="ChordFlow_AUv3" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="v-1">
-                        <rect key="frame" x="0.0" y="0.0" width="400" height="480"/>
+                        <rect key="frame" x="0.0" y="0.0" width="440" height="700"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" red="0.054901960784313725" green="0.058823529411764705" blue="0.11372549019607843" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                     </view>

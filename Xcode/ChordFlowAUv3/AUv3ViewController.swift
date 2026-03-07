@@ -1,6 +1,7 @@
 import SwiftUI
 import UIKit
 import AudioToolbox
+import ChordFlowShared
 
 // MARK: - ViewModel
 
@@ -9,6 +10,8 @@ final class AUv3ViewModel: ObservableObject {
     private var parameterObservation: AUParameterObserverToken?
     private var debugTimer: Timer?
 
+    // MARK: AU Parameters (synced with host)
+
     @Published var tonic: Float = 0
     @Published var mode: Float = 0
     @Published var tension: Float = 0.35
@@ -16,33 +19,49 @@ final class AUv3ViewModel: ObservableObject {
     @Published var swing: Float = 0.1
     @Published var humanize: Float = 0.1
 
-    // Debug state
+    // MARK: Progression State (managed locally in the AUv3 UI)
+
+    @Published var blocks: [CFSequenceBlock] = []
+    @Published var chordButtons: [CFChordButton] = []
+    @Published var suggestions: [CFSuggestion] = []
+    @Published var selectedBlockIndex: Int?
+    @Published var defaultOctave: Int = 0
+    @Published var borrowedPreset: CFBorrowedChordPreset = .jazz
+    @Published var showModeSheet = false
+    @Published var selectedTab: Int = 0
+    @Published var styleFilter: String = "All"
+
+    // MARK: Debug / Transport State
+
     @Published var debugInfo: String = "waiting..."
+    @Published var isPlaying: Bool = false
+    @Published var playbackProgress: Double = 0
+
+    // MARK: Lookup Data
 
     private let noteNames = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
-    private let modeNames = ["Major", "Minor", "Ionian", "Dorian", "Phrygian", "Lydian",
-                             "Mixolydian", "Aeolian", "Locrian", "Melodic Minor",
-                             "Harmonic Minor", "Harmonic Major", "Double Harmonic",
-                             "Phrygian Dominant", "Lydian Dominant", "Lydian Augmented",
-                             "Locrian #2", "Super Locrian", "Neapolitan Minor",
-                             "Neapolitan Major", "Hungarian Minor", "Romanian Minor",
-                             "Persian", "Enigmatic"]
-    private let patternNames = ["Block", "Arp Up", "Arp Down", "Strum"]
+    private let modeList = CFScaleMode.allCases
+    private let patternList = CFPattern.allCases
+    let styleFilters = ["All", "Pop", "Jazz", "Neo-Soul", "Cinematic", "Exp."]
 
     init(audioUnit: ChordFlowMIDIProcessorAudioUnit) {
         self.audioUnit = audioUnit
-        readAll()
+        readAllParameters()
+        refreshChordButtons()
+        refreshSuggestions()
 
         parameterObservation = audioUnit.parameterTree?.token(byAddingParameterObserver: { [weak self] address, value in
             DispatchQueue.main.async {
-                self?.handleExternal(address: address, value: value)
+                self?.handleExternalParameterChange(address: address, value: value)
             }
         })
 
-        // Poll debug state from the render thread
-        debugTimer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { [weak self] _ in
-            guard let self, let au = Optional(self.audioUnit) else { return }
-            self.debugInfo = "renders=\(au.debugRenderCount) beat=\(String(format: "%.1f", au.debugBeatPosition)) playing=\(au.debugIsPlaying) ctx=\(au.debugHasMusicalContext) trans=\(au.debugHasTransport) midi=\(au.debugHasMidiOut) chords=\(au.debugChordCount)"
+        // Poll debug/transport state from the AU
+        debugTimer = Timer.scheduledTimer(withTimeInterval: 1.0 / 15.0, repeats: true) { [weak self] _ in
+            guard let self else { return }
+            self.isPlaying = self.audioUnit.debugIsPlaying
+            self.playbackProgress = self.computePlaybackProgress()
+            self.debugInfo = "renders=\(self.audioUnit.debugRenderCount) beat=\(String(format: "%.1f", self.audioUnit.debugBeatPosition)) playing=\(self.audioUnit.debugIsPlaying) midi=\(self.audioUnit.debugHasMidiOut) chords=\(self.audioUnit.debugChordCount)"
         }
     }
 
@@ -53,20 +72,56 @@ final class AUv3ViewModel: ObservableObject {
         }
     }
 
-    var tonicName: String { noteNames[Int(tonic.rounded()) % noteNames.count] }
-    var modeName: String {
-        let idx = Int(mode.rounded())
-        return idx < modeNames.count ? modeNames[idx] : "?"
+    // MARK: - Computed Properties
+
+    var tonicNote: CFNote {
+        CFNote(rawValue: Int(tonic.rounded()) % 12) ?? .c
     }
+
+    var scaleMode: CFScaleMode {
+        let idx = Int(mode.rounded())
+        return idx < modeList.count ? modeList[idx] : .major
+    }
+
+    var key: CFKeyContext {
+        CFKeyContext(tonic: tonicNote, mode: scaleMode)
+    }
+
+    var tonicName: String { noteNames[Int(tonic.rounded()) % 12] }
+
+    var modeName: String { scaleMode.displayName() }
+
+    var keyDisplayName: String { "\(tonicName) \(modeName)" }
+
     var patternName: String {
         let idx = Int(pattern.rounded())
-        return idx < patternNames.count ? patternNames[idx] : "?"
+        return idx < patternList.count ? patternList[idx].rawValue : "?"
     }
-    var modeCount: Float { Float(modeNames.count - 1) }
 
-    // MARK: - Read from AU
+    var modeCount: Float { Float(modeList.count - 1) }
 
-    private func readAll() {
+    var tensionLevel: Double { Double(tension) }
+
+    var totalBeats: Int {
+        blocks.reduce(0) { $0 + Int($1.lengthBeats) }
+    }
+
+    var barCount: Int { blocks.count }
+
+    var currentBar: Int {
+        guard totalBeats > 0 else { return 1 }
+        let currentBeat = playbackProgress * Double(totalBeats)
+        var accumulated: Double = 0
+        for (i, block) in blocks.enumerated() {
+            accumulated += block.lengthBeats
+            if currentBeat < accumulated { return i + 1 }
+        }
+        return barCount
+    }
+
+    // MARK: - Read AU Parameters
+
+    private func readAllParameters() {
         tonic = audioUnit.tonicParameter.value
         mode = audioUnit.modeParameter.value
         tension = audioUnit.tensionParameter.value
@@ -75,7 +130,7 @@ final class AUv3ViewModel: ObservableObject {
         humanize = audioUnit.humanizeParameter.value
     }
 
-    private func handleExternal(address: AUParameterAddress, value: AUValue) {
+    private func handleExternalParameterChange(address: AUParameterAddress, value: AUValue) {
         switch address {
         case 0: tonic = value
         case 1: mode = value
@@ -85,23 +140,37 @@ final class AUv3ViewModel: ObservableObject {
         case 5: humanize = value
         default: break
         }
+        // Key or tension changed externally — rebuild chord buttons + suggestions
+        if address <= 2 {
+            refreshChordButtons()
+            refreshSuggestions()
+        }
     }
 
-    // MARK: - Write to AU
+    // MARK: - Write AU Parameters
 
     func setTonic(_ value: Float) {
         tonic = value
         audioUnit.tonicParameter.value = value
+        refreshChordButtons()
+        refreshSuggestions()
+        syncProgressionToAU()
     }
 
     func setMode(_ value: Float) {
         mode = value
         audioUnit.modeParameter.value = value
+        refreshChordButtons()
+        refreshSuggestions()
+        syncProgressionToAU()
     }
 
     func setTension(_ value: Float) {
         tension = value
         audioUnit.tensionParameter.value = value
+        refreshChordButtons()
+        refreshSuggestions()
+        syncProgressionToAU()
     }
 
     func setPattern(_ value: Float) {
@@ -118,167 +187,228 @@ final class AUv3ViewModel: ObservableObject {
         humanize = value
         audioUnit.humanizeParameter.value = value
     }
+
+    // MARK: - Chord Button Management
+
+    func refreshChordButtons() {
+        chordButtons = ChordFlowEngine.diatonicChords(
+            key: key,
+            tension: tensionLevel,
+            borrowedPreset: borrowedPreset
+        )
+    }
+
+    // MARK: - Suggestion Management
+
+    func refreshSuggestions() {
+        let previous = blocks.last?.chord
+        suggestions = ChordFlowEngine.suggestions(
+            key: key,
+            previous: previous,
+            tension: tensionLevel
+        )
+    }
+
+    // MARK: - Chord Progression Management
+
+    func addChord(_ chord: CFChord) {
+        let block = CFSequenceBlock(
+            barStart: blocks.count,
+            beatStart: 0,
+            lengthBeats: 4,
+            chord: chord,
+            pattern: .block,
+            octaveShift: defaultOctave
+        )
+        blocks.append(block)
+        selectedBlockIndex = blocks.count - 1
+        refreshSuggestions()
+        syncProgressionToAU()
+    }
+
+    func removeBlock(at index: Int) {
+        guard blocks.indices.contains(index) else { return }
+        blocks.remove(at: index)
+        for i in blocks.indices {
+            blocks[i].barStart = i
+        }
+        if selectedBlockIndex == index { selectedBlockIndex = nil }
+        refreshSuggestions()
+        syncProgressionToAU()
+    }
+
+    func moveBlock(from source: Int, to destination: Int) {
+        guard source != destination,
+              blocks.indices.contains(source),
+              blocks.indices.contains(destination) else { return }
+        let block = blocks.remove(at: source)
+        blocks.insert(block, at: destination)
+        for i in blocks.indices {
+            blocks[i].barStart = i
+        }
+        if selectedBlockIndex == source {
+            selectedBlockIndex = destination
+        } else if let sel = selectedBlockIndex {
+            if source < destination, sel > source, sel <= destination {
+                selectedBlockIndex = sel - 1
+            } else if source > destination, sel >= destination, sel < source {
+                selectedBlockIndex = sel + 1
+            }
+        }
+        syncProgressionToAU()
+    }
+
+    func clearProgression() {
+        blocks.removeAll()
+        selectedBlockIndex = nil
+        refreshSuggestions()
+        syncProgressionToAU()
+    }
+
+    func duplicateBlock(at index: Int) {
+        guard blocks.indices.contains(index) else { return }
+        var copy = blocks[index]
+        copy.id = UUID()
+        copy.barStart = blocks.count
+        blocks.append(copy)
+        refreshSuggestions()
+        syncProgressionToAU()
+    }
+
+    func updateBlockPattern(_ pattern: CFPattern, at index: Int) {
+        guard blocks.indices.contains(index) else { return }
+        blocks[index].pattern = pattern
+        syncProgressionToAU()
+    }
+
+    func updateBlockLength(_ beats: Double, at index: Int) {
+        guard blocks.indices.contains(index) else { return }
+        blocks[index].lengthBeats = beats
+        syncProgressionToAU()
+    }
+
+    func updateBlockExtensions(add7: Bool, add9: Bool, at index: Int) {
+        guard blocks.indices.contains(index) else { return }
+        blocks[index].chord.add7 = add7
+        blocks[index].chord.add9 = add9
+        syncProgressionToAU()
+    }
+
+    func updateBlockOctave(_ shift: Int, at index: Int) {
+        guard blocks.indices.contains(index) else { return }
+        blocks[index].octaveShift = min(max(shift, -3), 3)
+        syncProgressionToAU()
+    }
+
+    // MARK: - Style Filtering
+
+    func applyStyleFilter(_ filter: String) {
+        styleFilter = filter
+        switch filter {
+        case "Jazz": borrowedPreset = .jazz
+        case "Cinematic": borrowedPreset = .cinematic
+        case "Pop": borrowedPreset = .conservative
+        case "Neo-Soul": borrowedPreset = .colorful
+        case "Exp.": borrowedPreset = .experimental
+        default: break
+        }
+        refreshChordButtons()
+        refreshSuggestions()
+    }
+
+    // MARK: - Harmonic Function Resolution
+
+    func harmonicFunction(for button: CFChordButton) -> HarmonicFunction {
+        if button.isBorrowed { return .borrowed }
+        let diatonic = chordButtons.filter { !$0.isBorrowed }
+        guard let index = diatonic.firstIndex(where: { $0.id == button.id }) else { return .tonic }
+        return HarmonicFunction.forDegree(index)
+    }
+
+    func harmonicFunction(forBlockAt index: Int) -> HarmonicFunction {
+        guard blocks.indices.contains(index) else { return .tonic }
+        let chord = blocks[index].chord
+        if let btn = chordButtons.first(where: { $0.chord == chord }) {
+            return harmonicFunction(for: btn)
+        }
+        if chordButtons.filter({ $0.isBorrowed }).contains(where: { $0.chord.root == chord.root && $0.chord.quality == chord.quality }) {
+            return .borrowed
+        }
+        return .tonic
+    }
+
+    func romanNumeral(for chord: CFChord) -> String {
+        if let btn = chordButtons.first(where: { $0.chord == chord }) {
+            return btn.label
+        }
+        return "?"
+    }
+
+    func suggestionFunction(_ suggestion: CFSuggestion) -> HarmonicFunction {
+        if let btn = chordButtons.first(where: { $0.chord.root == suggestion.chord.root && $0.chord.quality == suggestion.chord.quality }) {
+            return harmonicFunction(for: btn)
+        }
+        return .tonic
+    }
+
+    // MARK: - Chord Tone Helpers
+
+    static func chordTones(_ chord: CFChord) -> [UInt8] {
+        let root = chord.root.rawValue
+        var intervals: [Int] = switch chord.quality {
+        case .major: [0, 4, 7]
+        case .minor: [0, 3, 7]
+        case .diminished: [0, 3, 6]
+        case .dominant: [0, 4, 7, 10]
+        }
+        if chord.add7, !intervals.contains(10) { intervals.append(10) }
+        if chord.add9 { intervals.append(14) }
+        return intervals.map { UInt8(root + $0 + 60) }
+    }
+
+    static func noteNames(for chord: CFChord) -> [String] {
+        let names = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
+        return chordTones(chord).map { names[Int($0) % 12] }
+    }
+
+    static func reasonPills(for suggestion: CFSuggestion, key: CFKeyContext, previous: CFChord?) -> [String] {
+        var pills: [String] = []
+        let chord = suggestion.chord
+        if chord.root == key.tonic { pills.append("Strong resolution") }
+        if let prev = previous {
+            let dist = min(abs(chord.root.rawValue - prev.root.rawValue),
+                           12 - abs(chord.root.rawValue - prev.root.rawValue))
+            if dist <= 2 { pills.append("Smooth voice leading") }
+            if dist == 5 || dist == 7 { pills.append("Circle-of-fifths motion") }
+        }
+        if chord.add9 { pills.append("Extended color") }
+        else if chord.add7 { pills.append("Seventh color") }
+        if suggestion.confidence > 0.8 { pills.append("Top resolution") }
+        else if suggestion.confidence > 0.6 { pills.append("Voice leading") }
+        if pills.isEmpty { pills.append("Harmonic variety") }
+        return Array(pills.prefix(3))
+    }
+
+    // MARK: - AU Sync
+
+    /// Push the current progression to the audio unit for render-thread playback.
+    func syncProgressionToAU() {
+        // Build the sequenced chord tones for the render block
+        var chordTonesList: [[UInt8]] = []
+        var beatLengths: [Double] = []
+        for block in blocks {
+            chordTonesList.append(Self.chordTones(block.chord))
+            beatLengths.append(block.lengthBeats)
+        }
+        audioUnit.updateProgression(chords: chordTonesList, beatLengths: beatLengths)
+    }
+
+    private func computePlaybackProgress() -> Double {
+        guard totalBeats > 0 else { return 0 }
+        let beatPos = audioUnit.debugBeatPosition
+        guard beatPos >= 0 else { return 0 }
+        let totalBeatsDbl = Double(totalBeats)
+        let progress = beatPos.truncatingRemainder(dividingBy: totalBeatsDbl) / totalBeatsDbl
+        return max(0, min(1, progress))
+    }
 }
-
-// MARK: - SwiftUI View
-
-struct AUv3View: View {
-    @ObservedObject var vm: AUv3ViewModel
-
-    // Match the app's dark theme
-    private let bgColor = Color(red: 0x0E / 255, green: 0x0F / 255, blue: 0x1D / 255)
-    private let surfaceColor = Color(red: 0x25 / 255, green: 0x27 / 255, blue: 0x40 / 255)
-    private let borderColor = Color(red: 0x3A / 255, green: 0x3D / 255, blue: 0x5C / 255)
-    private let textPrimary = Color(red: 0xF0 / 255, green: 0xF0 / 255, blue: 0xF5 / 255)
-    private let textSecondary = Color(red: 0x8B / 255, green: 0x8D / 255, blue: 0xA3 / 255)
-    private let accentTonic = Color(red: 0xF5 / 255, green: 0xA6 / 255, blue: 0x23 / 255)
-    private let accentDominant = Color(red: 0x4A / 255, green: 0x90 / 255, blue: 0xD9 / 255)
-    private let accentSubdominant = Color(red: 0x7E / 255, green: 0xD3 / 255, blue: 0x21 / 255)
-
-    var body: some View {
-        VStack(spacing: 16) {
-            // Header
-            HStack {
-                Text("ChordFlow")
-                    .font(.system(size: 20, weight: .bold, design: .rounded))
-                    .foregroundStyle(textPrimary)
-                Spacer()
-                Text("MIDI FX")
-                    .font(.system(size: 12, weight: .medium, design: .rounded))
-                    .foregroundStyle(accentDominant)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 4)
-                    .background(accentDominant.opacity(0.15))
-                    .clipShape(Capsule())
-            }
-            .padding(.bottom, 4)
-
-            // Key selection
-            VStack(spacing: 8) {
-                paramLabel("Key")
-                HStack(spacing: 12) {
-                    // Tonic picker
-                    paramPicker(value: $vm.tonic, range: 0...11, label: vm.tonicName, color: accentTonic) {
-                        vm.setTonic($0)
-                    }
-                    // Mode picker
-                    paramPicker(value: $vm.mode, range: 0...vm.modeCount, label: vm.modeName, color: accentTonic) {
-                        vm.setMode($0)
-                    }
-                }
-            }
-            .padding(12)
-            .background(surfaceColor)
-            .clipShape(RoundedRectangle(cornerRadius: 12))
-
-            // Tension slider
-            paramCard("Tension", value: $vm.tension, range: 0...1, color: accentDominant,
-                      displayValue: "\(Int(vm.tension * 100))%") {
-                vm.setTension($0)
-            }
-
-            // Pattern picker
-            VStack(spacing: 8) {
-                paramLabel("Pattern")
-                paramPicker(value: $vm.pattern, range: 0...3, label: vm.patternName, color: accentSubdominant) {
-                    vm.setPattern($0)
-                }
-            }
-            .padding(12)
-            .background(surfaceColor)
-            .clipShape(RoundedRectangle(cornerRadius: 12))
-
-            // Swing & Humanize
-            HStack(spacing: 12) {
-                paramCard("Swing", value: $vm.swing, range: 0...0.8, color: textSecondary,
-                          displayValue: "\(Int(vm.swing / 0.8 * 100))%") {
-                    vm.setSwing($0)
-                }
-                paramCard("Humanize", value: $vm.humanize, range: 0...1, color: textSecondary,
-                          displayValue: "\(Int(vm.humanize * 100))%") {
-                    vm.setHumanize($0)
-                }
-            }
-
-            // Debug info
-            Text(vm.debugInfo)
-                .font(.system(size: 10, weight: .regular, design: .monospaced))
-                .foregroundStyle(textSecondary.opacity(0.6))
-                .frame(maxWidth: .infinity, alignment: .leading)
-        }
-        .padding(16)
-        .background(bgColor)
-    }
-
-    // MARK: - Components
-
-    private func paramLabel(_ text: String) -> some View {
-        HStack {
-            Text(text)
-                .font(.system(size: 12, weight: .medium, design: .rounded))
-                .foregroundStyle(textSecondary)
-            Spacer()
-        }
-    }
-
-    private func paramCard(_ title: String, value: Binding<Float>, range: ClosedRange<Float>,
-                           color: Color, displayValue: String, onChanged: @escaping (Float) -> Void) -> some View {
-        VStack(spacing: 8) {
-            HStack {
-                Text(title)
-                    .font(.system(size: 12, weight: .medium, design: .rounded))
-                    .foregroundStyle(textSecondary)
-                Spacer()
-                Text(displayValue)
-                    .font(.system(size: 12, weight: .semibold, design: .monospaced))
-                    .foregroundStyle(textPrimary)
-            }
-            Slider(value: value, in: range) { _ in
-                onChanged(value.wrappedValue)
-            }
-            .tint(color)
-        }
-        .padding(12)
-        .background(surfaceColor)
-        .clipShape(RoundedRectangle(cornerRadius: 12))
-    }
-
-    private func paramPicker(value: Binding<Float>, range: ClosedRange<Float>,
-                             label: String, color: Color, onChanged: @escaping (Float) -> Void) -> some View {
-        HStack(spacing: 8) {
-            Button {
-                let newVal = max(range.lowerBound, value.wrappedValue - 1)
-                onChanged(newVal)
-            } label: {
-                Image(systemName: "chevron.left")
-                    .font(.system(size: 14, weight: .semibold))
-                    .foregroundStyle(color)
-                    .frame(width: 32, height: 32)
-                    .background(color.opacity(0.12))
-                    .clipShape(RoundedRectangle(cornerRadius: 8))
-            }
-
-            Text(label)
-                .font(.system(size: 15, weight: .semibold, design: .rounded))
-                .foregroundStyle(textPrimary)
-                .frame(maxWidth: .infinity)
-                .frame(height: 32)
-                .background(borderColor.opacity(0.5))
-                .clipShape(RoundedRectangle(cornerRadius: 8))
-
-            Button {
-                let newVal = min(range.upperBound, value.wrappedValue + 1)
-                onChanged(newVal)
-            } label: {
-                Image(systemName: "chevron.right")
-                    .font(.system(size: 14, weight: .semibold))
-                    .foregroundStyle(color)
-                    .frame(width: 32, height: 32)
-                    .background(color.opacity(0.12))
-                    .clipShape(RoundedRectangle(cornerRadius: 8))
-            }
-        }
-    }
-}
-
-

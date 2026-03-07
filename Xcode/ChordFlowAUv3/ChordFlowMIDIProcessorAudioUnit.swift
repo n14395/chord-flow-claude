@@ -50,11 +50,17 @@ public final class ChordFlowMIDIProcessorAudioUnit: AUAudioUnit {
     private var swingValue: AUValue = 0.1
     private var humanizeValue: AUValue = 0.1
 
-    // Chord cache
+    // Chord cache (auto-generated from parameters when no user progression exists)
     private var cachedChords: [[UInt8]] = []
     private var lastTonic: Int = -1
     private var lastMode: Int = -1
     private var lastTensionBucket: Int = -1
+
+    // User-built progression (set from the UI via updateProgression)
+    // When non-empty, this takes priority over cachedChords.
+    private var progressionChords: [[UInt8]] = []
+    private var progressionBeatLengths: [Double] = []
+    private var hasUserProgression: Bool { !progressionChords.isEmpty }
 
     public override var outputBusses: AUAudioUnitBusArray { outputBussesInternal }
     public override var inputBusses: AUAudioUnitBusArray { inputBussesInternal }
@@ -228,6 +234,19 @@ public final class ChordFlowMIDIProcessorAudioUnit: AUAudioUnit {
         }
     }
 
+    // MARK: - User Progression
+
+    /// Called from the UI thread to push a user-built chord progression to the render thread.
+    func updateProgression(chords: [[UInt8]], beatLengths: [Double]) {
+        // Simple assignment — these arrays are value types and the render thread
+        // reads them non-atomically, but the worst case is a single buffer with
+        // stale data, which is acceptable for a UI-driven update.
+        progressionChords = chords
+        progressionBeatLengths = beatLengths
+        // Reset chord beat tracking so the next render cycle picks up the new progression
+        lastChordBeat = -1
+    }
+
     // MARK: - Chord Cache
 
     private func rebuildChordsIfNeeded() {
@@ -326,30 +345,65 @@ public final class ChordFlowMIDIProcessorAudioUnit: AUAudioUnit {
             }
             au.wasPlaying = isPlaying
 
-            // Rebuild chords if parameters changed (called from render thread,
-            // but only when cache is invalidated — rare, not every buffer)
             if isPlaying {
-                au.rebuildChordsIfNeeded()
+                if au.hasUserProgression {
+                    // User-built progression with variable beat lengths
+                    let chords = au.progressionChords
+                    let lengths = au.progressionBeatLengths
+                    let chordCount = chords.count
+                    guard chordCount > 0, lengths.count == chordCount else { return noErr }
 
-                let chordLen = timeSigNum
-                let currentChordBeat = Int(floor(beatPosition / Double(chordLen)))
+                    // Compute total beats in the progression
+                    let totalBeats = lengths.reduce(0, +)
+                    guard totalBeats > 0 else { return noErr }
 
-                if currentChordBeat != au.lastChordBeat {
-                    au.lastChordBeat = currentChordBeat
+                    // Wrap beat position within the progression length
+                    let wrappedBeat = beatPosition.truncatingRemainder(dividingBy: totalBeats)
+                    let positiveBeat = wrappedBeat < 0 ? wrappedBeat + totalBeats : wrappedBeat
 
-                    // Note-off previous
-                    au.sendActiveNotesOff()
+                    // Walk chord boundaries to find which chord we're in
+                    var accumulated: Double = 0
+                    var currentIdx = 0
+                    for i in 0..<chordCount {
+                        accumulated += lengths[i]
+                        if positiveBeat < accumulated { currentIdx = i; break }
+                        if i == chordCount - 1 { currentIdx = i }
+                    }
 
-                    // Note-on new chord
-                    let chordCount = au.cachedChords.count
-                    if chordCount > 0 {
-                        let idx = ((currentChordBeat % chordCount) + chordCount) % chordCount
-                        let notes = au.cachedChords[idx]
+                    // Use a combination of wrap cycle + index to detect chord changes
+                    let cycleNumber = Int(floor(beatPosition / totalBeats))
+                    let chordKey = cycleNumber * 1000 + currentIdx
+
+                    if chordKey != au.lastChordBeat {
+                        au.lastChordBeat = chordKey
+                        au.sendActiveNotesOff()
+                        let notes = chords[currentIdx]
                         let offset = AUEventSampleTime(min(Int(frameCount) - 1, 64))
                         for note in notes {
                             au.sendNoteOn(note, offset: offset)
                         }
                         au.activeNotes = notes
+                    }
+                } else {
+                    // Fallback: auto-cycle through parameter-generated diatonic chords
+                    au.rebuildChordsIfNeeded()
+
+                    let chordLen = timeSigNum
+                    let currentChordBeat = Int(floor(beatPosition / Double(chordLen)))
+
+                    if currentChordBeat != au.lastChordBeat {
+                        au.lastChordBeat = currentChordBeat
+                        au.sendActiveNotesOff()
+                        let chordCount = au.cachedChords.count
+                        if chordCount > 0 {
+                            let idx = ((currentChordBeat % chordCount) + chordCount) % chordCount
+                            let notes = au.cachedChords[idx]
+                            let offset = AUEventSampleTime(min(Int(frameCount) - 1, 64))
+                            for note in notes {
+                                au.sendNoteOn(note, offset: offset)
+                            }
+                            au.activeNotes = notes
+                        }
                     }
                 }
             }
