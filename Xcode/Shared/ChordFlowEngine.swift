@@ -313,6 +313,11 @@ public enum ChordFlowEngine {
         return try encoder.encode(project)
     }
 
+    public static func decodeProject(_ data: Data) throws -> CFProjectDocument {
+        let decoder = JSONDecoder()
+        return try decoder.decode(CFProjectDocument.self, from: data)
+    }
+
     private static func scale(for key: CFKeyContext) -> [Int] {
         let pattern: [Int] = switch key.mode {
         case .major: [0, 2, 4, 5, 7, 9, 11]

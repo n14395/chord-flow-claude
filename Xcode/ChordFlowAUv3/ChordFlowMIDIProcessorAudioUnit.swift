@@ -12,6 +12,7 @@ private enum ParamAddress: AUParameterAddress {
 }
 
 public final class ChordFlowMIDIProcessorAudioUnit: AUAudioUnit {
+    private var inputBus: AUAudioUnitBus!
     private var outputBus: AUAudioUnitBus!
     private var outputBussesInternal: AUAudioUnitBusArray!
     private var inputBussesInternal: AUAudioUnitBusArray!
@@ -25,9 +26,24 @@ public final class ChordFlowMIDIProcessorAudioUnit: AUAudioUnit {
     private(set) var swingParameter: AUParameter!
     private(set) var humanizeParameter: AUParameter!
 
-    private var cachedTempo: Double = 120
-    private var cachedBeatPosition: Double = 0
-    private var cachedPlaying: Bool = false
+    // Render-thread state
+    private var lastChordBeat: Int = -1
+    private var wasPlaying: Bool = false
+    private var activeNotes: [UInt8] = []
+
+    // Backing storage for parameter values (avoids infinite recursion via implementorValueProvider)
+    private var tonicValue: AUValue = 0
+    private var modeValue: AUValue = 0
+    private var tensionValue: AUValue = 0.35
+    private var patternValue: AUValue = 0
+    private var swingValue: AUValue = 0.1
+    private var humanizeValue: AUValue = 0.1
+
+    // Chord cache
+    private var cachedChords: [[UInt8]] = []
+    private var lastTonic: Int = -1
+    private var lastMode: Int = -1
+    private var lastTensionBucket: Int = -1
 
     public override var outputBusses: AUAudioUnitBusArray { outputBussesInternal }
     public override var inputBusses: AUAudioUnitBusArray { inputBussesInternal }
@@ -39,14 +55,35 @@ public final class ChordFlowMIDIProcessorAudioUnit: AUAudioUnit {
     public override init(componentDescription: AudioComponentDescription, options: AudioComponentInstantiationOptions = []) throws {
         try super.init(componentDescription: componentDescription, options: options)
 
+        // Even though aumi is MIDI-only, hosts like AUM require at least one input+output bus
+        // for the render cycle to run. Audio passes through untouched.
         let format = AVAudioFormat(standardFormatWithSampleRate: 44_100, channels: 2)!
+        inputBus = try AUAudioUnitBus(format: format)
         outputBus = try AUAudioUnitBus(format: format)
+        inputBussesInternal = AUAudioUnitBusArray(audioUnit: self, busType: .input, busses: [inputBus])
         outputBussesInternal = AUAudioUnitBusArray(audioUnit: self, busType: .output, busses: [outputBus])
-        inputBussesInternal = AUAudioUnitBusArray(audioUnit: self, busType: .input, busses: [])
 
         setupParameterTree()
         maximumFramesToRender = 4096
     }
+
+    public override func allocateRenderResources() throws {
+        // Match output format to whatever the host set on the input bus
+        if let inputFormat = inputBussesInternal.count > 0 ? inputBussesInternal[0].format : nil {
+            try outputBus.setFormat(inputFormat)
+        }
+        try super.allocateRenderResources()
+        rebuildChordsIfNeeded()
+    }
+
+    public override func deallocateRenderResources() {
+        super.deallocateRenderResources()
+        lastChordBeat = -1
+        wasPlaying = false
+        sendActiveNotesOff()
+    }
+
+    // MARK: - Parameters
 
     private func setupParameterTree() {
         tonicParameter = AUParameterTree.createParameter(
@@ -131,13 +168,28 @@ public final class ChordFlowMIDIProcessorAudioUnit: AUAudioUnit {
             tonicParameter, modeParameter, tensionParameter, patternParameter, swingParameter, humanizeParameter
         ])
 
-        parameterTreeInternal.implementorValueObserver = { [weak self] parameter, value in
-            self?.handleParameter(address: parameter.address, value: value)
+        parameterTreeInternal.implementorValueObserver = { [weak self] param, value in
+            guard let self else { return }
+            // Store into backing variable
+            switch param.address {
+            case ParamAddress.tonic.rawValue: self.tonicValue = value
+            case ParamAddress.mode.rawValue: self.modeValue = value
+            case ParamAddress.tension.rawValue: self.tensionValue = value
+            case ParamAddress.pattern.rawValue: self.patternValue = value
+            case ParamAddress.swing.rawValue: self.swingValue = value
+            case ParamAddress.humanize.rawValue: self.humanizeValue = value
+            default: break
+            }
+            // Trigger chord rebuild on next render cycle
+            if param.address <= ParamAddress.tension.rawValue {
+                self.lastTonic = -1
+            }
         }
-        parameterTreeInternal.implementorValueProvider = { [weak self] parameter in
-            self?.currentValue(for: parameter.address) ?? 0
+        parameterTreeInternal.implementorValueProvider = { [weak self] param in
+            self?.currentValue(for: param.address) ?? 0
         }
 
+        // Set initial parameter values (these go through the observer to populate backing storage)
         tonicParameter.value = 0
         modeParameter.value = 0
         tensionParameter.value = 0.35
@@ -146,111 +198,171 @@ public final class ChordFlowMIDIProcessorAudioUnit: AUAudioUnit {
         humanizeParameter.value = 0.1
     }
 
-    private func handleParameter(address: AUParameterAddress, value: AUValue) {
-        switch address {
-        case ParamAddress.swing.rawValue:
-            swingParameter.value = min(max(value, 0), 0.8)
-        default:
-            break
-        }
-    }
-
     private func currentValue(for address: AUParameterAddress) -> AUValue {
+        // Read from backing storage, NOT from parameter.value, to avoid infinite recursion
+        // (implementorValueProvider -> currentValue -> parameter.value -> implementorValueProvider -> ...)
         switch address {
-        case ParamAddress.tonic.rawValue: tonicParameter.value
-        case ParamAddress.mode.rawValue: modeParameter.value
-        case ParamAddress.tension.rawValue: tensionParameter.value
-        case ParamAddress.pattern.rawValue: patternParameter.value
-        case ParamAddress.swing.rawValue: swingParameter.value
-        case ParamAddress.humanize.rawValue: humanizeParameter.value
+        case ParamAddress.tonic.rawValue: tonicValue
+        case ParamAddress.mode.rawValue: modeValue
+        case ParamAddress.tension.rawValue: tensionValue
+        case ParamAddress.pattern.rawValue: patternValue
+        case ParamAddress.swing.rawValue: swingValue
+        case ParamAddress.humanize.rawValue: humanizeValue
         default: 0
         }
     }
 
-    public override var internalRenderBlock: AUInternalRenderBlock {
-        { [weak self] _, _, frameCount, _, outputData, _, _ in
-            guard let self else { return noErr }
-            self.captureHostTransport()
+    // MARK: - Chord Cache
 
-            if self.cachedPlaying {
-                self.emitDemoChord(frameCount: frameCount)
+    private func rebuildChordsIfNeeded() {
+        let tonicIdx = Int(tonicValue.rounded())
+        let modeIdx = Int(modeValue.rounded())
+        let tension = Double(tensionValue)
+        let tensionBucket = Int(tension * 10)
+
+        guard tonicIdx != lastTonic || modeIdx != lastMode || tensionBucket != lastTensionBucket else { return }
+        lastTonic = tonicIdx
+        lastMode = modeIdx
+        lastTensionBucket = tensionBucket
+
+        let tonic = CFNote(rawValue: max(0, min(11, tonicIdx))) ?? .c
+        let modes = CFScaleMode.allCases
+        let mode = modes[max(0, min(modes.count - 1, modeIdx))]
+        let key = CFKeyContext(tonic: tonic, mode: mode)
+
+        let buttons = ChordFlowEngine.diatonicChords(key: key, tension: tension)
+        cachedChords = buttons.filter { !$0.isBorrowed }.map { btn in
+            chordTones(btn.chord)
+        }
+    }
+
+    private func chordTones(_ chord: CFChord) -> [UInt8] {
+        let root = chord.root.rawValue
+        var intervals: [Int]
+        switch chord.quality {
+        case .major: intervals = [0, 4, 7]
+        case .minor: intervals = [0, 3, 7]
+        case .diminished: intervals = [0, 3, 6]
+        case .dominant: intervals = [0, 4, 7, 10]
+        }
+        if chord.add7, !intervals.contains(10) { intervals.append(10) }
+        if chord.add9 { intervals.append(14) }
+        return intervals.map { UInt8(min(127, root + $0 + 60)) }
+    }
+
+    // MARK: - Render
+
+    public override var internalRenderBlock: AUInternalRenderBlock {
+        // Capture what we need — avoid capturing self directly
+        let stateRef = Unmanaged.passUnretained(self)
+
+        return { actionFlags, timestamp, frameCount, outputBusNumber, outputData, realtimeEventListHead, pullInputBlock in
+            let au = stateRef.takeUnretainedValue()
+
+            // Pull input and pass through to output (required even for aumi in some hosts)
+            if let pullInputBlock {
+                var pullFlags: AudioUnitRenderActionFlags = []
+                _ = pullInputBlock(&pullFlags, timestamp, frameCount, outputBusNumber, outputData)
             }
 
-            let bufferCount = Int(outputData.pointee.mNumberBuffers)
-            let firstBufferPtr = withUnsafeMutablePointer(to: &outputData.pointee.mBuffers) { $0 }
-            let buffers = UnsafeMutableBufferPointer(start: firstBufferPtr, count: bufferCount)
-            for i in 0..<buffers.count {
-                let buffer = buffers[i]
-                if let mData = buffer.mData {
-                    memset(mData, 0, Int(buffer.mDataByteSize))
+            // Read host transport
+            var beatPosition: Double = 0
+            var isPlaying = false
+            var timeSigNum = 4
+
+            if let ctx = au.musicalContextBlock {
+                var tempo: Double = 120
+                var tsNum: Double = 4
+                var tsDen: Int = 4
+                var bp: Double = 0
+                var sampleOff: Int = 0
+                var downbeat: Double = 0
+                _ = ctx(&tempo, &tsNum, &tsDen, &bp, &sampleOff, &downbeat)
+                beatPosition = bp
+                timeSigNum = max(1, Int(tsNum))
+            }
+
+            if let transport = au.transportStateBlock {
+                var flags: AUHostTransportStateFlags = []
+                var samplePos: Double = 0
+                var cycleStart: Double = 0
+                var cycleEnd: Double = 0
+                _ = transport(&flags, &samplePos, &cycleStart, &cycleEnd)
+                isPlaying = flags.contains(.moving)
+            }
+
+            // Transport transitions
+            if isPlaying && !au.wasPlaying {
+                au.lastChordBeat = -1
+            } else if !isPlaying && au.wasPlaying {
+                au.sendActiveNotesOff()
+            }
+            au.wasPlaying = isPlaying
+
+            // Rebuild chords if parameters changed (called from render thread,
+            // but only when cache is invalidated — rare, not every buffer)
+            if isPlaying {
+                au.rebuildChordsIfNeeded()
+
+                let chordLen = timeSigNum
+                let currentChordBeat = Int(floor(beatPosition / Double(chordLen)))
+
+                if currentChordBeat != au.lastChordBeat {
+                    au.lastChordBeat = currentChordBeat
+
+                    // Note-off previous
+                    au.sendActiveNotesOff()
+
+                    // Note-on new chord
+                    let chordCount = au.cachedChords.count
+                    if chordCount > 0 {
+                        let idx = ((currentChordBeat % chordCount) + chordCount) % chordCount
+                        let notes = au.cachedChords[idx]
+                        let offset = AUEventSampleTime(min(Int(frameCount) - 1, 64))
+                        for note in notes {
+                            au.sendNoteOn(note, offset: offset)
+                        }
+                        au.activeNotes = notes
+                    }
                 }
             }
+
             return noErr
         }
     }
 
-    private func emitDemoChord(frameCount: AUAudioFrameCount) {
+    // MARK: - MIDI Output
+
+    private func sendNoteOn(_ note: UInt8, offset: AUEventSampleTime) {
         guard let midiOut = midiOutputEventBlock else { return }
-
-        let chord = currentChordFromParameters()
-        let tones = ChordFlowEngine.render(blocks: [
-            CFSequenceBlock(barStart: 0, beatStart: 0, lengthBeats: 1, chord: chord, pattern: currentPattern())
-        ], swing: Double(swingParameter.value))
-
-        let sampleOffset = AUEventSampleTime(min(Int(frameCount - 1), 64))
-        for event in tones.prefix(4) {
-            let data: [UInt8] = [event.status, event.data1, 100]
-            data.withUnsafeBufferPointer { ptr in
-                guard let base = ptr.baseAddress else { return }
-                _ = midiOut(sampleOffset, 0, 3, base)
-            }
+        let bytes: [UInt8] = [0x90, note, 100]
+        bytes.withUnsafeBufferPointer { ptr in
+            guard let base = ptr.baseAddress else { return }
+            _ = midiOut(offset, 0, 3, base)
         }
     }
 
-    private func currentChordFromParameters() -> CFChord {
-        let tonicIndex = Int(tonicParameter.value.rounded())
-        let tonic = CFNote(rawValue: max(0, min(11, tonicIndex))) ?? .c
-        let tension = tensionParameter.value
-        return CFChord(root: tonic, quality: .major, add7: tension > 0.45, add9: tension > 0.75)
-    }
-
-    private func currentPattern() -> CFPattern {
-        let idx = Int(patternParameter.value.rounded())
-        return CFPattern.allCases[max(0, min(CFPattern.allCases.count - 1, idx))]
-    }
-
-    public func captureHostTransport() {
-        var tempo: Double = 120
-        var timeSigNum: Double = 4
-        var timeSigDen: Int = 4
-        var beatPosition: Double = 0
-        var sampleOffsetToNextBeat: Int = 0
-        var measureDownbeatPosition: Double = 0
-
-        if let musicalContextBlock {
-            _ = musicalContextBlock(
-                &tempo,
-                &timeSigNum,
-                &timeSigDen,
-                &beatPosition,
-                &sampleOffsetToNextBeat,
-                &measureDownbeatPosition
-            )
-            cachedTempo = tempo
-            cachedBeatPosition = beatPosition
-        }
-
-        if let transportStateBlock {
-            var flags: AUHostTransportStateFlags = []
-            var currentSamplePosition: Double = 0
-            var cycleStartBeat: Double = 0
-            var cycleEndBeat: Double = 0
-            _ = transportStateBlock(&flags, &currentSamplePosition, &cycleStartBeat, &cycleEndBeat)
-            cachedPlaying = flags.contains(.moving)
+    private func sendNoteOff(_ note: UInt8) {
+        guard let midiOut = midiOutputEventBlock else { return }
+        let bytes: [UInt8] = [0x80, note, 0]
+        bytes.withUnsafeBufferPointer { ptr in
+            guard let base = ptr.baseAddress else { return }
+            _ = midiOut(0, 0, 3, base)
         }
     }
+
+    private func sendActiveNotesOff() {
+        for note in activeNotes {
+            sendNoteOff(note)
+        }
+        activeNotes.removeAll(keepingCapacity: true)
+    }
+
+    // MARK: - Public Accessors
+
+    public func captureHostTransport() {}
 
     public func latestHostSnapshot() -> (tempo: Double, beatPosition: Double, isPlaying: Bool) {
-        (cachedTempo, cachedBeatPosition, cachedPlaying)
+        (120, 0, false)
     }
 }

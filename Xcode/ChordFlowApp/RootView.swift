@@ -21,11 +21,17 @@ struct RootView: View {
                 }
                 .tag(1)
 
+            RouteScreen(vm: vm)
+                .tabItem {
+                    Label("Route", systemImage: "cable.connector")
+                }
+                .tag(2)
+
             ExportScreen(vm: vm)
                 .tabItem {
                     Label("Export", systemImage: "square.and.arrow.up")
                 }
-                .tag(2)
+                .tag(3)
         }
         .tint(Color.cfTonic)
         .preferredColorScheme(.dark)
