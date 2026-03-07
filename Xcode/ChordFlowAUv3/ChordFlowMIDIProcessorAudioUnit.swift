@@ -30,6 +30,17 @@ public final class ChordFlowMIDIProcessorAudioUnit: AUAudioUnit {
     private var lastChordBeat: Int = -1
     private var wasPlaying: Bool = false
     private var activeNotes: [UInt8] = []
+    private var lastBeatPosition: Double = -1
+    private var renderCallCount: Int = 0
+
+    // Debug state readable from UI
+    var debugHasMusicalContext: Bool { musicalContextBlock != nil }
+    var debugHasTransport: Bool { transportStateBlock != nil }
+    var debugHasMidiOut: Bool { midiOutputEventBlock != nil }
+    var debugRenderCount: Int { renderCallCount }
+    var debugIsPlaying: Bool { wasPlaying }
+    var debugBeatPosition: Double { lastBeatPosition }
+    var debugChordCount: Int { cachedChords.count }
 
     // Backing storage for parameter values (avoids infinite recursion via implementorValueProvider)
     private var tonicValue: AUValue = 0
@@ -51,6 +62,10 @@ public final class ChordFlowMIDIProcessorAudioUnit: AUAudioUnit {
         get { parameterTreeInternal }
         set { parameterTreeInternal = newValue }
     }
+
+    // Tell the host we generate MIDI so it sets midiOutputEventBlock.
+    // Returning a non-empty array causes the host to provide midiOutputEventBlock.
+    public override var midiOutputNames: [String] { ["ChordFlow MIDI Out"] }
 
     public override init(componentDescription: AudioComponentDescription, options: AudioComponentInstantiationOptions = []) throws {
         try super.init(componentDescription: componentDescription, options: options)
@@ -80,6 +95,7 @@ public final class ChordFlowMIDIProcessorAudioUnit: AUAudioUnit {
         super.deallocateRenderResources()
         lastChordBeat = -1
         wasPlaying = false
+        lastBeatPosition = -1
         sendActiveNotesOff()
     }
 
@@ -277,9 +293,10 @@ public final class ChordFlowMIDIProcessorAudioUnit: AUAudioUnit {
                 var bp: Double = 0
                 var sampleOff: Int = 0
                 var downbeat: Double = 0
-                _ = ctx(&tempo, &tsNum, &tsDen, &bp, &sampleOff, &downbeat)
-                beatPosition = bp
-                timeSigNum = max(1, Int(tsNum))
+                if ctx(&tempo, &tsNum, &tsDen, &bp, &sampleOff, &downbeat) {
+                    beatPosition = bp
+                    timeSigNum = max(1, Int(tsNum))
+                }
             }
 
             if let transport = au.transportStateBlock {
@@ -287,9 +304,19 @@ public final class ChordFlowMIDIProcessorAudioUnit: AUAudioUnit {
                 var samplePos: Double = 0
                 var cycleStart: Double = 0
                 var cycleEnd: Double = 0
-                _ = transport(&flags, &samplePos, &cycleStart, &cycleEnd)
-                isPlaying = flags.contains(.moving)
+                if transport(&flags, &samplePos, &cycleStart, &cycleEnd) {
+                    isPlaying = flags.contains(.moving)
+                }
             }
+
+            // Fallback: if transportStateBlock wasn't provided or returned false,
+            // infer playing state from beat position advancing
+            if !isPlaying && au.lastBeatPosition >= 0 && beatPosition != au.lastBeatPosition {
+                isPlaying = true
+            }
+            au.lastBeatPosition = beatPosition
+
+            au.renderCallCount += 1
 
             // Transport transitions
             if isPlaying && !au.wasPlaying {
@@ -358,11 +385,5 @@ public final class ChordFlowMIDIProcessorAudioUnit: AUAudioUnit {
         activeNotes.removeAll(keepingCapacity: true)
     }
 
-    // MARK: - Public Accessors
 
-    public func captureHostTransport() {}
-
-    public func latestHostSnapshot() -> (tempo: Double, beatPosition: Double, isPlaying: Bool) {
-        (120, 0, false)
-    }
 }

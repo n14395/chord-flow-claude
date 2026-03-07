@@ -1,6 +1,6 @@
 name: ChordFlow
 options:
-  bundleIdPrefix: com.nwf
+  bundleIdPrefix: com.n14395.chordflow2
   deploymentTarget:
     iOS: "17.0"
     macOS: "14.0"
@@ -19,6 +19,11 @@ targets:
     sources:
       - path: Shared
         group: Xcode/Shared
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.n14395.chordflow2.shared
+        DEVELOPMENT_TEAM: P52946XHRJ
+        CODE_SIGN_STYLE: Automatic
     info:
       path: Shared/Info.plist
       properties:
@@ -82,6 +87,9 @@ targets:
           - "@loader_path/Frameworks"
           - "@loader_path/../../Frameworks"
         ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES: NO
+        OTHER_LDFLAGS:
+          - "-framework"
+          - "CoreAudioKit"
     info:
       path: ChordFlowAUv3/Info.plist
       properties:
@@ -89,8 +97,8 @@ targets:
         CFBundleShortVersionString: "1.0"
         CFBundleVersion: "1"
         NSExtension:
-          NSExtensionPointIdentifier: com.apple.AudioUnit
-          NSExtensionPrincipalClass: $(PRODUCT_MODULE_NAME).ChordFlowAudioUnitFactory
+          NSExtensionPointIdentifier: com.apple.AudioUnit-UI
+          NSExtensionMainStoryboard: MainInterface
           NSExtensionAttributes:
             AudioComponents:
               - type: aumi
@@ -98,7 +106,7 @@ targets:
                 manufacturer: NWF1
                 name: ChordFlow MIDI FX
                 description: Harmonic suggestion MIDI effect
-                version: 1
+                version: 2
                 sandboxSafe: true
                 tags: [Effects, MIDI]
     dependencies:
@@ -114,7 +122,9 @@ targets:
         group: Xcode/HostHarness
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.nwf.chordflow.hostharness
+        PRODUCT_BUNDLE_IDENTIFIER: com.n14395.chordflow2.hostharness
+        DEVELOPMENT_TEAM: P52946XHRJ
+        CODE_SIGN_STYLE: Automatic
     info:
       path: HostHarness/Info.plist
       properties:
@@ -130,7 +140,7 @@ targets:
     settings:
       base:
         GENERATE_INFOPLIST_FILE: YES
-        PRODUCT_BUNDLE_IDENTIFIER: com.nwf.chordflow.hostharness.tests
+        PRODUCT_BUNDLE_IDENTIFIER: com.n14395.chordflow2.hostharness.tests
         TEST_HOST: ""
         BUNDLE_LOADER: ""
 schemes:

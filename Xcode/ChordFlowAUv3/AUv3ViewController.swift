@@ -5,8 +5,9 @@ import AudioToolbox
 // MARK: - ViewModel
 
 final class AUv3ViewModel: ObservableObject {
-    private let audioUnit: ChordFlowMIDIProcessorAudioUnit
+    let audioUnit: ChordFlowMIDIProcessorAudioUnit
     private var parameterObservation: AUParameterObserverToken?
+    private var debugTimer: Timer?
 
     @Published var tonic: Float = 0
     @Published var mode: Float = 0
@@ -14,6 +15,9 @@ final class AUv3ViewModel: ObservableObject {
     @Published var pattern: Float = 0
     @Published var swing: Float = 0.1
     @Published var humanize: Float = 0.1
+
+    // Debug state
+    @Published var debugInfo: String = "waiting..."
 
     private let noteNames = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
     private let modeNames = ["Major", "Minor", "Ionian", "Dorian", "Phrygian", "Lydian",
@@ -34,9 +38,16 @@ final class AUv3ViewModel: ObservableObject {
                 self?.handleExternal(address: address, value: value)
             }
         })
+
+        // Poll debug state from the render thread
+        debugTimer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { [weak self] _ in
+            guard let self, let au = Optional(self.audioUnit) else { return }
+            self.debugInfo = "renders=\(au.debugRenderCount) beat=\(String(format: "%.1f", au.debugBeatPosition)) playing=\(au.debugIsPlaying) ctx=\(au.debugHasMusicalContext) trans=\(au.debugHasTransport) midi=\(au.debugHasMidiOut) chords=\(au.debugChordCount)"
+        }
     }
 
     deinit {
+        debugTimer?.invalidate()
         if let token = parameterObservation {
             audioUnit.parameterTree?.removeParameterObserver(token)
         }
@@ -188,6 +199,12 @@ struct AUv3View: View {
                     vm.setHumanize($0)
                 }
             }
+
+            // Debug info
+            Text(vm.debugInfo)
+                .font(.system(size: 10, weight: .regular, design: .monospaced))
+                .foregroundStyle(textSecondary.opacity(0.6))
+                .frame(maxWidth: .infinity, alignment: .leading)
         }
         .padding(16)
         .background(bgColor)

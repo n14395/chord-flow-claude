@@ -115,6 +115,34 @@ final class ProgressionPlaybackEngine {
         schedulerQueue.asyncAfter(deadline: .now() + longestEnd + 0.05, execute: finish)
     }
 
+    /// Runs the timeline for progress tracking but produces no audio.
+    /// Used when MIDI output is active and the built-in sine player should be silent.
+    func playSilent(events: [CFMIDIEvent], tempo: Double, ppq: Int = ChordFlowEngine.ppq) {
+        stop()
+        guard !events.isEmpty else { return }
+
+        let secondsPerTick = 60.0 / max(1.0, tempo) / Double(max(1, ppq))
+        var longestEnd: Double = 0
+        for event in events {
+            let offTime = max(0, Double(event.startTick + event.durationTicks) * secondsPerTick)
+            longestEnd = max(longestEnd, offTime)
+        }
+
+        startTime = CFAbsoluteTimeGetCurrent()
+        duration = longestEnd
+        onPlaybackStateChange?(true)
+
+        let finish = DispatchWorkItem { [weak self] in
+            guard let self else { return }
+            Task { @MainActor in
+                self.duration = 0
+                self.onPlaybackStateChange?(false)
+            }
+        }
+        scheduledItems.append(finish)
+        schedulerQueue.asyncAfter(deadline: .now() + longestEnd + 0.05, execute: finish)
+    }
+
     func stop() {
         for item in scheduledItems {
             item.cancel()

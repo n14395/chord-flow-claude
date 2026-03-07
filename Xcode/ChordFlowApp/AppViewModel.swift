@@ -215,8 +215,11 @@ final class AppViewModel: ObservableObject {
             octaveShift: defaultOctave
         )
         let events = ChordFlowEngine.render(blocks: [block], swing: 0)
-        if midiOutputEnabled { scheduleMIDIEvents(events, tempo: project.tempo) }
-        previewEngine.play(events: events, tempo: project.tempo)
+        if midiOutputEnabled {
+            scheduleMIDIEvents(events, tempo: project.tempo)
+        } else {
+            previewEngine.play(events: events, tempo: project.tempo)
+        }
     }
 
     func previewBlock(_ block: CFSequenceBlock) {
@@ -224,8 +227,11 @@ final class AppViewModel: ObservableObject {
         preview.barStart = 0
         preview.beatStart = 0
         let events = ChordFlowEngine.render(blocks: [preview], swing: 0)
-        if midiOutputEnabled { scheduleMIDIEvents(events, tempo: project.tempo) }
-        previewEngine.play(events: events, tempo: project.tempo)
+        if midiOutputEnabled {
+            scheduleMIDIEvents(events, tempo: project.tempo)
+        } else {
+            previewEngine.play(events: events, tempo: project.tempo)
+        }
     }
 
     func togglePlayback() {
@@ -244,12 +250,14 @@ final class AppViewModel: ObservableObject {
         let sequenced = sequencedBlocks(project.blocks)
         let events = ChordFlowEngine.render(blocks: sequenced, swing: 0)
 
-        // Schedule MIDI output alongside audio playback
         if midiOutputEnabled {
+            // MIDI-only playback: send MIDI events, use silent playback for timeline/progress
             scheduleMIDIEvents(events, tempo: project.tempo)
+            playbackEngine.playSilent(events: events, tempo: project.tempo)
+        } else {
+            // Built-in sine-wave playback
+            playbackEngine.play(events: events, tempo: project.tempo)
         }
-
-        playbackEngine.play(events: events, tempo: project.tempo)
         status = "Playing \(project.blocks.count) chord(s) at \(Int(project.tempo.rounded())) BPM"
     }
 
