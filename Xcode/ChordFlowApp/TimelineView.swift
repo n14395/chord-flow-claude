@@ -121,8 +121,9 @@ struct TimelineView: View {
             let color = function.color
             let beats = Int(block.lengthBeats)
             let startBeat = vm.project.blocks[0..<index].reduce(0) { $0 + Int($1.lengthBeats) }
-            let x = CGFloat(startBeat) * beatWidth + 6
-            let width = CGFloat(beats) * beatWidth - 4
+            let blockPad: CGFloat = 2
+            let x = CGFloat(startBeat) * beatWidth + 4 + blockPad
+            let width = CGFloat(beats) * beatWidth - blockPad * 2
             let isBorrowed = function == .borrowed
 
             ZStack {
@@ -138,17 +139,34 @@ struct TimelineView: View {
                     )
                     .frame(width: width, height: blockHeight)
 
-                VStack(spacing: 2) {
-                    Text(block.chord.symbol())
-                        .font(.system(size: 14, weight: .semibold, design: .rounded))
-                        .foregroundStyle(color)
-                    Text(vm.romanNumeral(for: block.chord))
-                        .font(.system(size: 9, weight: .regular, design: .rounded))
-                        .foregroundStyle(color.opacity(0.5))
+                HStack(spacing: 0) {
+                    Spacer(minLength: 0)
+                    VStack(spacing: 2) {
+                        Text(block.chord.symbol())
+                            .font(.system(size: 14, weight: .semibold, design: .rounded))
+                            .foregroundStyle(color)
+                        Text(vm.romanNumeral(for: block.chord))
+                            .font(.system(size: 9, weight: .regular, design: .rounded))
+                            .foregroundStyle(color.opacity(0.5))
+                    }
+                    Spacer(minLength: 0)
+                    Button {
+                        vm.previewChord(block.chord)
+                    } label: {
+                        Image(systemName: "play.fill")
+                            .font(.system(size: 12))
+                            .foregroundStyle(color.opacity(0.7))
+                            .frame(width: 26, height: 26)
+                            .background(color.opacity(0.1))
+                            .clipShape(Circle())
+                    }
+                    .buttonStyle(.plain)
+                    .padding(.trailing, 4)
                 }
+                .frame(width: width, height: blockHeight)
             }
             .id(block.id)
-            .offset(x: x + width / 2 - 2, y: barNumberHeight + 8 + blockHeight / 2)
+            .offset(x: x, y: barNumberHeight + 8)
             .onTapGesture {
                 onBlockTap?(index)
             }
