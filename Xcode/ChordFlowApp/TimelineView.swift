@@ -16,6 +16,7 @@ struct TimelineView: View {
     @State private var draggingBlockID: UUID?
     @State private var dragOffset: CGFloat = 0
     @State private var dragSwapAccumulator: CGFloat = 0
+    @State private var dragStartX: CGFloat = 0
 
     var body: some View {
         VStack(alignment: .leading, spacing: CFSpacing.tight) {
@@ -74,8 +75,9 @@ struct TimelineView: View {
                     ZStack(alignment: .topLeading) {
                         beatGrid(beatWidth: beatWidth)
 
-                        // Invisible scroll anchors in an HStack so ScrollViewReader
-                        // can resolve each block's actual layout position.
+                        // Invisible scroll anchors laid out sequentially so
+                        // ScrollViewReader can resolve each block position,
+                        // plus a trailing anchor for reliable scroll-to-end.
                         scrollAnchors(beatWidth: beatWidth)
 
                         chordBlocks(beatWidth: beatWidth)
@@ -84,6 +86,7 @@ struct TimelineView: View {
                             playbackCursor(beatWidth: beatWidth)
                         }
                     }
+                    .coordinateSpace(name: "timeline")
                     .padding(.vertical, 4)
 
                     patternIndicators(beatWidth: beatWidth)
@@ -92,8 +95,13 @@ struct TimelineView: View {
             }
             .scrollDisabled(draggingBlockID != nil)
             .onChange(of: vm.project.blocks.count) { oldCount, newCount in
-                guard newCount > oldCount, let last = vm.project.blocks.last else { return }
-                withAnimation { proxy.scrollTo(last.id, anchor: .trailing) }
+                guard newCount > oldCount else { return }
+                // Use DispatchQueue to let the layout pass complete before scrolling
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                    withAnimation(.easeOut(duration: 0.3)) {
+                        proxy.scrollTo("timeline_end", anchor: .trailing)
+                    }
+                }
             }
         }
     }
@@ -106,6 +114,10 @@ struct TimelineView: View {
                     .frame(width: CGFloat(beats) * beatWidth, height: 1)
                     .id(block.id)
             }
+            // Trailing anchor always positioned at the very end of all blocks
+            Color.clear
+                .frame(width: 1, height: 1)
+                .id("timeline_end")
         }
         .padding(.leading, 4)
     }
@@ -180,27 +192,36 @@ struct TimelineView: View {
         }
     }
 
-    // Drag gesture for reordering, attached only to the handle area
+    // Drag gesture for reordering, attached only to the handle area.
+    // Uses the "timeline" coordinate space so the gesture location is
+    // always relative to the scroll content, avoiding drift when the
+    // block's own frame moves.
     private func reorderDragGesture(
         block: CFSequenceBlock,
         beatWidth: CGFloat,
         blockPad: CGFloat
     ) -> some Gesture {
-        DragGesture(minimumDistance: 8)
+        DragGesture(minimumDistance: 8, coordinateSpace: .named("timeline"))
             .onChanged { value in
                 if draggingBlockID == nil {
                     draggingBlockID = block.id
                     dragSwapAccumulator = 0
+                    // Record the finger's start X in timeline space
+                    dragStartX = value.startLocation.x
                 }
                 guard draggingBlockID == block.id else { return }
 
-                dragOffset = value.translation.width + dragSwapAccumulator
-
                 guard let currentIndex = vm.project.blocks.firstIndex(where: { $0.id == block.id }) else { return }
 
+                // Where the block currently sits (its layout origin) based on array order
                 let currentStartBeat = vm.project.blocks[0..<currentIndex].reduce(0) { $0 + Int($1.lengthBeats) }
                 let currentX = CGFloat(currentStartBeat) * beatWidth + 4 + blockPad
                 let currentWidth = CGFloat(Int(vm.project.blocks[currentIndex].lengthBeats)) * beatWidth - blockPad * 2
+
+                // The drag offset is how far the finger has moved from its start,
+                // adjusted by swap accumulator to account for array reorders.
+                dragOffset = (value.location.x - dragStartX) + dragSwapAccumulator
+
                 let draggedCenter = currentX + currentWidth / 2 + dragOffset
 
                 if currentIndex > 0 {
@@ -213,7 +234,7 @@ struct TimelineView: View {
                         let prevBlockWidth = CGFloat(Int(vm.project.blocks[currentIndex - 1].lengthBeats)) * beatWidth
                         vm.moveBlock(from: currentIndex, to: currentIndex - 1)
                         dragSwapAccumulator += prevBlockWidth
-                        dragOffset = value.translation.width + dragSwapAccumulator
+                        dragOffset = (value.location.x - dragStartX) + dragSwapAccumulator
                         return
                     }
                 }
@@ -228,7 +249,7 @@ struct TimelineView: View {
                         let nextBlockWidth = CGFloat(Int(vm.project.blocks[currentIndex + 1].lengthBeats)) * beatWidth
                         vm.moveBlock(from: currentIndex, to: currentIndex + 1)
                         dragSwapAccumulator -= nextBlockWidth
-                        dragOffset = value.translation.width + dragSwapAccumulator
+                        dragOffset = (value.location.x - dragStartX) + dragSwapAccumulator
                         return
                     }
                 }
@@ -322,6 +343,9 @@ struct TimelineView: View {
                             onBlockTap?(index)
                         }
                     }
+                    .contextMenu {
+                        blockContextMenu(block: block, index: index)
+                    }
                 }
             } else {
                 // Normal layout: handle | label | play strip
@@ -338,47 +362,72 @@ struct TimelineView: View {
                     .contentShape(Rectangle())
                     .gesture(reorderDragGesture(block: block, beatWidth: beatWidth, blockPad: blockPad))
 
-                    // Chord label (centered, tappable for selection)
-                    VStack(spacing: 2) {
-                        Text(vm.romanNumeral(for: block.chord))
-                            .font(.system(size: 9, weight: .regular, design: .rounded))
-                            .foregroundStyle(color.opacity(0.5))
-                        Text(block.chord.symbol())
-                            .font(.system(size: 14, weight: .semibold, design: .rounded))
-                            .foregroundStyle(color)
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.6)
-                    }
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .contentShape(Rectangle())
-                    .onTapGesture {
-                        guard !isDragging else { return }
-                        onBlockTap?(index)
-                    }
-
-                    // Play button — full-height strip on the right
-                    Button {
-                        guard !isDragging else { return }
-                        vm.previewBlock(block)
-                    } label: {
-                        ZStack {
-                            UnevenRoundedRectangle(
-                                topLeadingRadius: 0,
-                                bottomLeadingRadius: 0,
-                                bottomTrailingRadius: CFRadius.button,
-                                topTrailingRadius: CFRadius.button
-                            )
-                            .fill(color.opacity(0.6))
-                            Image(systemName: "waveform")
-                                .font(.system(size: 14, weight: .medium))
-                                .foregroundStyle(Color.cfBase.opacity(0.85))
+                    // Content area (label + play strip) with context menu
+                    HStack(spacing: 0) {
+                        // Chord label (centered, tappable for selection)
+                        VStack(spacing: 2) {
+                            Text(vm.romanNumeral(for: block.chord))
+                                .font(.system(size: 9, weight: .regular, design: .rounded))
+                                .foregroundStyle(color.opacity(0.5))
+                            Text(block.chord.symbol())
+                                .font(.system(size: 14, weight: .semibold, design: .rounded))
+                                .foregroundStyle(color)
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.6)
                         }
-                        .frame(width: playWidth, height: blockHeight)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
                         .contentShape(Rectangle())
+                        .onTapGesture {
+                            guard !isDragging else { return }
+                            onBlockTap?(index)
+                        }
+
+                        // Play button — full-height strip on the right
+                        Button {
+                            guard !isDragging else { return }
+                            vm.previewBlock(block)
+                        } label: {
+                            ZStack {
+                                UnevenRoundedRectangle(
+                                    topLeadingRadius: 0,
+                                    bottomLeadingRadius: 0,
+                                    bottomTrailingRadius: CFRadius.button,
+                                    topTrailingRadius: CFRadius.button
+                                )
+                                .fill(color.opacity(0.6))
+                                Image(systemName: "waveform")
+                                    .font(.system(size: 14, weight: .medium))
+                                    .foregroundStyle(Color.cfBase.opacity(0.85))
+                            }
+                            .frame(width: playWidth, height: blockHeight)
+                            .contentShape(Rectangle())
+                        }
+                        .buttonStyle(.plain)
                     }
-                    .buttonStyle(.plain)
+                    .contextMenu {
+                        blockContextMenu(block: block, index: index)
+                    }
                 }
             }
+        }
+    }
+
+    // MARK: - Block Context Menu
+
+    @ViewBuilder
+    private func blockContextMenu(block: CFSequenceBlock, index: Int) -> some View {
+        Button {
+            vm.previewBlock(block)
+        } label: {
+            Label("Preview", systemImage: "play.fill")
+        }
+
+        Divider()
+
+        Button(role: .destructive) {
+            vm.removeBlock(at: index)
+        } label: {
+            Label("Remove", systemImage: "trash")
         }
     }
 

@@ -390,7 +390,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 2DBF3DC0ACBBC239282C6546 /* Build configuration list for PBXProject "ChordFlow" */;
+			buildConfigurationList = 2DBF3DC0ACBBC239282C6546 /* Build configuration list for PBXProject "ChordFlow2" */;
 			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -494,13 +494,17 @@
 		0FFEEC5C5A58E02B6D50B1BC /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = P52946XHRJ;
 				INFOPLIST_FILE = HostHarness/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.nwf.chordflow2.hostharness;
+				PRODUCT_BUNDLE_IDENTIFIER = com.n14395.chordflow2.hostharness;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = macosx;
 			};
 			name = Release;
@@ -517,7 +521,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.nwf.chordflow2.auv3;
+				PRODUCT_BUNDLE_IDENTIFIER = com.n14395.chordflow2.auv3;
 				PRODUCT_NAME = "ChordFlow AUv3";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
@@ -533,14 +537,18 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "";
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = P52946XHRJ;
 				GENERATE_INFOPLIST_FILE = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 					"@loader_path/../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.nwf.chordflow2.hostharness.tests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.n14395.chordflow2.hostharness.tests;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = macosx;
 				TEST_HOST = "";
 			};
@@ -559,7 +567,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.nwf.chordflow2;
+				PRODUCT_BUNDLE_IDENTIFIER = com.n14395.chordflow2;
 				PRODUCT_NAME = ChordFlow;
 				SDKROOT = iphoneos;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -573,13 +581,17 @@
 		623DD8D034E40CB880CEF4C3 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = P52946XHRJ;
 				INFOPLIST_FILE = HostHarness/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.nwf.chordflow2.hostharness;
+				PRODUCT_BUNDLE_IDENTIFIER = com.n14395.chordflow2.hostharness;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = macosx;
 			};
 			name = Debug;
@@ -645,14 +657,18 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "";
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = P52946XHRJ;
 				GENERATE_INFOPLIST_FILE = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 					"@loader_path/../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.nwf.chordflow2.hostharness.tests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.n14395.chordflow2.hostharness.tests;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = macosx;
 				TEST_HOST = "";
 			};
@@ -661,9 +677,11 @@
 		C25D914B2D161D98BF892538 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "";
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = P52946XHRJ;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -673,7 +691,8 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.nwf.chordflow2.shared;
+				PRODUCT_BUNDLE_IDENTIFIER = com.n14395.chordflow2.shared;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -762,7 +781,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.nwf.chordflow2;
+				PRODUCT_BUNDLE_IDENTIFIER = com.n14395.chordflow2;
 				PRODUCT_NAME = ChordFlow;
 				SDKROOT = iphoneos;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -776,9 +795,11 @@
 		E62756DB84D2546C76791575 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "";
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = P52946XHRJ;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -788,7 +809,8 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.nwf.chordflow2.shared;
+				PRODUCT_BUNDLE_IDENTIFIER = com.n14395.chordflow2.shared;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -812,7 +834,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.nwf.chordflow2.auv3;
+				PRODUCT_BUNDLE_IDENTIFIER = com.n14395.chordflow2.auv3;
 				PRODUCT_NAME = "ChordFlow AUv3";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
@@ -836,7 +858,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
 		};
-		2DBF3DC0ACBBC239282C6546 /* Build configuration list for PBXProject "ChordFlow" */ = {
+		2DBF3DC0ACBBC239282C6546 /* Build configuration list for PBXProject "ChordFlow2" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				D0BA56F247A052092570CB12 /* Debug */,

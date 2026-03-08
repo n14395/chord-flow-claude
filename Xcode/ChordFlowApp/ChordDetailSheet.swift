@@ -118,13 +118,13 @@ struct ChordDetailPanel: View {
                     } label: {
                         VStack(spacing: 4) {
                             patternIcon(pattern)
-                                .frame(height: 24)
+                                .frame(height: 40)
                             Text(patternLabel(pattern))
                                 .font(.system(size: 8, weight: isSelected ? .semibold : .regular, design: .rounded))
                         }
                         .foregroundStyle(isActive && isSelected ? color : Color.cfTextTertiary)
                         .frame(maxWidth: .infinity)
-                        .frame(height: 46)
+                        .frame(height: 80)
                         .background(
                             RoundedRectangle(cornerRadius: CFRadius.button)
                                 .fill(isActive && isSelected ? color.opacity(0.12) : Color.cfBackground)
@@ -199,7 +199,7 @@ struct ChordDetailPanel: View {
                             .font(.system(size: 11, weight: isSelected ? .semibold : .medium, design: .rounded))
                             .foregroundStyle(isActive && isSelected ? color : Color.cfTextTertiary)
                             .frame(minWidth: 32, maxWidth: .infinity)
-                            .frame(height: 34)
+                            .frame(height: 58)
                             .padding(.horizontal, 4)
                             .background(
                                 RoundedRectangle(cornerRadius: CFRadius.button)
@@ -258,7 +258,7 @@ struct ChordDetailPanel: View {
                 .font(.system(size: 11, weight: isSelected ? .semibold : .regular, design: .rounded))
                 .foregroundStyle(isActive && isSelected ? color : Color.cfTextTertiary)
                 .frame(maxWidth: .infinity)
-                .frame(height: 30)
+                .frame(height: 52)
                 .background(
                     RoundedRectangle(cornerRadius: CFRadius.button)
                         .fill(isActive && isSelected ? color.opacity(0.15) : Color.cfBackground)
@@ -290,7 +290,7 @@ struct ChordDetailPanel: View {
                     Image(systemName: "chevron.down")
                         .font(.system(size: 14, weight: .semibold))
                         .foregroundStyle(isActive ? color : Color.cfTextTertiary)
-                        .frame(width: 40, height: 30)
+                        .frame(width: 40, height: 52)
                         .background(
                             RoundedRectangle(cornerRadius: CFRadius.button)
                                 .fill(isActive ? color.opacity(0.08) : Color.cfBackground)
@@ -303,7 +303,7 @@ struct ChordDetailPanel: View {
                 Text(octaveLabel)
                     .font(.system(size: 13, weight: .semibold, design: .rounded))
                     .foregroundStyle(isActive ? color : Color.cfTextTertiary)
-                    .frame(width: 48, height: 30)
+                    .frame(width: 48, height: 52)
 
                 Button {
                     guard isActive, let block else { return }
@@ -312,7 +312,7 @@ struct ChordDetailPanel: View {
                     Image(systemName: "chevron.up")
                         .font(.system(size: 14, weight: .semibold))
                         .foregroundStyle(isActive ? color : Color.cfTextTertiary)
-                        .frame(width: 40, height: 30)
+                        .frame(width: 40, height: 52)
                         .background(
                             RoundedRectangle(cornerRadius: CFRadius.button)
                                 .fill(isActive ? color.opacity(0.08) : Color.cfBackground)
@@ -343,10 +343,10 @@ struct ChordDetailPanel: View {
 
             if let block {
                 MiniKeyboardView(chord: block.chord, color: color)
-                    .frame(height: 44)
+                    .frame(height: 76)
             } else {
                 MiniKeyboardPlaceholder()
-                    .frame(height: 44)
+                    .frame(height: 76)
             }
         }
     }
@@ -362,7 +362,7 @@ struct ChordDetailPanel: View {
                 Text("Preview")
                     .font(.system(size: 12, weight: .medium, design: .rounded))
                     .foregroundStyle(isActive ? color : Color.cfTextTertiary)
-                    .frame(maxWidth: .infinity, minHeight: 36)
+                    .frame(maxWidth: .infinity, minHeight: 62)
                     .background(
                         RoundedRectangle(cornerRadius: CFRadius.button)
                             .fill(isActive ? color.opacity(0.12) : Color.cfBackground)
@@ -379,7 +379,7 @@ struct ChordDetailPanel: View {
                 Text("Duplicate")
                     .font(.system(size: 12, weight: .medium, design: .rounded))
                     .foregroundStyle(isActive ? Color.cfTextPrimary : Color.cfTextTertiary)
-                    .frame(maxWidth: .infinity, minHeight: 36)
+                    .frame(maxWidth: .infinity, minHeight: 62)
                     .background(
                         RoundedRectangle(cornerRadius: CFRadius.button)
                             .fill(Color.cfBackground)
@@ -398,7 +398,7 @@ struct ChordDetailPanel: View {
                 Text("Remove")
                     .font(.system(size: 12, weight: .medium, design: .rounded))
                     .foregroundStyle(isActive ? Color.cfDestructive : Color.cfTextTertiary)
-                    .frame(maxWidth: .infinity, minHeight: 36)
+                    .frame(maxWidth: .infinity, minHeight: 62)
                     .background(
                         RoundedRectangle(cornerRadius: CFRadius.button)
                             .fill(isActive ? Color.cfDestructive.opacity(0.12) : Color.cfBackground)
