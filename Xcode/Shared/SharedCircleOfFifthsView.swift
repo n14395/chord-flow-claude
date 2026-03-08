@@ -1,13 +1,18 @@
+#if canImport(SwiftUI)
 import SwiftUI
-import ChordFlowShared
 
-struct AUv3CircleOfFifthsView: View {
-    @ObservedObject var vm: AUv3ViewModel
+public struct SharedCircleOfFifthsView<VM: ChordFlowViewModel>: View {
+    @ObservedObject var vm: VM
     var onChordTap: ((CFChord) -> Void)?
 
     @State private var expandedChordID: String?
 
-    var body: some View {
+    public init(vm: VM, onChordTap: ((CFChord) -> Void)? = nil) {
+        self._vm = ObservedObject(wrappedValue: vm)
+        self.onChordTap = onChordTap
+    }
+
+    public var body: some View {
         GeometryReader { geo in
             let size = min(geo.size.width, geo.size.height)
             let center = CGPoint(x: geo.size.width / 2, y: size / 2)
@@ -16,30 +21,7 @@ struct AUv3CircleOfFifthsView: View {
             let borrowedR = size * 0.38
 
             ZStack {
-                // Center glow
-                RadialGradient(
-                    colors: [Color.cfTonic.opacity(0.08), Color.clear],
-                    center: .center,
-                    startRadius: 0,
-                    endRadius: size * 0.45
-                )
-
-                // Ring tracks
-                Circle()
-                    .stroke(Color.cfSurface, lineWidth: 1)
-                    .frame(width: outerR * 2, height: outerR * 2)
-                    .position(center)
-                Circle()
-                    .stroke(Color.cfSurface.opacity(0.5), style: StrokeStyle(lineWidth: 0.5, dash: [4, 6]))
-                    .frame(width: innerR * 2, height: innerR * 2)
-                    .position(center)
-
-                outerNoteRing(center: center, radius: outerR)
-                innerDiatonicRing(center: center, radius: innerR)
-                borrowedHints(center: center, radius: borrowedR)
-                centerLabel(center: center)
-
-                // Background tap to dismiss expanded chord
+                // Background tap to dismiss expanded chord (first = lowest hit-test priority)
                 Color.clear
                     .contentShape(Rectangle())
                     .onTapGesture {
@@ -50,6 +32,39 @@ struct AUv3CircleOfFifthsView: View {
                         }
                     }
                     .allowsHitTesting(expandedChordID != nil)
+
+                // Subtle center glow
+                RadialGradient(
+                    colors: [Color.cfTonic.opacity(0.08), Color.clear],
+                    center: .center,
+                    startRadius: 0,
+                    endRadius: size * 0.45
+                )
+                .allowsHitTesting(false)
+
+                // Ring tracks
+                Circle()
+                    .stroke(Color.cfSurface, lineWidth: 1)
+                    .frame(width: outerR * 2, height: outerR * 2)
+                    .position(center)
+                    .allowsHitTesting(false)
+                Circle()
+                    .stroke(Color.cfSurface.opacity(0.5), style: StrokeStyle(lineWidth: 0.5, dash: [4, 6]))
+                    .frame(width: innerR * 2, height: innerR * 2)
+                    .position(center)
+                    .allowsHitTesting(false)
+
+                // Outer note ring
+                outerNoteRing(center: center, radius: outerR)
+
+                // Inner diatonic chord ring
+                innerDiatonicRing(center: center, radius: innerR)
+
+                // Borrowed chord hints
+                borrowedHints(center: center, radius: borrowedR)
+
+                // Center label
+                centerLabel(center: center, innerRadius: innerR)
             }
         }
         .aspectRatio(1, contentMode: .fit)
@@ -63,8 +78,8 @@ struct AUv3CircleOfFifthsView: View {
             let note = CFNote(rawValue: noteRaw) ?? .c
             let angleDeg = CircleOfFifths.angle(for: position)
             let point = CircleOfFifths.point(center: center, radius: radius, angleDegrees: angleDeg)
-            let isKey = note == vm.tonicNote
-            let nodeR: CGFloat = isKey ? 30 : 26
+            let isKey = note == vm.key.tonic
+            let nodeR: CGFloat = isKey ? 24 : 20
 
             ZStack {
                 if isKey {
@@ -84,12 +99,12 @@ struct AUv3CircleOfFifthsView: View {
                     .frame(width: nodeR * 2, height: nodeR * 2)
 
                 Text(CircleOfFifths.displayNames[position])
-                    .font(.system(size: isKey ? 22 : 18, weight: isKey ? .bold : .semibold, design: .rounded))
+                    .font(.system(size: isKey ? 17 : 14, weight: isKey ? .bold : .semibold, design: .rounded))
                     .foregroundStyle(isKey ? Color.cfTonic : noteTextColor(position: position))
             }
             .position(point)
             .onTapGesture {
-                vm.setTonic(Float(noteRaw))
+                vm.setTonic(note)
             }
         }
     }
@@ -103,7 +118,7 @@ struct AUv3CircleOfFifthsView: View {
             let notePosition = CircleOfFifths.position(for: button.chord.root.rawValue)
             let angleDeg = CircleOfFifths.angle(for: notePosition)
             let point = CircleOfFifths.point(center: center, radius: radius, angleDegrees: angleDeg)
-            let nodeR: CGFloat = 36
+            let nodeR: CGFloat = 26
             let color = function.color
             let isExpanded = expandedChordID == button.id
 
@@ -112,7 +127,7 @@ struct AUv3CircleOfFifthsView: View {
             let expandX = -expandOffset * CGFloat(sin(angleRad))
             let expandY = expandOffset * CGFloat(cos(angleRad))
 
-            let plusOffset = nodeR + 20
+            let plusOffset = nodeR + 16
             let plusX = plusOffset * CGFloat(sin(angleRad))
             let plusY = -plusOffset * CGFloat(cos(angleRad))
 
@@ -124,11 +139,11 @@ struct AUv3CircleOfFifthsView: View {
                     .stroke(color, lineWidth: isExpanded ? 2.5 : 2)
                     .frame(width: nodeR * 2, height: nodeR * 2)
 
-                VStack(spacing: 2) {
+                VStack(spacing: 1) {
                     Text(button.label)
-                        .font(.system(size: 15, weight: .bold, design: .rounded))
+                        .font(.system(size: 12, weight: .bold, design: .rounded))
                     Text(button.chord.symbol())
-                        .font(.system(size: 14, weight: .semibold, design: .rounded))
+                        .font(.system(size: 11, weight: .semibold, design: .rounded))
                 }
                 .foregroundStyle(color)
 
@@ -142,9 +157,9 @@ struct AUv3CircleOfFifthsView: View {
                         ZStack {
                             Circle()
                                 .fill(color)
-                                .frame(width: 48, height: 48)
+                                .frame(width: 36, height: 36)
                             Image(systemName: "plus")
-                                .font(.system(size: 26, weight: .bold))
+                                .font(.system(size: 20, weight: .bold))
                                 .foregroundStyle(Color.cfBase)
                         }
                     }
@@ -154,13 +169,20 @@ struct AUv3CircleOfFifthsView: View {
                 }
             }
             .position(x: point.x + expandX, y: point.y + expandY)
-            .zIndex(isExpanded ? 10 : 0)
             .animation(.spring(response: 0.3, dampingFraction: 0.8), value: isExpanded)
             .onTapGesture {
-                withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
-                    expandedChordID = isExpanded ? nil : button.id
+                if isExpanded {
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                        expandedChordID = nil
+                    }
+                } else {
+                    vm.previewChord(button.chord)
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                        expandedChordID = button.id
+                    }
                 }
             }
+            .zIndex(isExpanded ? 10 : 1)
         }
     }
 
@@ -224,34 +246,52 @@ struct AUv3CircleOfFifthsView: View {
                 }
             }
             .position(x: point.x + expandX, y: point.y + expandY)
-            .zIndex(isExpanded ? 10 : 0)
             .animation(.spring(response: 0.3, dampingFraction: 0.8), value: isExpanded)
             .onTapGesture {
-                withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
-                    expandedChordID = isExpanded ? nil : button.id
+                if isExpanded {
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                        expandedChordID = nil
+                    }
+                } else {
+                    vm.previewChord(button.chord)
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                        expandedChordID = button.id
+                    }
                 }
             }
+            .zIndex(isExpanded ? 10 : 1)
         }
     }
 
     // MARK: - Center Label
 
-    private func centerLabel(center: CGPoint) -> some View {
-        VStack(spacing: 3) {
-            Text(vm.keyDisplayName)
-                .font(.system(size: 26, weight: .bold, design: .rounded))
+    private func centerLabel(center: CGPoint, innerRadius: CGFloat) -> some View {
+        let maxWidth = innerRadius * 1.5
+        return VStack(spacing: 2) {
+            Text(vm.key.tonic.display())
+                .font(.system(size: 22, weight: .bold, design: .rounded))
                 .foregroundStyle(Color.cfTextPrimary)
+            Text(vm.key.mode.displayName())
+                .font(.system(size: 13, weight: .semibold, design: .rounded))
+                .foregroundStyle(Color.cfTextPrimary.opacity(0.85))
+                .multilineTextAlignment(.center)
+                .lineLimit(2)
+                .minimumScaleFactor(0.7)
             Text("Tap to change mode")
-                .font(.system(size: 13, weight: .regular, design: .rounded))
+                .font(.system(size: 10, weight: .regular, design: .rounded))
                 .foregroundStyle(Color.cfTextSecondary)
         }
+        .frame(maxWidth: maxWidth)
         .position(center)
         .onTapGesture {
             vm.showModeSheet = true
         }
     }
 
+    // MARK: - Helpers
+
     private func noteTextColor(position: Int) -> Color {
         position < 6 ? Color.cfTextSecondary : Color.cfTextTertiary
     }
 }
+#endif

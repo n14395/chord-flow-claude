@@ -1,8 +1,12 @@
+#if canImport(SwiftUI)
 import SwiftUI
-import ChordFlowShared
 
-struct AUv3ChordDetailPanel: View {
-    @ObservedObject var vm: AUv3ViewModel
+public struct SharedChordDetailPanel<VM: ChordFlowViewModel>: View {
+    @ObservedObject var vm: VM
+
+    public init(vm: VM) {
+        self._vm = ObservedObject(wrappedValue: vm)
+    }
 
     private var isActive: Bool { vm.selectedBlockIndex != nil }
     private var blockIndex: Int { vm.selectedBlockIndex ?? 0 }
@@ -20,7 +24,7 @@ struct AUv3ChordDetailPanel: View {
 
     private var color: Color { isActive ? function.color : Color.cfTextTertiary }
 
-    var body: some View {
+    public var body: some View {
         VStack(alignment: .leading, spacing: CFSpacing.standard) {
             header
             Divider().background(Color.cfBorder)
@@ -65,7 +69,7 @@ struct AUv3ChordDetailPanel: View {
                             .padding(.vertical, 2)
                             .background(Capsule().fill(color.opacity(0.12)))
                     }
-                    let noteNames = AUv3ViewModel.noteNames(for: block.chord).joined(separator: "  ")
+                    let noteNames = VM.noteNames(for: block.chord).joined(separator: "  ")
                     Text("Bar \(blockIndex + 1) of \(vm.barCount)  |  \(noteNames)")
                         .font(.system(size: 11, weight: .regular, design: .rounded))
                         .foregroundStyle(Color.cfTextSecondary)
@@ -86,7 +90,9 @@ struct AUv3ChordDetailPanel: View {
             if isActive {
                 Button { vm.selectedBlockIndex = nil } label: {
                     ZStack {
-                        Circle().fill(Color.cfBorder).frame(width: 24, height: 24)
+                        Circle()
+                            .fill(Color.cfBorder)
+                            .frame(width: 24, height: 24)
                         Image(systemName: "xmark")
                             .font(.system(size: 10, weight: .semibold))
                             .foregroundStyle(Color.cfTextSecondary)
@@ -114,13 +120,14 @@ struct AUv3ChordDetailPanel: View {
                         vm.updateBlockPattern(pattern, at: blockIndex)
                     } label: {
                         VStack(spacing: 4) {
-                            patternIcon(pattern).frame(height: 24)
+                            patternIcon(pattern)
+                                .frame(height: 40)
                             Text(patternLabel(pattern))
                                 .font(.system(size: 8, weight: isSelected ? .semibold : .regular, design: .rounded))
                         }
                         .foregroundStyle(isActive && isSelected ? color : Color.cfTextTertiary)
                         .frame(maxWidth: .infinity)
-                        .frame(height: 46)
+                        .frame(height: 80)
                         .background(
                             RoundedRectangle(cornerRadius: CFRadius.button)
                                 .fill(isActive && isSelected ? color.opacity(0.12) : Color.cfBackground)
@@ -144,26 +151,32 @@ struct AUv3ChordDetailPanel: View {
         case .block:
             VStack(spacing: 3) {
                 ForEach(0..<3, id: \.self) { _ in
-                    RoundedRectangle(cornerRadius: 1).frame(width: 24, height: 3)
+                    RoundedRectangle(cornerRadius: 1)
+                        .frame(width: 24, height: 3)
                 }
             }
         case .arpUp:
             HStack(spacing: 3) {
                 ForEach(0..<4, id: \.self) { i in
-                    RoundedRectangle(cornerRadius: 1).frame(width: 5, height: 3).offset(y: CGFloat(3 - i) * 4)
+                    RoundedRectangle(cornerRadius: 1)
+                        .frame(width: 5, height: 3)
+                        .offset(y: CGFloat(3 - i) * 4)
                 }
             }
         case .arpDown:
             HStack(spacing: 3) {
                 ForEach(0..<4, id: \.self) { i in
-                    RoundedRectangle(cornerRadius: 1).frame(width: 5, height: 3).offset(y: CGFloat(i) * 4)
+                    RoundedRectangle(cornerRadius: 1)
+                        .frame(width: 5, height: 3)
+                        .offset(y: CGFloat(i) * 4)
                 }
             }
         case .strum:
             HStack(spacing: 2) {
                 ForEach(0..<5, id: \.self) { i in
                     let h = CGFloat([12, 16, 18, 16, 12][i])
-                    RoundedRectangle(cornerRadius: 1).frame(width: 2, height: h)
+                    RoundedRectangle(cornerRadius: 1)
+                        .frame(width: 2, height: h)
                 }
             }
         }
@@ -179,7 +192,7 @@ struct AUv3ChordDetailPanel: View {
                 .textCase(.uppercase)
 
             HStack(spacing: CFSpacing.tight) {
-                ForEach([1.0, 2.0, 4.0, 8.0, 16.0], id: \.self) { beats in
+                ForEach(lengthOptions, id: \.self) { beats in
                     let isSelected = block?.lengthBeats == beats
                     Button {
                         guard isActive else { return }
@@ -189,7 +202,7 @@ struct AUv3ChordDetailPanel: View {
                             .font(.system(size: 11, weight: isSelected ? .semibold : .medium, design: .rounded))
                             .foregroundStyle(isActive && isSelected ? color : Color.cfTextTertiary)
                             .frame(minWidth: 32, maxWidth: .infinity)
-                            .frame(height: 34)
+                            .frame(height: 58)
                             .padding(.horizontal, 4)
                             .background(
                                 RoundedRectangle(cornerRadius: CFRadius.button)
@@ -211,6 +224,8 @@ struct AUv3ChordDetailPanel: View {
             }
         }
     }
+
+    private let lengthOptions: [Double] = [1, 2, 4, 8, 16]
 
     // MARK: - Extension Toggles
 
@@ -242,7 +257,7 @@ struct AUv3ChordDetailPanel: View {
                 .font(.system(size: 11, weight: isSelected ? .semibold : .regular, design: .rounded))
                 .foregroundStyle(isActive && isSelected ? color : Color.cfTextTertiary)
                 .frame(maxWidth: .infinity)
-                .frame(height: 30)
+                .frame(height: 52)
                 .background(
                     RoundedRectangle(cornerRadius: CFRadius.button)
                         .fill(isActive && isSelected ? color.opacity(0.15) : Color.cfBackground)
@@ -274,7 +289,7 @@ struct AUv3ChordDetailPanel: View {
                     Image(systemName: "chevron.down")
                         .font(.system(size: 14, weight: .semibold))
                         .foregroundStyle(isActive ? color : Color.cfTextTertiary)
-                        .frame(width: 40, height: 30)
+                        .frame(width: 40, height: 52)
                         .background(
                             RoundedRectangle(cornerRadius: CFRadius.button)
                                 .fill(isActive ? color.opacity(0.08) : Color.cfBackground)
@@ -287,7 +302,7 @@ struct AUv3ChordDetailPanel: View {
                 Text(octaveLabel)
                     .font(.system(size: 13, weight: .semibold, design: .rounded))
                     .foregroundStyle(isActive ? color : Color.cfTextTertiary)
-                    .frame(width: 48, height: 30)
+                    .frame(width: 48, height: 52)
 
                 Button {
                     guard isActive, let block else { return }
@@ -296,7 +311,7 @@ struct AUv3ChordDetailPanel: View {
                     Image(systemName: "chevron.up")
                         .font(.system(size: 14, weight: .semibold))
                         .foregroundStyle(isActive ? color : Color.cfTextTertiary)
-                        .frame(width: 40, height: 30)
+                        .frame(width: 40, height: 52)
                         .background(
                             RoundedRectangle(cornerRadius: CFRadius.button)
                                 .fill(isActive ? color.opacity(0.08) : Color.cfBackground)
@@ -326,11 +341,11 @@ struct AUv3ChordDetailPanel: View {
                 .textCase(.uppercase)
 
             if let block {
-                AUv3MiniKeyboardView(chord: block.chord, color: color)
-                    .frame(height: 44)
+                SharedMiniKeyboardView<VM>(chord: block.chord, color: color)
+                    .frame(height: 76)
             } else {
-                AUv3MiniKeyboardPlaceholder()
-                    .frame(height: 44)
+                SharedMiniKeyboardPlaceholder()
+                    .frame(height: 76)
             }
         }
     }
@@ -340,13 +355,30 @@ struct AUv3ChordDetailPanel: View {
     private var actionButtons: some View {
         HStack(spacing: CFSpacing.compact) {
             Button {
+                guard let block else { return }
+                vm.previewBlock(block)
+            } label: {
+                Text("Preview")
+                    .font(.system(size: 12, weight: .medium, design: .rounded))
+                    .foregroundStyle(isActive ? color : Color.cfTextTertiary)
+                    .frame(maxWidth: .infinity, minHeight: 62)
+                    .background(
+                        RoundedRectangle(cornerRadius: CFRadius.button)
+                            .fill(isActive ? color.opacity(0.12) : Color.cfBackground)
+                            .strokeBorder(isActive ? color : Color.cfBorder, lineWidth: 1.5)
+                    )
+            }
+            .buttonStyle(.plain)
+            .disabled(!isActive)
+
+            Button {
                 guard isActive else { return }
                 vm.duplicateBlock(at: blockIndex)
             } label: {
                 Text("Duplicate")
                     .font(.system(size: 12, weight: .medium, design: .rounded))
                     .foregroundStyle(isActive ? Color.cfTextPrimary : Color.cfTextTertiary)
-                    .frame(maxWidth: .infinity, minHeight: 36)
+                    .frame(maxWidth: .infinity, minHeight: 62)
                     .background(
                         RoundedRectangle(cornerRadius: CFRadius.button)
                             .fill(Color.cfBackground)
@@ -365,7 +397,7 @@ struct AUv3ChordDetailPanel: View {
                 Text("Remove")
                     .font(.system(size: 12, weight: .medium, design: .rounded))
                     .foregroundStyle(isActive ? Color.cfDestructive : Color.cfTextTertiary)
-                    .frame(maxWidth: .infinity, minHeight: 36)
+                    .frame(maxWidth: .infinity, minHeight: 62)
                     .background(
                         RoundedRectangle(cornerRadius: CFRadius.button)
                             .fill(isActive ? Color.cfDestructive.opacity(0.12) : Color.cfBackground)
@@ -377,6 +409,8 @@ struct AUv3ChordDetailPanel: View {
         }
     }
 
+    // MARK: - Helpers
+
     private func patternLabel(_ pattern: CFPattern) -> String {
         switch pattern {
         case .block: return "Block"
@@ -387,10 +421,12 @@ struct AUv3ChordDetailPanel: View {
     }
 }
 
-// MARK: - Mini Keyboard
+// MARK: - Shared Mini Keyboard
 
-private struct AUv3MiniKeyboardPlaceholder: View {
-    var body: some View {
+public struct SharedMiniKeyboardPlaceholder: View {
+    public init() {}
+
+    public var body: some View {
         GeometryReader { geo in
             let keyCount = 14
             let keyWidth = min(geo.size.width / CGFloat(keyCount), 22.0)
@@ -406,29 +442,37 @@ private struct AUv3MiniKeyboardPlaceholder: View {
     }
 }
 
-struct AUv3MiniKeyboardView: View {
+public struct SharedMiniKeyboardView<VM: ChordFlowViewModel>: View {
     let chord: CFChord
     let color: Color
 
     private let whiteKeyWidth: CGFloat = 22
-    private let whiteKeyNotes = [0, 2, 4, 5, 7, 9, 11]
 
-    private var activeMIDI: Set<Int> {
-        Set(AUv3ViewModel.chordTones(chord).map { Int($0) % 12 })
+    public init(chord: CFChord, color: Color) {
+        self.chord = chord
+        self.color = color
     }
 
-    var body: some View {
+    private var activeMIDI: Set<Int> {
+        Set(VM.chordTones(chord).map { Int($0) % 12 })
+    }
+
+    public var body: some View {
         GeometryReader { geo in
+            let availableWidth = geo.size.width
             let keyCount = 14
-            let scale = min(geo.size.width / (CGFloat(keyCount) * whiteKeyWidth), 1.0)
+            let scale = min(availableWidth / (CGFloat(keyCount) * whiteKeyWidth), 1.0)
+
             HStack(spacing: 0) {
                 ForEach(0..<keyCount, id: \.self) { i in
                     let noteInOctave = whiteKeyNotes[i % 7]
                     let isActive = activeMIDI.contains(noteInOctave)
+
                     ZStack(alignment: .bottom) {
                         RoundedRectangle(cornerRadius: 2)
                             .fill(isActive ? color.opacity(0.3) : Color.cfElevated)
                             .strokeBorder(isActive ? color : Color.cfBorder, lineWidth: 0.5)
+
                         if isActive {
                             Text(noteNameForPC(noteInOctave))
                                 .font(.system(size: 7 * scale, weight: .semibold, design: .rounded))
@@ -442,7 +486,10 @@ struct AUv3MiniKeyboardView: View {
         }
     }
 
+    private let whiteKeyNotes = [0, 2, 4, 5, 7, 9, 11]
+
     private func noteNameForPC(_ pc: Int) -> String {
         ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"][pc]
     }
 }
+#endif

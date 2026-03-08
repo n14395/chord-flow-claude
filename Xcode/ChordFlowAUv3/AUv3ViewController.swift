@@ -5,7 +5,8 @@ import ChordFlowShared
 
 // MARK: - ViewModel
 
-final class AUv3ViewModel: ObservableObject {
+@MainActor
+final class AUv3ViewModel: ObservableObject, ChordFlowViewModel {
     let audioUnit: ChordFlowMIDIProcessorAudioUnit
     private var parameterObservation: AUParameterObserverToken?
     private var debugTimer: Timer?
@@ -119,6 +120,27 @@ final class AUv3ViewModel: ObservableObject {
         return barCount
     }
 
+    // MARK: - ChordFlowViewModel Bridging
+
+    var tensionValue: Double { Double(tension) }
+
+    func setTensionValue(_ value: Double) {
+        setTension(Float(value))
+    }
+
+    func setTonic(_ note: CFNote) {
+        setTonic(Float(note.rawValue))
+    }
+
+    func setScaleMode(_ newMode: CFScaleMode) {
+        guard let idx = CFScaleMode.allCases.firstIndex(of: newMode) else { return }
+        setMode(Float(idx))
+    }
+
+    func togglePlayback() {
+        // Host-controlled — no-op in AUv3
+    }
+
     // MARK: - Read AU Parameters
 
     private func readAllParameters() {
@@ -207,6 +229,18 @@ final class AUv3ViewModel: ObservableObject {
             previous: previous,
             tension: tensionLevel
         )
+    }
+
+    // MARK: - Preview
+
+    func previewChord(_ chord: CFChord) {
+        let notes = Self.chordTones(chord)
+        audioUnit.sendPreviewNotes(notes)
+    }
+
+    func previewBlock(_ block: CFSequenceBlock) {
+        let notes = Self.chordTones(block.chord)
+        audioUnit.sendPreviewNotes(notes)
     }
 
     // MARK: - Chord Progression Management

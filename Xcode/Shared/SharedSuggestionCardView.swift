@@ -1,7 +1,7 @@
+#if canImport(SwiftUI)
 import SwiftUI
-import ChordFlowShared
 
-struct SuggestionCardView: View {
+public struct SharedSuggestionCardView: View {
     let suggestion: CFSuggestion
     let rank: Int
     let function: HarmonicFunction
@@ -10,12 +10,30 @@ struct SuggestionCardView: View {
     var onTap: (() -> Void)?
     var onPreview: (() -> Void)?
 
-    var body: some View {
+    public init(
+        suggestion: CFSuggestion,
+        rank: Int,
+        function: HarmonicFunction,
+        reasons: [String],
+        isTopPick: Bool,
+        onTap: (() -> Void)? = nil,
+        onPreview: (() -> Void)? = nil
+    ) {
+        self.suggestion = suggestion
+        self.rank = rank
+        self.function = function
+        self.reasons = reasons
+        self.isTopPick = isTopPick
+        self.onTap = onTap
+        self.onPreview = onPreview
+    }
+
+    public var body: some View {
         let color = function.color
         let isBorrowed = function == .borrowed
 
         HStack(spacing: 0) {
-            // Play/preview strip on the left (matches timeline block style)
+            // Play/preview strip on the left
             Button {
                 onPreview?()
             } label: {
@@ -108,51 +126,4 @@ struct SuggestionCardView: View {
         )
     }
 }
-
-// MARK: - Suggestion Hint Bar (compact, for compose screen)
-
-struct SuggestionHintBar: View {
-    let suggestion: CFSuggestion?
-    var onTap: (() -> Void)?
-
-    var body: some View {
-        if let suggestion {
-            Button(action: { onTap?() }) {
-                HStack(spacing: CFSpacing.compact) {
-                    // Lightbulb icon
-                    Image(systemName: "lightbulb.fill")
-                        .font(.system(size: 14))
-                        .foregroundStyle(Color.cfTonic.opacity(0.6))
-
-                    VStack(alignment: .leading, spacing: 1) {
-                        HStack(spacing: CFSpacing.micro) {
-                            Text("Next suggestion:")
-                                .font(.system(size: 10, weight: .medium, design: .rounded))
-                                .foregroundStyle(Color.cfTextSecondary)
-                            Text(suggestion.chord.symbol())
-                                .font(.system(size: 12, weight: .semibold, design: .rounded))
-                                .foregroundStyle(Color.cfTonic)
-                        }
-                        Text("Tap for more suggestions")
-                            .font(.system(size: 9, weight: .regular, design: .rounded))
-                            .foregroundStyle(Color.cfTextTertiary)
-                    }
-
-                    Spacer()
-
-                    Image(systemName: "chevron.right")
-                        .font(.system(size: 12))
-                        .foregroundStyle(Color.cfTextTertiary)
-                }
-                .padding(.horizontal, CFSpacing.standard)
-                .padding(.vertical, CFSpacing.compact)
-                .background(
-                    RoundedRectangle(cornerRadius: 10)
-                        .fill(Color.cfSurface)
-                        .strokeBorder(Color.cfBorder, lineWidth: 1)
-                )
-            }
-            .buttonStyle(.plain)
-        }
-    }
-}
+#endif

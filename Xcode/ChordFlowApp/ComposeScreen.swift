@@ -29,7 +29,7 @@ struct ComposeScreen: View {
             ScrollView {
                 VStack(spacing: CFSpacing.standard) {
                     // Circle of Fifths
-                    CircleOfFifthsView(vm: vm) { chord in
+                    SharedCircleOfFifthsView(vm: vm) { chord in
                         vm.addChord(chord)
                     }
                     .padding(.horizontal, CFSpacing.spacious)
@@ -39,7 +39,7 @@ struct ComposeScreen: View {
                         .padding(.horizontal, CFSpacing.spacious)
 
                     // Chord detail panel
-                    ChordDetailPanel(vm: vm)
+                    SharedChordDetailPanel(vm: vm)
                         .padding(.horizontal, CFSpacing.compact)
                 }
                 .padding(.top, CFSpacing.compact)
@@ -63,7 +63,7 @@ struct ComposeScreen: View {
                 // Left column: Circle + controls
                 ScrollView {
                     VStack(spacing: CFSpacing.standard) {
-                        CircleOfFifthsView(vm: vm) { chord in
+                        SharedCircleOfFifthsView(vm: vm) { chord in
                             vm.addChord(chord)
                         }
 
@@ -77,7 +77,7 @@ struct ComposeScreen: View {
                 // Right column: Chord detail
                 ScrollView {
                     VStack(spacing: CFSpacing.standard) {
-                        ChordDetailPanel(vm: vm)
+                        SharedChordDetailPanel(vm: vm)
                     }
                 }
                 .frame(maxWidth: .infinity)
@@ -283,9 +283,7 @@ struct ComposeScreen: View {
             List {
                 ForEach(CFScaleMode.allCases, id: \.self) { mode in
                     Button {
-                        vm.project.key.mode = mode
-                        vm.refreshChordButtons()
-                        vm.refreshSuggestions()
+                        vm.setScaleMode(mode)
                         vm.showModeSheet = false
                     } label: {
                         HStack {
@@ -293,7 +291,7 @@ struct ComposeScreen: View {
                                 .font(.cfBody)
                                 .foregroundStyle(Color.cfTextPrimary)
                             Spacer()
-                            if vm.project.key.mode == mode {
+                            if vm.key.mode == mode {
                                 Image(systemName: "checkmark")
                                     .foregroundStyle(Color.cfTonic)
                             }
@@ -317,44 +315,4 @@ extension Int: @retroactive Identifiable {
     public var id: Int { self }
 }
 
-// MARK: - Simple Flow Layout
-
-struct FlowLayout: Layout {
-    let spacing: CGFloat
-
-    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
-        let result = arrangeSubviews(proposal: proposal, subviews: subviews)
-        return result.size
-    }
-
-    func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
-        let result = arrangeSubviews(proposal: proposal, subviews: subviews)
-        for (index, position) in result.positions.enumerated() {
-            subviews[index].place(at: CGPoint(x: bounds.minX + position.x, y: bounds.minY + position.y), proposal: .unspecified)
-        }
-    }
-
-    private func arrangeSubviews(proposal: ProposedViewSize, subviews: Subviews) -> (size: CGSize, positions: [CGPoint]) {
-        let maxWidth = proposal.width ?? .infinity
-        var positions: [CGPoint] = []
-        var x: CGFloat = 0
-        var y: CGFloat = 0
-        var rowHeight: CGFloat = 0
-        var maxX: CGFloat = 0
-
-        for subview in subviews {
-            let size = subview.sizeThatFits(.unspecified)
-            if x + size.width > maxWidth && x > 0 {
-                x = 0
-                y += rowHeight + spacing
-                rowHeight = 0
-            }
-            positions.append(CGPoint(x: x, y: y))
-            rowHeight = max(rowHeight, size.height)
-            x += size.width + spacing
-            maxX = max(maxX, x - spacing)
-        }
-
-        return (CGSize(width: maxX, height: y + rowHeight), positions)
-    }
-}
+// FlowLayout is now in ChordFlowShared/DesignTokens.swift

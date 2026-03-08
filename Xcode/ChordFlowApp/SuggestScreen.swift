@@ -32,7 +32,7 @@ struct SuggestScreen: View {
             ScrollView {
                 VStack(spacing: CFSpacing.standard) {
                     // Circle of Fifths
-                    CircleOfFifthsView(vm: vm) { chord in
+                    SharedCircleOfFifthsView(vm: vm) { chord in
                         vm.addChord(chord)
                     }
                     .padding(.horizontal, CFSpacing.spacious)
@@ -66,7 +66,7 @@ struct SuggestScreen: View {
                 // Left column: Circle + controls
                 ScrollView {
                     VStack(spacing: CFSpacing.standard) {
-                        CircleOfFifthsView(vm: vm) { chord in
+                        SharedCircleOfFifthsView(vm: vm) { chord in
                             vm.addChord(chord)
                         }
 
@@ -299,9 +299,7 @@ struct SuggestScreen: View {
             List {
                 ForEach(CFScaleMode.allCases, id: \.self) { mode in
                     Button {
-                        vm.project.key.mode = mode
-                        vm.refreshChordButtons()
-                        vm.refreshSuggestions()
+                        vm.setScaleMode(mode)
                         vm.showModeSheet = false
                     } label: {
                         HStack {
@@ -309,7 +307,7 @@ struct SuggestScreen: View {
                                 .font(.cfBody)
                                 .foregroundStyle(Color.cfTextPrimary)
                             Spacer()
-                            if vm.project.key.mode == mode {
+                            if vm.key.mode == mode {
                                 Image(systemName: "checkmark")
                                     .foregroundStyle(Color.cfTonic)
                             }
@@ -360,14 +358,14 @@ struct SuggestScreen: View {
         VStack(spacing: CFSpacing.tight) {
             ForEach(Array(vm.suggestions.enumerated()), id: \.offset) { index, suggestion in
                 let function = suggestionFunction(suggestion)
-                SuggestionCardView(
+                SharedSuggestionCardView(
                     suggestion: suggestion,
                     rank: index + 1,
                     function: function,
                     reasons: AppViewModel.reasonPills(
                         for: suggestion,
-                        key: vm.project.key,
-                        previous: vm.project.blocks.last?.chord
+                        key: vm.key,
+                        previous: vm.blocks.last?.chord
                     ),
                     isTopPick: index == 0,
                     onTap: {

@@ -1,4 +1,5 @@
 import SwiftUI
+import ChordFlowShared
 
 struct KnobView: View {
     @Binding var value: Double

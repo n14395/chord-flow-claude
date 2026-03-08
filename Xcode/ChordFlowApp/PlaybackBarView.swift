@@ -1,4 +1,5 @@
 import SwiftUI
+import ChordFlowShared
 
 struct PlaybackBarView: View {
     @ObservedObject var vm: AppViewModel
@@ -42,7 +43,7 @@ struct PlaybackBarView: View {
                 .fixedSize(horizontal: true, vertical: false)
 
                 // Inline timeline (replaces Spacer + BPM)
-                TimelineView(vm: vm, onBlockTap: onBlockTap)
+                SharedTimelineView(vm: vm, onBlockTap: onBlockTap)
                     .frame(maxWidth: .infinity)
             }
             .padding(.horizontal, CFSpacing.spacious)
@@ -59,7 +60,7 @@ struct PlaybackBarView: View {
     }
 
     private var statusDetail: String {
-        if vm.project.blocks.isEmpty {
+        if vm.blocks.isEmpty {
             return "No chords"
         }
         if vm.isPlaying {

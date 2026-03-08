@@ -21,7 +21,7 @@ struct AUv3View: View {
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
 
-            // Playback bar
+            // Playback bar with inline timeline
             playbackBar
                 .padding(.horizontal, CFSpacing.compact)
                 .padding(.bottom, CFSpacing.tight)
@@ -75,33 +75,57 @@ struct AUv3View: View {
     // MARK: - Compose Tab
 
     private var composeTab: some View {
-        ScrollView {
-            VStack(spacing: CFSpacing.standard) {
-                AUv3CircleOfFifthsView(vm: vm) { chord in
-                    vm.addChord(chord)
+        HStack(alignment: .top, spacing: CFSpacing.spacious) {
+            // Left column: Circle + controls
+            ScrollView {
+                VStack(spacing: CFSpacing.standard) {
+                    SharedCircleOfFifthsView(vm: vm) { chord in
+                        vm.addChord(chord)
+                    }
+
+                    controlsStrip
                 }
-                .padding(.horizontal, CFSpacing.spacious)
-
-                controlsStrip
-                    .padding(.horizontal, CFSpacing.spacious)
-
-                AUv3TimelineView(vm: vm) { index in
-                    vm.selectedBlockIndex = vm.selectedBlockIndex == index ? nil : index
-                }
-                .padding(.horizontal, CFSpacing.compact)
-
-                AUv3ChordDetailPanel(vm: vm)
-                    .padding(.horizontal, CFSpacing.compact)
             }
-            .padding(.top, CFSpacing.compact)
-            .padding(.bottom, CFSpacing.spacious)
+            .frame(maxWidth: .infinity)
+
+            // Right column: Chord detail
+            ScrollView {
+                VStack(spacing: CFSpacing.standard) {
+                    SharedChordDetailPanel(vm: vm)
+                }
+            }
+            .frame(maxWidth: .infinity)
         }
+        .padding(.horizontal, CFSpacing.spacious)
+        .padding(.top, CFSpacing.standard)
     }
 
     // MARK: - Suggest Tab
 
     private var suggestTab: some View {
-        AUv3SuggestView(vm: vm)
+        HStack(alignment: .top, spacing: CFSpacing.spacious) {
+            // Left column: Circle + controls
+            ScrollView {
+                VStack(spacing: CFSpacing.standard) {
+                    SharedCircleOfFifthsView(vm: vm) { chord in
+                        vm.addChord(chord)
+                    }
+
+                    controlsStrip
+                }
+            }
+            .frame(maxWidth: .infinity)
+
+            // Right column: Suggestions panel
+            ScrollView {
+                VStack(spacing: CFSpacing.standard) {
+                    AUv3SuggestView(vm: vm)
+                }
+            }
+            .frame(maxWidth: .infinity)
+        }
+        .padding(.horizontal, CFSpacing.spacious)
+        .padding(.top, CFSpacing.standard)
     }
 
     // MARK: - Controls Strip
@@ -237,50 +261,29 @@ struct AUv3View: View {
         }
     }
 
-    // MARK: - Playback Bar
+    // MARK: - Playback Bar (with inline timeline)
 
     private var playbackBar: some View {
         VStack(spacing: 0) {
-            if vm.isPlaying {
-                GeometryReader { geo in
-                    let barWidth = geo.size.width * vm.playbackProgress
-                    ZStack(alignment: .leading) {
-                        RoundedRectangle(cornerRadius: 1.5)
-                            .fill(Color.cfSurface)
-                            .frame(height: 3)
-                        RoundedRectangle(cornerRadius: 1.5)
-                            .fill(Color.cfTonic.opacity(0.7))
-                            .frame(width: barWidth, height: 3)
-                        Circle()
-                            .fill(Color.cfTonic)
-                            .frame(width: 10, height: 10)
-                            .offset(x: barWidth - 5)
-                    }
-                    .animation(.linear(duration: 1.0 / 15.0), value: vm.playbackProgress)
-                }
-                .frame(height: 10)
-                .padding(.horizontal, CFSpacing.spacious)
-                .padding(.top, CFSpacing.tight)
-            }
-
-            HStack(spacing: CFSpacing.standard) {
-                // Transport status indicator
+            HStack(spacing: CFSpacing.compact) {
+                // Transport status indicator (host-controlled, not interactive)
                 ZStack {
                     Circle()
                         .fill(vm.isPlaying ? Color.cfTonic : Color.cfSurface)
-                        .frame(width: 32, height: 32)
+                        .frame(width: 44, height: 44)
                     if vm.isPlaying {
-                        RoundedRectangle(cornerRadius: 2)
+                        RoundedRectangle(cornerRadius: 3)
                             .fill(Color.cfBase)
-                            .frame(width: 12, height: 12)
+                            .frame(width: 18, height: 18)
                     } else {
                         Image(systemName: "play.fill")
-                            .font(.system(size: 12))
+                            .font(.system(size: 18))
                             .foregroundStyle(Color.cfTextTertiary)
                             .offset(x: 1)
                     }
                 }
 
+                // Status text
                 VStack(alignment: .leading, spacing: 1) {
                     Text(vm.isPlaying ? "Playing" : "Ready")
                         .font(.system(size: 14, weight: .semibold, design: .rounded))
@@ -289,27 +292,13 @@ struct AUv3View: View {
                         .font(.system(size: 11, weight: .regular, design: .rounded))
                         .foregroundStyle(Color.cfTextSecondary)
                 }
+                .fixedSize(horizontal: true, vertical: false)
 
-                Spacer()
-
-                // Clear button
-                if !vm.blocks.isEmpty {
-                    Button {
-                        vm.clearProgression()
-                    } label: {
-                        Text("Clear")
-                            .font(.system(size: 11, weight: .medium, design: .rounded))
-                            .foregroundStyle(Color.cfDestructive)
-                            .padding(.horizontal, CFSpacing.tight)
-                            .padding(.vertical, CFSpacing.micro)
-                            .background(
-                                Capsule()
-                                    .fill(Color.cfDestructive.opacity(0.12))
-                                    .strokeBorder(Color.cfDestructive.opacity(0.5), lineWidth: 1)
-                            )
-                    }
-                    .buttonStyle(.plain)
+                // Inline timeline
+                SharedTimelineView(vm: vm) { index in
+                    vm.selectedBlockIndex = vm.selectedBlockIndex == index ? nil : index
                 }
+                .frame(maxWidth: .infinity)
             }
             .padding(.horizontal, CFSpacing.spacious)
             .padding(.vertical, CFSpacing.compact)
@@ -341,8 +330,7 @@ struct AUv3View: View {
             List {
                 ForEach(CFScaleMode.allCases, id: \.self) { scaleMode in
                     Button {
-                        let idx = CFScaleMode.allCases.firstIndex(of: scaleMode) ?? 0
-                        vm.setMode(Float(idx))
+                        vm.setScaleMode(scaleMode)
                         vm.showModeSheet = false
                     } label: {
                         HStack {

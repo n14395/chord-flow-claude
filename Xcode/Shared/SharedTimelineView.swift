@@ -1,8 +1,8 @@
+#if canImport(SwiftUI)
 import SwiftUI
-import ChordFlowShared
 
-struct TimelineView: View {
-    @ObservedObject var vm: AppViewModel
+public struct SharedTimelineView<VM: ChordFlowViewModel>: View {
+    @ObservedObject var vm: VM
     var onBlockTap: ((Int) -> Void)?
 
     private let blockHeight: CGFloat = 56
@@ -18,7 +18,12 @@ struct TimelineView: View {
     @State private var dragSwapAccumulator: CGFloat = 0
     @State private var dragStartX: CGFloat = 0
 
-    var body: some View {
+    public init(vm: VM, onBlockTap: ((Int) -> Void)? = nil) {
+        self._vm = ObservedObject(wrappedValue: vm)
+        self.onBlockTap = onBlockTap
+    }
+
+    public var body: some View {
         VStack(alignment: .leading, spacing: CFSpacing.tight) {
             // Header
             HStack {
@@ -27,14 +32,14 @@ struct TimelineView: View {
                     .textCase(.uppercase)
                     .foregroundStyle(Color.cfTextSecondary)
                 Spacer()
-                if !vm.project.blocks.isEmpty {
+                if !vm.blocks.isEmpty {
                     Text("\(vm.barCount) bars")
                         .font(.cfCaption)
                         .foregroundStyle(Color.cfTextTertiary)
                 }
             }
 
-            if vm.project.blocks.isEmpty {
+            if vm.blocks.isEmpty {
                 emptyState
             } else {
                 GeometryReader { geo in
@@ -46,7 +51,6 @@ struct TimelineView: View {
         }
     }
 
-    /// Compute beat width so that `barsBeforeScroll` bars (each 4 beats) fit the available width.
     private func beatWidth(for availableWidth: CGFloat) -> CGFloat {
         let targetBeats = CGFloat(barsBeforeScroll * 4.0)
         return max(16, (availableWidth - gridPadding) / targetBeats)
@@ -75,9 +79,6 @@ struct TimelineView: View {
                     ZStack(alignment: .topLeading) {
                         beatGrid(beatWidth: beatWidth)
 
-                        // Invisible scroll anchors laid out sequentially so
-                        // ScrollViewReader can resolve each block position,
-                        // plus a trailing anchor for reliable scroll-to-end.
                         scrollAnchors(beatWidth: beatWidth)
 
                         chordBlocks(beatWidth: beatWidth)
@@ -94,9 +95,8 @@ struct TimelineView: View {
                 }
             }
             .scrollDisabled(draggingBlockID != nil)
-            .onChange(of: vm.project.blocks.count) { oldCount, newCount in
+            .onChange(of: vm.blocks.count) { oldCount, newCount in
                 guard newCount > oldCount else { return }
-                // Use DispatchQueue to let the layout pass complete before scrolling
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
                     withAnimation(.easeOut(duration: 0.3)) {
                         proxy.scrollTo("timeline_end", anchor: .trailing)
@@ -108,13 +108,12 @@ struct TimelineView: View {
 
     private func scrollAnchors(beatWidth: CGFloat) -> some View {
         HStack(spacing: 0) {
-            ForEach(vm.project.blocks) { block in
+            ForEach(vm.blocks) { block in
                 let beats = Int(block.lengthBeats)
                 Color.clear
                     .frame(width: CGFloat(beats) * beatWidth, height: 1)
                     .id(block.id)
             }
-            // Trailing anchor always positioned at the very end of all blocks
             Color.clear
                 .frame(width: 1, height: 1)
                 .id("timeline_end")
@@ -134,7 +133,6 @@ struct TimelineView: View {
                 .strokeBorder(Color.cfSurface, lineWidth: 1)
                 .frame(width: totalWidth, height: blockHeight + barNumberHeight + 16)
 
-            // Beat subdivision lines
             ForEach(0..<totalBeats, id: \.self) { beat in
                 let x = CGFloat(beat) * beatWidth + 4
                 let isBarLine = beat % 4 == 0 && beat > 0
@@ -144,7 +142,6 @@ struct TimelineView: View {
                     .offset(x: x, y: 4)
             }
 
-            // Bar numbers
             ForEach(0..<((totalBeats + 3) / 4), id: \.self) { bar in
                 let centerX = (CGFloat(bar) * 4 + 2) * beatWidth + 4
                 Text("\(bar + 1)")
@@ -158,11 +155,11 @@ struct TimelineView: View {
     // MARK: - Chord Blocks
 
     private func chordBlocks(beatWidth: CGFloat) -> some View {
-        return ForEach(Array(vm.project.blocks.enumerated()), id: \.element.id) { index, block in
+        return ForEach(Array(vm.blocks.enumerated()), id: \.element.id) { index, block in
             let function = vm.harmonicFunction(forBlockAt: index)
             let color = function.color
             let beats = Int(block.lengthBeats)
-            let startBeat = vm.project.blocks[0..<index].reduce(0) { $0 + Int($1.lengthBeats) }
+            let startBeat = vm.blocks[0..<index].reduce(0) { $0 + Int($1.lengthBeats) }
             let blockPad: CGFloat = 2
             let x = CGFloat(startBeat) * beatWidth + 4 + blockPad
             let width = CGFloat(beats) * beatWidth - blockPad * 2
@@ -185,17 +182,11 @@ struct TimelineView: View {
             .scaleEffect(isDragging ? 1.05 : 1.0)
             .opacity(isDragging ? 0.9 : 1.0)
             .offset(x: x + xOffset, y: barNumberHeight + 8)
-            // Non-dragged blocks animate smoothly to new positions on reorder;
-            // the dragged block must not animate (its position is driven by the gesture).
             .animation(isDragging ? nil : .interactiveSpring(response: 0.3, dampingFraction: 0.8), value: x)
             .zIndex(isDragging ? 100 : 0)
         }
     }
 
-    // Drag gesture for reordering, attached only to the handle area.
-    // Uses the "timeline" coordinate space so the gesture location is
-    // always relative to the scroll content, avoiding drift when the
-    // block's own frame moves.
     private func reorderDragGesture(
         block: CFSequenceBlock,
         beatWidth: CGFloat,
@@ -206,32 +197,28 @@ struct TimelineView: View {
                 if draggingBlockID == nil {
                     draggingBlockID = block.id
                     dragSwapAccumulator = 0
-                    // Record the finger's start X in timeline space
                     dragStartX = value.startLocation.x
                 }
                 guard draggingBlockID == block.id else { return }
 
-                guard let currentIndex = vm.project.blocks.firstIndex(where: { $0.id == block.id }) else { return }
+                guard let currentIndex = vm.blocks.firstIndex(where: { $0.id == block.id }) else { return }
 
-                // Where the block currently sits (its layout origin) based on array order
-                let currentStartBeat = vm.project.blocks[0..<currentIndex].reduce(0) { $0 + Int($1.lengthBeats) }
+                let currentStartBeat = vm.blocks[0..<currentIndex].reduce(0) { $0 + Int($1.lengthBeats) }
                 let currentX = CGFloat(currentStartBeat) * beatWidth + 4 + blockPad
-                let currentWidth = CGFloat(Int(vm.project.blocks[currentIndex].lengthBeats)) * beatWidth - blockPad * 2
+                let currentWidth = CGFloat(Int(vm.blocks[currentIndex].lengthBeats)) * beatWidth - blockPad * 2
 
-                // The drag offset is how far the finger has moved from its start,
-                // adjusted by swap accumulator to account for array reorders.
                 dragOffset = (value.location.x - dragStartX) + dragSwapAccumulator
 
                 let draggedCenter = currentX + currentWidth / 2 + dragOffset
 
                 if currentIndex > 0 {
-                    let prevBeats = vm.project.blocks[0..<(currentIndex - 1)].reduce(0) { $0 + Int($1.lengthBeats) }
-                    let prevWidth = CGFloat(Int(vm.project.blocks[currentIndex - 1].lengthBeats)) * beatWidth - blockPad * 2
+                    let prevBeats = vm.blocks[0..<(currentIndex - 1)].reduce(0) { $0 + Int($1.lengthBeats) }
+                    let prevWidth = CGFloat(Int(vm.blocks[currentIndex - 1].lengthBeats)) * beatWidth - blockPad * 2
                     let prevX = CGFloat(prevBeats) * beatWidth + 4 + blockPad
                     let prevCenter = prevX + prevWidth / 2
 
                     if draggedCenter < prevCenter {
-                        let prevBlockWidth = CGFloat(Int(vm.project.blocks[currentIndex - 1].lengthBeats)) * beatWidth
+                        let prevBlockWidth = CGFloat(Int(vm.blocks[currentIndex - 1].lengthBeats)) * beatWidth
                         vm.moveBlock(from: currentIndex, to: currentIndex - 1)
                         dragSwapAccumulator += prevBlockWidth
                         dragOffset = (value.location.x - dragStartX) + dragSwapAccumulator
@@ -239,14 +226,14 @@ struct TimelineView: View {
                     }
                 }
 
-                if currentIndex < vm.project.blocks.count - 1 {
-                    let nextStartBeat = vm.project.blocks[0..<(currentIndex + 1)].reduce(0) { $0 + Int($1.lengthBeats) }
-                    let nextWidth = CGFloat(Int(vm.project.blocks[currentIndex + 1].lengthBeats)) * beatWidth - blockPad * 2
+                if currentIndex < vm.blocks.count - 1 {
+                    let nextStartBeat = vm.blocks[0..<(currentIndex + 1)].reduce(0) { $0 + Int($1.lengthBeats) }
+                    let nextWidth = CGFloat(Int(vm.blocks[currentIndex + 1].lengthBeats)) * beatWidth - blockPad * 2
                     let nextX = CGFloat(nextStartBeat) * beatWidth + 4 + blockPad
                     let nextCenter = nextX + nextWidth / 2
 
                     if draggedCenter > nextCenter {
-                        let nextBlockWidth = CGFloat(Int(vm.project.blocks[currentIndex + 1].lengthBeats)) * beatWidth
+                        let nextBlockWidth = CGFloat(Int(vm.blocks[currentIndex + 1].lengthBeats)) * beatWidth
                         vm.moveBlock(from: currentIndex, to: currentIndex + 1)
                         dragSwapAccumulator -= nextBlockWidth
                         dragOffset = (value.location.x - dragStartX) + dragSwapAccumulator
@@ -290,7 +277,6 @@ struct TimelineView: View {
                 )
 
             if isNarrow {
-                // Narrow layout: handle | [play button (top half) / chord label (bottom half)]
                 HStack(spacing: 0) {
                     // Drag handle
                     VStack(spacing: 3) {
@@ -304,7 +290,6 @@ struct TimelineView: View {
                     .contentShape(Rectangle())
                     .gesture(reorderDragGesture(block: block, beatWidth: beatWidth, blockPad: blockPad))
 
-                    // Stacked: play on top, label below
                     VStack(spacing: 0) {
                         Button {
                             guard !isDragging else { return }
@@ -328,7 +313,6 @@ struct TimelineView: View {
                         }
                         .buttonStyle(.plain)
 
-                        // Chord label squeezed below
                         VStack(spacing: 0) {
                             Text(block.chord.symbol())
                                 .font(.system(size: 11, weight: .semibold, design: .rounded))
@@ -348,7 +332,6 @@ struct TimelineView: View {
                     }
                 }
             } else {
-                // Normal layout: handle | label | play strip
                 HStack(spacing: 0) {
                     // Drag handle
                     VStack(spacing: 3) {
@@ -362,9 +345,7 @@ struct TimelineView: View {
                     .contentShape(Rectangle())
                     .gesture(reorderDragGesture(block: block, beatWidth: beatWidth, blockPad: blockPad))
 
-                    // Content area (label + play strip) with context menu
                     HStack(spacing: 0) {
-                        // Chord label (centered, tappable for selection)
                         VStack(spacing: 2) {
                             Text(vm.romanNumeral(for: block.chord))
                                 .font(.system(size: 9, weight: .regular, design: .rounded))
@@ -382,7 +363,6 @@ struct TimelineView: View {
                             onBlockTap?(index)
                         }
 
-                        // Play button — full-height strip on the right
                         Button {
                             guard !isDragging else { return }
                             vm.previewBlock(block)
@@ -422,6 +402,12 @@ struct TimelineView: View {
             Label("Preview", systemImage: "play.fill")
         }
 
+        Button {
+            vm.duplicateBlock(at: index)
+        } label: {
+            Label("Duplicate", systemImage: "doc.on.doc")
+        }
+
         Divider()
 
         Button(role: .destructive) {
@@ -453,7 +439,7 @@ struct TimelineView: View {
 
     private func patternIndicators(beatWidth: CGFloat) -> some View {
         HStack(spacing: 0) {
-            ForEach(Array(vm.project.blocks.enumerated()), id: \.element.id) { index, block in
+            ForEach(Array(vm.blocks.enumerated()), id: \.element.id) { index, block in
                 let function = vm.harmonicFunction(forBlockAt: index)
                 let width = CGFloat(Int(block.lengthBeats)) * beatWidth - 4
                 Text(patternLabel(block.pattern))
@@ -475,3 +461,4 @@ struct TimelineView: View {
         }
     }
 }
+#endif

@@ -62,6 +62,13 @@ public final class ChordFlowMIDIProcessorAudioUnit: AUAudioUnit {
     private var progressionBeatLengths: [Double] = []
     private var hasUserProgression: Bool { !progressionChords.isEmpty }
 
+    // Preview note queue (UI thread writes, render thread reads and drains)
+    private var previewNoteOns: [UInt8] = []
+    private var previewNoteOffs: [UInt8] = []
+    private var previewActiveNotes: [UInt8] = []
+    private var hasPendingPreviewOn: Bool = false
+    private var hasPendingPreviewOff: Bool = false
+
     public override var outputBusses: AUAudioUnitBusArray { outputBussesInternal }
     public override var inputBusses: AUAudioUnitBusArray { inputBussesInternal }
     public override var parameterTree: AUParameterTree? {
@@ -247,6 +254,40 @@ public final class ChordFlowMIDIProcessorAudioUnit: AUAudioUnit {
         lastChordBeat = -1
     }
 
+    // MARK: - Preview
+
+    /// Send a set of MIDI notes immediately via the render block's MIDI output.
+    /// Notes are queued and emitted on the next render cycle. After `durationSeconds`,
+    /// note-offs are automatically queued.
+    func sendPreviewNotes(_ notes: [UInt8], durationSeconds: Double = 1.0) {
+        // Queue note-offs for any currently previewing notes
+        if !previewActiveNotes.isEmpty {
+            previewNoteOffs = previewActiveNotes
+            hasPendingPreviewOff = true
+        }
+        // Queue the new notes
+        previewNoteOns = notes
+        previewActiveNotes = notes
+        hasPendingPreviewOn = true
+
+        // Schedule auto note-off after duration
+        DispatchQueue.main.asyncAfter(deadline: .now() + durationSeconds) { [weak self] in
+            guard let self else { return }
+            // Only stop if these are still the active preview notes
+            if self.previewActiveNotes == notes {
+                self.stopPreview()
+            }
+        }
+    }
+
+    /// Immediately queue note-offs for any previewing notes.
+    func stopPreview() {
+        guard !previewActiveNotes.isEmpty else { return }
+        previewNoteOffs = previewActiveNotes
+        hasPendingPreviewOff = true
+        previewActiveNotes = []
+    }
+
     // MARK: - Chord Cache
 
     private func rebuildChordsIfNeeded() {
@@ -346,6 +387,23 @@ public final class ChordFlowMIDIProcessorAudioUnit: AUAudioUnit {
                 au.sendActiveNotesOff()
             }
             au.wasPlaying = isPlaying
+
+            // Drain preview note queues (UI-triggered chord previews)
+            if au.hasPendingPreviewOff {
+                au.hasPendingPreviewOff = false
+                for note in au.previewNoteOffs {
+                    au.sendNoteOff(note)
+                }
+                au.previewNoteOffs.removeAll(keepingCapacity: true)
+            }
+            if au.hasPendingPreviewOn {
+                au.hasPendingPreviewOn = false
+                let offset = AUEventSampleTime(min(Int(frameCount) - 1, 64))
+                for note in au.previewNoteOns {
+                    au.sendNoteOn(note, offset: offset)
+                }
+                au.previewNoteOns.removeAll(keepingCapacity: true)
+            }
 
             if isPlaying {
                 if au.hasUserProgression {

@@ -3,7 +3,7 @@ import Combine
 import ChordFlowShared
 
 @MainActor
-final class AppViewModel: ObservableObject {
+final class AppViewModel: ObservableObject, ChordFlowViewModel {
 
     // MARK: - Published State
 
@@ -93,6 +93,35 @@ final class AppViewModel: ObservableObject {
         progressTimer?.cancel()
         progressTimer = nil
         playbackProgress = 0
+    }
+
+    // MARK: - ChordFlowViewModel Bridging
+
+    var blocks: [CFSequenceBlock] {
+        get { project.blocks }
+        set { project.blocks = newValue }
+    }
+
+    var key: CFKeyContext { project.key }
+
+    var tensionValue: Double { tension }
+
+    func setTensionValue(_ value: Double) {
+        tension = value
+        refreshChordButtons()
+        refreshSuggestions()
+    }
+
+    func setTonic(_ note: CFNote) {
+        project.key = CFKeyContext(tonic: note, mode: project.key.mode)
+        refreshChordButtons()
+        refreshSuggestions()
+    }
+
+    func setScaleMode(_ mode: CFScaleMode) {
+        project.key = CFKeyContext(tonic: project.key.tonic, mode: mode)
+        refreshChordButtons()
+        refreshSuggestions()
     }
 
     // MARK: - Chord Management
