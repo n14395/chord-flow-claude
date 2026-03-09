@@ -171,6 +171,7 @@ public struct SharedTimelineView<VM: ChordFlowViewModel>: View {
             let width = CGFloat(beats) * beatWidth - blockPad * 2
             let isBorrowed = function == .borrowed
             let isDragging = draggingBlockID == block.id
+            let isSelected = vm.selectedBlockIndex == index
             let xOffset = isDragging ? dragOffset : 0
 
             chordBlockView(
@@ -184,12 +185,13 @@ public struct SharedTimelineView<VM: ChordFlowViewModel>: View {
             )
             .frame(width: width, height: blockHeight)
             .clipShape(RoundedRectangle(cornerRadius: CFRadius.button))
-            .shadow(color: isDragging ? color.opacity(0.3) : .clear, radius: 8, x: 0, y: 4)
+            .shadow(color: isDragging ? color.opacity(0.3) : isSelected ? color.opacity(0.4) : .clear, radius: isDragging ? 8 : 6, x: 0, y: isDragging ? 4 : 2)
             .scaleEffect(isDragging ? 1.05 : 1.0)
             .opacity(isDragging ? 0.9 : 1.0)
             .offset(x: x + xOffset, y: barNumberHeight + 8)
             .animation(isDragging ? nil : .interactiveSpring(response: 0.3, dampingFraction: 0.8), value: x)
-            .zIndex(isDragging ? 100 : 0)
+            .animation(.easeInOut(duration: 0.2), value: isSelected)
+            .zIndex(isDragging ? 100 : isSelected ? 50 : 0)
         }
     }
 
@@ -268,18 +270,21 @@ public struct SharedTimelineView<VM: ChordFlowViewModel>: View {
         isBorrowed: Bool
     ) -> some View {
         let isDragging = draggingBlockID == block.id
+        let isSelected = vm.selectedBlockIndex == index
         let isNarrow = Int(block.lengthBeats) == 1
         let playWidth: CGFloat = max(width * 0.28, 28)
+        let fillOpacity: Double = isSelected ? 0.28 : 0.12
+        let strokeWidth: CGFloat = isSelected ? 2.5 : 1.5
         return ZStack {
             // Background
             RoundedRectangle(cornerRadius: CFRadius.button)
-                .fill(color.opacity(0.12))
+                .fill(color.opacity(fillOpacity))
             RoundedRectangle(cornerRadius: CFRadius.button)
                 .stroke(
                     color,
                     style: isBorrowed
-                        ? StrokeStyle(lineWidth: 1.5, dash: [6, 3])
-                        : StrokeStyle(lineWidth: 1.5)
+                        ? StrokeStyle(lineWidth: strokeWidth, dash: [6, 3])
+                        : StrokeStyle(lineWidth: strokeWidth)
                 )
 
             if isNarrow {
