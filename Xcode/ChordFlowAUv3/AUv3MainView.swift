@@ -164,6 +164,7 @@ struct AUv3View: View {
 
                     controlsStrip
                 }
+                .padding(.bottom, CFSpacing.standard)
             }
             .frame(maxWidth: .infinity)
 
@@ -192,6 +193,7 @@ struct AUv3View: View {
 
                     controlsStrip
                 }
+                .padding(.bottom, CFSpacing.standard)
             }
             .frame(maxWidth: .infinity)
 

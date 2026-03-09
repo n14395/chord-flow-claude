@@ -15,17 +15,19 @@ struct AUv3SuggestView: View {
         }
     }
 
-    // MARK: - Style Filter Pills
+    // MARK: - Borrowed Preset Pills
 
     private var styleFilterPills: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: CFSpacing.tight) {
-                ForEach(vm.styleFilters, id: \.self) { filter in
-                    let isActive = vm.styleFilter == filter
+                ForEach(CFBorrowedChordPreset.allCases, id: \.self) { preset in
+                    let isActive = vm.borrowedPreset == preset
                     Button {
-                        vm.applyStyleFilter(filter)
+                        vm.borrowedPreset = preset
+                        vm.refreshChordButtons()
+                        vm.refreshSuggestions()
                     } label: {
-                        Text(filter)
+                        Text(preset.displayName())
                             .font(.system(size: 12, weight: isActive ? .semibold : .regular, design: .rounded))
                             .foregroundStyle(isActive ? Color.cfTonic : Color.cfTextSecondary)
                             .padding(.horizontal, CFSpacing.compact)

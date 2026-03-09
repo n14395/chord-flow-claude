@@ -30,7 +30,6 @@ final class AUv3ViewModel: ObservableObject, ChordFlowViewModel {
     @Published var borrowedPreset: CFBorrowedChordPreset = .jazz
     @Published var showModeSheet = false
     @Published var selectedTab: Int = 0
-    @Published var styleFilter: String = "All"
 
     // MARK: Save/Load State
 
@@ -51,7 +50,7 @@ final class AUv3ViewModel: ObservableObject, ChordFlowViewModel {
     private let noteNames = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
     private let modeList = CFScaleMode.allCases
     private let patternList = CFPattern.allCases
-    let styleFilters = ["All", "Pop", "Jazz", "Neo-Soul", "Cinematic", "Exp."]
+    
 
     init(audioUnit: ChordFlowMIDIProcessorAudioUnit) {
         self.audioUnit = audioUnit
@@ -497,21 +496,7 @@ final class AUv3ViewModel: ObservableObject, ChordFlowViewModel {
         syncProgressionToAU()
     }
 
-    // MARK: - Style Filtering
-
-    func applyStyleFilter(_ filter: String) {
-        styleFilter = filter
-        switch filter {
-        case "Jazz": borrowedPreset = .jazz
-        case "Cinematic": borrowedPreset = .cinematic
-        case "Pop": borrowedPreset = .conservative
-        case "Neo-Soul": borrowedPreset = .colorful
-        case "Exp.": borrowedPreset = .experimental
-        default: break
-        }
-        refreshChordButtons()
-        refreshSuggestions()
-    }
+    
 
     // MARK: - Harmonic Function Resolution
 

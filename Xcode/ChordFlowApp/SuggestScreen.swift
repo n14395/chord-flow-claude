@@ -4,10 +4,7 @@ import ChordFlowShared
 struct SuggestScreen: View {
     @ObservedObject var vm: AppViewModel
     @Environment(\.horizontalSizeClass) private var sizeClass
-    @State private var styleFilter: String = "All"
     @State private var showBorrowedPicker = false
-
-    private let styleFilters = ["All", "Pop", "Jazz", "Neo-Soul", "Cinematic", "Exp."]
 
     var body: some View {
         VStack(spacing: 0) {
@@ -239,18 +236,19 @@ struct SuggestScreen: View {
         }
     }
 
-    // MARK: - Style Filter Pills
+    // MARK: - Borrowed Preset Pills
 
     private var styleFilterPills: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: CFSpacing.tight) {
-                ForEach(styleFilters, id: \.self) { filter in
-                    let isActive = styleFilter == filter
+                ForEach(CFBorrowedChordPreset.allCases, id: \.self) { preset in
+                    let isActive = vm.borrowedPreset == preset
                     Button {
-                        styleFilter = filter
-                        applyStyleFilter(filter)
+                        vm.borrowedPreset = preset
+                        vm.refreshChordButtons()
+                        vm.refreshSuggestions()
                     } label: {
-                        Text(filter)
+                        Text(preset.displayName())
                             .font(.system(size: 12, weight: isActive ? .semibold : .regular, design: .rounded))
                             .foregroundStyle(isActive ? Color.cfTonic : Color.cfTextSecondary)
                             .padding(.horizontal, CFSpacing.compact)
@@ -309,25 +307,6 @@ struct SuggestScreen: View {
     }
 
     // MARK: - Helpers
-
-    private func applyStyleFilter(_ filter: String) {
-        switch filter {
-        case "Jazz":
-            vm.borrowedPreset = .jazz
-        case "Cinematic":
-            vm.borrowedPreset = .cinematic
-        case "Pop":
-            vm.borrowedPreset = .conservative
-        case "Neo-Soul":
-            vm.borrowedPreset = .colorful
-        case "Exp.":
-            vm.borrowedPreset = .experimental
-        default:
-            break // "All" keeps current preset
-        }
-        vm.refreshChordButtons()
-        vm.refreshSuggestions()
-    }
 
     private func suggestionFunction(_ suggestion: CFSuggestion) -> HarmonicFunction {
         if let btn = vm.chordButtons.first(where: { $0.chord.root == suggestion.chord.root && $0.chord.quality == suggestion.chord.quality }) {
