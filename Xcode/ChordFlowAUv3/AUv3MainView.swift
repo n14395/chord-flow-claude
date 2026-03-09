@@ -116,29 +116,37 @@ struct AUv3View: View {
     // MARK: - Tab Bar
 
     private var tabBar: some View {
-        HStack(spacing: 0) {
-            tabButton(title: "Compose", icon: "circle.circle", tag: 0)
-            tabButton(title: "Suggest", icon: "lightbulb", tag: 1)
-            tabButton(title: "Output", icon: "arrow.up.forward.square", tag: 2)
+        HStack(spacing: CFSpacing.tight) {
+            tabButton(title: "Compose", tag: 0)
+            tabButton(title: "Suggest", tag: 1)
+            tabButton(title: "Output", tag: 2)
         }
-        .background(Color.cfSurface)
+        .padding(3)
+        .background(
+            Capsule()
+                .fill(Color.cfSurface)
+                .strokeBorder(Color.cfBorder.opacity(0.6), lineWidth: 1)
+        )
+        .padding(.horizontal, CFSpacing.spacious)
+        .padding(.vertical, CFSpacing.compact)
     }
 
-    private func tabButton(title: String, icon: String, tag: Int) -> some View {
+    private func tabButton(title: String, tag: Int) -> some View {
         let isSelected = vm.selectedTab == tag
         return Button {
-            vm.selectedTab = tag
-        } label: {
-            VStack(spacing: 2) {
-                Image(systemName: icon)
-                    .font(.system(size: 14))
-                Text(title)
-                    .font(.system(size: 10, weight: .medium, design: .rounded))
+            withAnimation(.easeInOut(duration: 0.2)) {
+                vm.selectedTab = tag
             }
-            .foregroundStyle(isSelected ? Color.cfTonic : Color.cfTextTertiary)
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, CFSpacing.tight)
-            .background(isSelected ? Color.cfTonic.opacity(0.08) : Color.clear)
+        } label: {
+            Text(title)
+                .font(.system(size: 15, weight: isSelected ? .semibold : .regular, design: .rounded))
+                .foregroundStyle(isSelected ? Color.cfTonic : Color.cfTextTertiary)
+                .padding(.horizontal, CFSpacing.spacious)
+                .padding(.vertical, CFSpacing.compact)
+                .background(
+                    Capsule()
+                        .fill(isSelected ? Color.cfElevated : Color.clear)
+                )
         }
         .buttonStyle(.plain)
     }
