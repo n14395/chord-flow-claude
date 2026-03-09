@@ -441,11 +441,10 @@ public struct SharedTimelineView<VM: ChordFlowViewModel>: View {
 
 // MARK: - Block Interaction Modifier
 //
-// Long-press gesture (for touch) fires the onActivate callback to show the
-// custom overlay. A native .contextMenu with the same actions handles
-// right-click on macOS Catalyst / iPadOS with mouse. The .contextMenu
-// doesn't work in AUv3 hosts, but the long-press does — both code paths
-// exist so whichever environment is active has a working interaction.
+// Long-press gesture (for touch) and right-click / secondary-tap (for mouse)
+// both fire the onActivate callback to show the custom SharedBlockActionOverlay.
+// This avoids SwiftUI's .contextMenu which presents in a separate UIWindow that
+// doesn't receive touches inside AUv3 host apps.
 
 private struct BlockInteractionModifier<VM: ChordFlowViewModel>: ViewModifier {
     let vm: VM
@@ -460,20 +459,73 @@ private struct BlockInteractionModifier<VM: ChordFlowViewModel>: ViewModifier {
                 LongPressGesture(minimumDuration: 0.45)
                     .onEnded { _ in onActivate(index) }
             )
-            // Right-click / secondary click — uses native .contextMenu which
-            // works in the standalone app and Mac Catalyst but not in AUv3.
-            .contextMenu {
-                Button { vm.previewBlock(block) } label: {
-                    Label("Preview", systemImage: "play.fill")
-                }
-                Button { vm.duplicateBlock(at: index) } label: {
-                    Label("Duplicate", systemImage: "doc.on.doc")
-                }
-                Divider()
-                Button(role: .destructive) { vm.removeBlock(at: index) } label: {
-                    Label("Remove", systemImage: "trash")
-                }
+            // Right-click overlay: a UIKit tap recognizer for secondary button.
+            // Uses a pass-through UIView so normal taps reach SwiftUI buttons.
+            .overlay {
+                RightClickOverlay { onActivate(index) }
             }
     }
 }
+
+// MARK: - Right-Click Overlay
+//
+// A UIView that detects secondary (right) click via UIKit gesture recognizer.
+// Returns itself from hitTest only for indirect-pointer (mouse/trackpad)
+// events so that direct finger touches pass through to SwiftUI views below.
+
+#if canImport(UIKit)
+private struct RightClickOverlay: UIViewRepresentable {
+    let action: () -> Void
+
+    func makeUIView(context: Context) -> RightClickPassthroughView {
+        let view = RightClickPassthroughView()
+        view.backgroundColor = .clear
+
+        let tap = UITapGestureRecognizer(
+            target: context.coordinator,
+            action: #selector(Coordinator.handleTap)
+        )
+        tap.buttonMaskRequired = .secondary
+        tap.allowedTouchTypes = [NSNumber(value: UITouch.TouchType.indirectPointer.rawValue)]
+        view.addGestureRecognizer(tap)
+
+        return view
+    }
+
+    func updateUIView(_ uiView: RightClickPassthroughView, context: Context) {
+        context.coordinator.action = action
+    }
+
+    func makeCoordinator() -> Coordinator {
+        Coordinator(action: action)
+    }
+
+    final class Coordinator {
+        var action: () -> Void
+
+        init(action: @escaping () -> Void) {
+            self.action = action
+        }
+
+        @objc func handleTap() {
+            action()
+        }
+    }
+}
+
+/// Returns self from hitTest only for indirect-pointer (mouse) events.
+/// Direct finger touches return nil so they pass through to SwiftUI views.
+private final class RightClickPassthroughView: UIView {
+    override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
+        // Only intercept indirect pointer (mouse/trackpad) events
+        if let touches = event?.allTouches {
+            for touch in touches where touch.type == .indirectPointer {
+                return super.hitTest(point, with: event)
+            }
+        }
+        // Direct finger touches pass through
+        return nil
+    }
+}
+#endif
 #endif
