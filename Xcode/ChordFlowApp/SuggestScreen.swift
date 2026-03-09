@@ -6,7 +6,6 @@ struct SuggestScreen: View {
     @Environment(\.horizontalSizeClass) private var sizeClass
     @State private var styleFilter: String = "All"
     @State private var showBorrowedPicker = false
-    @State private var contextMenuBlockIndex: Int?
 
     private let styleFilters = ["All", "Pop", "Jazz", "Neo-Soul", "Cinematic", "Exp."]
 
@@ -20,9 +19,6 @@ struct SuggestScreen: View {
         }
         .background(Color.cfBackground.ignoresSafeArea())
         .dismissBorrowedPicker(isExpanded: $showBorrowedPicker)
-        .overlay {
-            SharedBlockActionOverlay(vm: vm, blockIndex: $contextMenuBlockIndex)
-        }
         .sheet(isPresented: $vm.showModeSheet) {
             modePickerSheet
                 .presentationDetents([.medium])
@@ -34,83 +30,52 @@ struct SuggestScreen: View {
     // MARK: - iPhone Layout
 
     private var iPhoneLayout: some View {
-        VStack(spacing: 0) {
-            ScrollView {
-                VStack(spacing: CFSpacing.standard) {
-                    // Circle of Fifths
-                    SharedCircleOfFifthsView(vm: vm) { chord in
-                        vm.addChord(chord)
-                    }
+        ScrollView {
+            VStack(spacing: CFSpacing.standard) {
+                // Circle of Fifths
+                SharedCircleOfFifthsView(vm: vm) { chord in
+                    vm.addChord(chord)
+                }
+                .padding(.horizontal, CFSpacing.spacious)
+
+                // Controls strip
+                controlsStrip
                     .padding(.horizontal, CFSpacing.spacious)
 
-                    // Controls strip
-                    controlsStrip
-                        .padding(.horizontal, CFSpacing.spacious)
-
-                    // Suggestions panel (replaces ChordDetailPanel)
-                    suggestionsPanel
-                        .padding(.horizontal, CFSpacing.compact)
-                }
-                .padding(.top, CFSpacing.compact)
-                .padding(.bottom, 100) // room for playback bar
+                // Suggestions panel (replaces ChordDetailPanel)
+                suggestionsPanel
+                    .padding(.horizontal, CFSpacing.compact)
             }
-
-            // Playback bar (includes inline timeline)
-            PlaybackBarView(
-                vm: vm,
-                onBlockTap: { index in
-                    vm.selectedBlockIndex = vm.selectedBlockIndex == index ? nil : index
-                },
-                onBlockLongPress: { index in
-                    contextMenuBlockIndex = index
-                }
-            )
-            .padding(.horizontal, CFSpacing.compact)
-            .padding(.bottom, CFSpacing.tight)
+            .padding(.top, CFSpacing.compact)
         }
     }
 
     // MARK: - iPad Layout
 
     private var iPadLayout: some View {
-        VStack(spacing: 0) {
-            HStack(alignment: .top, spacing: CFSpacing.spacious) {
-                // Left column: Circle + controls
-                ScrollView {
-                    VStack(spacing: CFSpacing.standard) {
-                        SharedCircleOfFifthsView(vm: vm) { chord in
-                            vm.addChord(chord)
-                        }
-
-                        controlsStrip
+        HStack(alignment: .top, spacing: CFSpacing.spacious) {
+            // Left column: Circle + controls
+            ScrollView {
+                VStack(spacing: CFSpacing.standard) {
+                    SharedCircleOfFifthsView(vm: vm) { chord in
+                        vm.addChord(chord)
                     }
-                }
-                .frame(maxWidth: .infinity)
 
-                // Right column: Suggestions panel
-                ScrollView {
-                    VStack(spacing: CFSpacing.standard) {
-                        suggestionsPanel
-                    }
+                    controlsStrip
                 }
-                .frame(maxWidth: .infinity)
             }
-            .padding(.horizontal, CFSpacing.spacious)
-            .padding(.top, CFSpacing.standard)
+            .frame(maxWidth: .infinity)
 
-            // Playback bar (includes inline timeline)
-            PlaybackBarView(
-                vm: vm,
-                onBlockTap: { index in
-                    vm.selectedBlockIndex = vm.selectedBlockIndex == index ? nil : index
-                },
-                onBlockLongPress: { index in
-                    contextMenuBlockIndex = index
+            // Right column: Suggestions panel
+            ScrollView {
+                VStack(spacing: CFSpacing.standard) {
+                    suggestionsPanel
                 }
-            )
-            .padding(.horizontal, CFSpacing.spacious)
-            .padding(.bottom, CFSpacing.compact)
+            }
+            .frame(maxWidth: .infinity)
         }
+        .padding(.horizontal, CFSpacing.spacious)
+        .padding(.top, CFSpacing.standard)
     }
 
     // MARK: - Suggestions Panel (Right Column Content)

@@ -5,7 +5,6 @@ struct ComposeScreen: View {
     @ObservedObject var vm: AppViewModel
     @Environment(\.horizontalSizeClass) private var sizeClass
     @State private var showBorrowedPicker = false
-    @State private var contextMenuBlockIndex: Int?
 
     var body: some View {
         VStack(spacing: 0) {
@@ -17,9 +16,6 @@ struct ComposeScreen: View {
         }
         .background(Color.cfBackground.ignoresSafeArea())
         .dismissBorrowedPicker(isExpanded: $showBorrowedPicker)
-        .overlay {
-            SharedBlockActionOverlay(vm: vm, blockIndex: $contextMenuBlockIndex)
-        }
         .sheet(isPresented: $vm.showModeSheet) {
             modePickerSheet
                 .presentationDetents([.medium])
@@ -31,83 +27,52 @@ struct ComposeScreen: View {
     // MARK: - iPhone Layout
 
     private var iPhoneLayout: some View {
-        VStack(spacing: 0) {
-            ScrollView {
-                VStack(spacing: CFSpacing.standard) {
-                    // Circle of Fifths
-                    SharedCircleOfFifthsView(vm: vm) { chord in
-                        vm.addChord(chord)
-                    }
+        ScrollView {
+            VStack(spacing: CFSpacing.standard) {
+                // Circle of Fifths
+                SharedCircleOfFifthsView(vm: vm) { chord in
+                    vm.addChord(chord)
+                }
+                .padding(.horizontal, CFSpacing.spacious)
+
+                // Controls strip
+                controlsStrip
                     .padding(.horizontal, CFSpacing.spacious)
 
-                    // Controls strip
-                    controlsStrip
-                        .padding(.horizontal, CFSpacing.spacious)
-
-                    // Chord detail panel
-                    SharedChordDetailPanel(vm: vm)
-                        .padding(.horizontal, CFSpacing.compact)
-                }
-                .padding(.top, CFSpacing.compact)
-                .padding(.bottom, 100) // room for playback bar
+                // Chord detail panel
+                SharedChordDetailPanel(vm: vm)
+                    .padding(.horizontal, CFSpacing.compact)
             }
-
-            // Playback bar (includes inline timeline)
-            PlaybackBarView(
-                vm: vm,
-                onBlockTap: { index in
-                    vm.selectedBlockIndex = vm.selectedBlockIndex == index ? nil : index
-                },
-                onBlockLongPress: { index in
-                    contextMenuBlockIndex = index
-                }
-            )
-            .padding(.horizontal, CFSpacing.compact)
-            .padding(.bottom, CFSpacing.tight)
+            .padding(.top, CFSpacing.compact)
         }
     }
 
     // MARK: - iPad Layout
 
     private var iPadLayout: some View {
-        VStack(spacing: 0) {
-            HStack(alignment: .top, spacing: CFSpacing.spacious) {
-                // Left column: Circle + controls
-                ScrollView {
-                    VStack(spacing: CFSpacing.standard) {
-                        SharedCircleOfFifthsView(vm: vm) { chord in
-                            vm.addChord(chord)
-                        }
-
-                        controlsStrip
+        HStack(alignment: .top, spacing: CFSpacing.spacious) {
+            // Left column: Circle + controls
+            ScrollView {
+                VStack(spacing: CFSpacing.standard) {
+                    SharedCircleOfFifthsView(vm: vm) { chord in
+                        vm.addChord(chord)
                     }
-                }
-                .frame(maxWidth: .infinity)
 
-                // Right column: Chord detail
-                ScrollView {
-                    VStack(spacing: CFSpacing.standard) {
-                        SharedChordDetailPanel(vm: vm)
-                    }
+                    controlsStrip
                 }
-                .frame(maxWidth: .infinity)
             }
-            .padding(.horizontal, CFSpacing.spacious)
-            .padding(.top, CFSpacing.standard)
+            .frame(maxWidth: .infinity)
 
-            // Playback bar (includes inline timeline)
-            PlaybackBarView(
-                vm: vm,
-                onBlockTap: { index in
-                    vm.selectedBlockIndex = vm.selectedBlockIndex == index ? nil : index
-                },
-                onBlockLongPress: { index in
-                    contextMenuBlockIndex = index
+            // Right column: Chord detail
+            ScrollView {
+                VStack(spacing: CFSpacing.standard) {
+                    SharedChordDetailPanel(vm: vm)
                 }
-            )
-            .padding(.horizontal, CFSpacing.spacious)
-            .padding(.bottom, CFSpacing.compact)
+            }
+            .frame(maxWidth: .infinity)
         }
+        .padding(.horizontal, CFSpacing.spacious)
+        .padding(.top, CFSpacing.standard)
     }
 
     // MARK: - Controls Strip
