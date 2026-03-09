@@ -15,7 +15,7 @@ final class AUv3ViewModel: ObservableObject, ChordFlowViewModel {
 
     @Published var tonic: Float = 0
     @Published var mode: Float = 0
-    @Published var tension: Float = 0.35
+    @Published var tension: Float = 0.2
     @Published var pattern: Float = 0
     @Published var swing: Float = 0.1
     @Published var humanize: Float = 0.1

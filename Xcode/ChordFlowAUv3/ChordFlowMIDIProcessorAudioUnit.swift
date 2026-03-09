@@ -57,7 +57,7 @@ public final class ChordFlowMIDIProcessorAudioUnit: AUAudioUnit {
     // Backing storage for parameter values (avoids infinite recursion via implementorValueProvider)
     private var tonicValue: AUValue = 0
     private var modeValue: AUValue = 0
-    private var tensionValue: AUValue = 0.35
+    private var tensionValue: AUValue = 0.2
     private var patternValue: AUValue = 0
     private var swingValue: AUValue = 0.1
     private var humanizeValue: AUValue = 0.1
@@ -246,7 +246,7 @@ public final class ChordFlowMIDIProcessorAudioUnit: AUAudioUnit {
         // Set initial parameter values (these go through the observer to populate backing storage)
         tonicParameter.value = 0
         modeParameter.value = 0
-        tensionParameter.value = 0.35
+        tensionParameter.value = 0.2
         patternParameter.value = 0
         swingParameter.value = 0.1
         humanizeParameter.value = 0.1

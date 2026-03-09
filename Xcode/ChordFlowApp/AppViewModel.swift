@@ -9,7 +9,7 @@ final class AppViewModel: ObservableObject, ChordFlowViewModel {
 
     @Published var project = CFProjectDocument()
     @Published var chordButtons: [CFChordButton] = []
-    @Published var tension: Double = 0.5
+    @Published var tension: Double = 0.2
     @Published var defaultOctave: Int = 0
     @Published var borrowedPreset: CFBorrowedChordPreset = .jazz
     @Published var isPlaying = false
@@ -339,7 +339,7 @@ final class AppViewModel: ObservableObject, ChordFlowViewModel {
             let data = try Data(contentsOf: Self.autoSaveURL)
             project = try ChordFlowEngine.decodeProject(data)
             if project.blocks.isEmpty {
-                tension = 0.5
+                tension = 0.2
             } else {
                 let c = project.blocks.first!.chord
                 if c.add13 { tension = 0.9 }
