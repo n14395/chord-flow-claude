@@ -119,7 +119,7 @@ struct AUv3View: View {
         HStack(spacing: CFSpacing.tight) {
             tabButton(title: "Compose", tag: 0)
             tabButton(title: "Suggest", tag: 1)
-            tabButton(title: "Output", tag: 2)
+            tabButton(title: "Files", tag: 2)
         }
         .padding(3)
         .background(

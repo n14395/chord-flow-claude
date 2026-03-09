@@ -26,7 +26,7 @@ struct RootView: View {
 
                 OutputScreen(vm: vm)
                     .tabItem {
-                        Label("Output", systemImage: "arrow.up.forward.square")
+                        Label("Files", systemImage: "arrow.up.forward.square")
                     }
                     .tag(2)
             }

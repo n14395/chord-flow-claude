@@ -600,25 +600,9 @@ public final class ChordFlowMIDIProcessorAudioUnit: AUAudioUnit {
                         }
                     }
                 } else {
-                    // Fallback: auto-cycle through parameter-generated diatonic chords
-                    au.rebuildChordsIfNeeded()
-
-                    let chordLen = timeSigNum
-                    let currentChordBeat = Int(floor(beatPosition / Double(chordLen)))
-
-                    if currentChordBeat != au.lastChordBeat {
-                        au.lastChordBeat = currentChordBeat
+                    // No user progression — silence any leftover notes
+                    if !au.activeNotes.isEmpty {
                         au.sendActiveNotesOff()
-                        let chordCount = au.cachedChords.count
-                        if chordCount > 0 {
-                            let idx = ((currentChordBeat % chordCount) + chordCount) % chordCount
-                            let notes = au.cachedChords[idx]
-                            let offset = AUEventSampleTime(min(Int(frameCount) - 1, 64))
-                            for note in notes {
-                                au.sendNoteOn(note, offset: offset)
-                            }
-                            au.activeNotes = notes
-                        }
                     }
                 }
             }
