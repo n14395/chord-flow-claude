@@ -56,7 +56,24 @@ targets:
           UIApplicationSupportsMultipleScenes: false
         UIBackgroundModes:
           - audio
+        UIFileSharingEnabled: true
+        LSSupportsOpeningDocumentsInPlace: true
         UILaunchScreen: {}
+        UTExportedTypeDeclarations:
+          - UTTypeIdentifier: com.n14395.chordflow2.project
+            UTTypeDescription: ChordFlow Project
+            UTTypeConformsTo:
+              - public.json
+            UTTypeTagSpecification:
+              public.filename-extension:
+                - chordflow
+              public.mime-type: application/json
+        CFBundleDocumentTypes:
+          - CFBundleTypeName: ChordFlow Project
+            CFBundleTypeRole: Editor
+            LSHandlerRank: Owner
+            LSItemContentTypes:
+              - com.n14395.chordflow2.project
     dependencies:
       - target: ChordFlowShared
       - target: ChordFlowAUv3

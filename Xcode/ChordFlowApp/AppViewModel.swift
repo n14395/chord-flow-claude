@@ -353,17 +353,24 @@ final class AppViewModel: ObservableObject, ChordFlowViewModel {
         }
     }
 
+    static let projectExtension = "chordflow"
+
     func saveProjectAs(name: String) {
         let safeName = name.replacingOccurrences(of: "/", with: "-")
-        let url = URL.documentsDirectory.appending(path: "\(safeName).json")
+        let url = URL.documentsDirectory.appending(path: "\(safeName).\(Self.projectExtension)")
         do {
             let data = try ChordFlowEngine.encodeProject(project)
             try data.write(to: url)
-            status = "Saved: \(safeName).json"
+            status = "Saved: \(safeName).\(Self.projectExtension)"
             refreshSavedProjects()
         } catch {
             status = "Save failed: \(error.localizedDescription)"
         }
+    }
+
+    /// Encode the current project for use with .fileExporter
+    func encodeProjectData() -> Data? {
+        try? ChordFlowEngine.encodeProject(project)
     }
 
     func loadProject(from url: URL) {
@@ -387,6 +394,8 @@ final class AppViewModel: ObservableObject, ChordFlowViewModel {
         refreshSavedProjects()
     }
 
+    private static let validProjectExtensions: Set<String> = ["chordflow", "json"]
+
     func refreshSavedProjects() {
         let fm = FileManager.default
         let dir = URL.documentsDirectory
@@ -395,7 +404,7 @@ final class AppViewModel: ObservableObject, ChordFlowViewModel {
             return
         }
         savedProjects = files
-            .filter { $0.pathExtension == "json" && $0.lastPathComponent != Self.autoSaveFileName }
+            .filter { Self.validProjectExtensions.contains($0.pathExtension) && $0.lastPathComponent != Self.autoSaveFileName }
             .compactMap { url -> SavedProject? in
                 guard let attrs = try? fm.attributesOfItem(atPath: url.path),
                       let date = attrs[.modificationDate] as? Date else { return nil }
@@ -427,7 +436,7 @@ final class AppViewModel: ObservableObject, ChordFlowViewModel {
     }
 
     func exportProject() {
-        let url = URL.documentsDirectory.appending(path: "ChordFlow-Project.json")
+        let url = URL.documentsDirectory.appending(path: "ChordFlow-Project.\(Self.projectExtension)")
         do {
             try ChordFlowEngine.encodeProject(project).write(to: url)
             status = "Exported: \(url.lastPathComponent)"

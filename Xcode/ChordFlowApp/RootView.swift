@@ -21,19 +21,17 @@ struct RootView: View {
                 }
                 .tag(1)
 
-            RouteScreen(vm: vm)
+            OutputScreen(vm: vm)
                 .tabItem {
-                    Label("Route", systemImage: "cable.connector")
+                    Label("Output", systemImage: "arrow.up.forward.square")
                 }
                 .tag(2)
-
-            ExportScreen(vm: vm)
-                .tabItem {
-                    Label("Export", systemImage: "square.and.arrow.up")
-                }
-                .tag(3)
         }
         .tint(Color.cfTonic)
         .preferredColorScheme(.dark)
+        .onOpenURL { url in
+            vm.loadProject(from: url)
+            selectedTab = 0 // Switch to Compose after loading
+        }
     }
 }

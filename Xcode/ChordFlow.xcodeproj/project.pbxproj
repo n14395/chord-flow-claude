@@ -12,7 +12,7 @@
 		0910F0B0FBCA6886379CAC47 /* ChordFlowShared.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C21FFB8CB0C34360450136A3 /* ChordFlowShared.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		0D8952BA1A9429AB11266317 /* ChordFlowShared.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C21FFB8CB0C34360450136A3 /* ChordFlowShared.framework */; };
 		1565EFCE599B17FABEBE08D3 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD8F7245296F96C8E3012B22 /* main.swift */; };
-		20C1712474E97BED9E6AF06F /* ExportScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4156FA601940D69FDC658829 /* ExportScreen.swift */; };
+		20C1712474E97BED9E6AF06F /* OutputScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4156FA601940D69FDC658829 /* OutputScreen.swift */; };
 		2201D79B75445F8171B62A19 /* KnobView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C364D28B7AE03B0CFFAFA7A3 /* KnobView.swift */; };
 		2240AF40DEC32E24C8B90127 /* AUv3ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA5A9832E9AF74775A6E9C18 /* AUv3ViewController.swift */; };
 		2B187353BA5A10D6F085C859 /* SharedBorrowedPresetPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = D22492FB24031D6519986C38 /* SharedBorrowedPresetPicker.swift */; };
@@ -36,7 +36,7 @@
 		96EE8C665F3F0D8665CA063D /* AppViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A37A91AD1A46A6655269749B /* AppViewModel.swift */; };
 		9F41798E9A32E4A655CDCA81 /* ChordFlowShared.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C21FFB8CB0C34360450136A3 /* ChordFlowShared.framework */; };
 		A0E4BD8CF1EF725084869EE7 /* AUv3DesignTokens.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57A932D8EEAC08D15D44812D /* AUv3DesignTokens.swift */; };
-		A2C901C9FF80A03043660A33 /* RouteScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EE4ADE4CA9D22CFEC78DFD7 /* RouteScreen.swift */; };
+
 		A66B5E30E14CA41E70A22BED /* AUv3SuggestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C7C519C6403FB065071421B /* AUv3SuggestView.swift */; };
 		B414B420BCFAC7A577E71D1A /* ChordFlowEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A1800A3C5E1948588B10394 /* ChordFlowEngine.swift */; };
 		BC575126EAE671B50650F95E /* ChordFlow AUv3.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = F391EF4AFBA678FA74A60050 /* ChordFlow AUv3.appex */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -119,7 +119,7 @@
 		28D9892CAD0A544DE6EA0CC2 /* ChordFlowViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChordFlowViewModel.swift; sourceTree = "<group>"; };
 		3112A4B5EF407C146ED90066 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
 		3C7C519C6403FB065071421B /* AUv3SuggestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AUv3SuggestView.swift; sourceTree = "<group>"; };
-		4156FA601940D69FDC658829 /* ExportScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportScreen.swift; sourceTree = "<group>"; };
+		4156FA601940D69FDC658829 /* OutputScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutputScreen.swift; sourceTree = "<group>"; };
 		435BABE1510CA2A3CE969C46 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		442F08B399EFA935D037E01E /* ChordFlowHostHarness */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = ChordFlowHostHarness; sourceTree = BUILT_PRODUCTS_DIR; };
 		4A1800A3C5E1948588B10394 /* ChordFlowEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChordFlowEngine.swift; sourceTree = "<group>"; };
@@ -129,7 +129,7 @@
 		57A932D8EEAC08D15D44812D /* AUv3DesignTokens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AUv3DesignTokens.swift; sourceTree = "<group>"; };
 		58156C553D0F76B8B1DDBCA4 /* DesignTokens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignTokens.swift; sourceTree = "<group>"; };
 		5E35F4131737A00F17AF8E67 /* HostHarnessTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HostHarnessTests.swift; sourceTree = "<group>"; };
-		5EE4ADE4CA9D22CFEC78DFD7 /* RouteScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouteScreen.swift; sourceTree = "<group>"; };
+
 		68C81244636DE807D6EAB71A /* MIDIOutputManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MIDIOutputManager.swift; sourceTree = "<group>"; };
 		71E8FF4031C60D12F18519F0 /* ChordFlowMIDIProcessorAudioUnit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChordFlowMIDIProcessorAudioUnit.swift; sourceTree = "<group>"; };
 		7276B6E91134D6076E115FF8 /* ChordFlowHostHarnessTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ChordFlowHostHarnessTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -181,13 +181,12 @@
 				B161D922C69887355BCB1919 /* ChordFlowApp.swift */,
 				FDEC4BE9436C5B7AEA7F72F3 /* ComposeScreen.swift */,
 				58156C553D0F76B8B1DDBCA4 /* DesignTokens.swift */,
-				4156FA601940D69FDC658829 /* ExportScreen.swift */,
 				4E45454F23C1921A384788D4 /* Info.plist */,
 				C364D28B7AE03B0CFFAFA7A3 /* KnobView.swift */,
+				4156FA601940D69FDC658829 /* OutputScreen.swift */,
 				530DDEDB41331498E4122933 /* PlaybackBarView.swift */,
 				835D5E76D3976F196247D401 /* ProgressionPlaybackEngine.swift */,
 				3112A4B5EF407C146ED90066 /* RootView.swift */,
-				5EE4ADE4CA9D22CFEC78DFD7 /* RouteScreen.swift */,
 				07741CB781828BC724C71C6C /* SuggestScreen.swift */,
 			);
 			name = ChordFlowApp;
@@ -507,12 +506,11 @@
 				5856A2C52518204E20D50907 /* ChordFlowApp.swift in Sources */,
 				3ED0B3A12221343E084EF5EC /* ComposeScreen.swift in Sources */,
 				953E095CCA1EDFC9A53E40DB /* DesignTokens.swift in Sources */,
-				20C1712474E97BED9E6AF06F /* ExportScreen.swift in Sources */,
 				2201D79B75445F8171B62A19 /* KnobView.swift in Sources */,
+				20C1712474E97BED9E6AF06F /* OutputScreen.swift in Sources */,
 				CB0D65B73D413A3455EE5D46 /* PlaybackBarView.swift in Sources */,
 				4382C04DB4DCDDF3314F8F35 /* ProgressionPlaybackEngine.swift in Sources */,
 				06A9318E1A86442A54ED933E /* RootView.swift in Sources */,
-				A2C901C9FF80A03043660A33 /* RouteScreen.swift in Sources */,
 				3E44DB608090BB59515F3379 /* SuggestScreen.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
