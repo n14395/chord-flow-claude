@@ -328,12 +328,8 @@ public struct SharedTimelineView<VM: ChordFlowViewModel>: View {
                         }
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                         .contentShape(Rectangle())
-                        .onTapGesture {
-                            guard !isDragging else { return }
-                            onBlockTap?(index)
-                        }
+                        .modifier(BlockInteractionModifier(vm: vm, block: block, index: index, onTap: { onBlockTap?(index) }, onActivate: onBlockLongPress))
                     }
-                    .modifier(BlockInteractionModifier(vm: vm, block: block, index: index, onActivate: onBlockLongPress))
                 }
             } else {
                 HStack(spacing: 0) {
@@ -362,10 +358,7 @@ public struct SharedTimelineView<VM: ChordFlowViewModel>: View {
                         }
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                         .contentShape(Rectangle())
-                        .onTapGesture {
-                            guard !isDragging else { return }
-                            onBlockTap?(index)
-                        }
+                        .modifier(BlockInteractionModifier(vm: vm, block: block, index: index, onTap: { onBlockTap?(index) }, onActivate: onBlockLongPress))
 
                         Button {
                             guard !isDragging else { return }
@@ -388,7 +381,6 @@ public struct SharedTimelineView<VM: ChordFlowViewModel>: View {
                         }
                         .buttonStyle(.plain)
                     }
-                    .modifier(BlockInteractionModifier(vm: vm, block: block, index: index, onActivate: onBlockLongPress))
                 }
             }
         }
@@ -450,81 +442,100 @@ private struct BlockInteractionModifier<VM: ChordFlowViewModel>: ViewModifier {
     let vm: VM
     let block: CFSequenceBlock
     let index: Int
+    let onTap: () -> Void
     let onActivate: (Int) -> Void
 
     func body(content: Content) -> some View {
         content
-            // Long-press for touch (simultaneous so child taps still work)
-            .simultaneousGesture(
-                LongPressGesture(minimumDuration: 0.45)
-                    .onEnded { _ in onActivate(index) }
-            )
-            // Right-click overlay: a UIKit tap recognizer for secondary button.
-            // Uses a pass-through UIView so normal taps reach SwiftUI buttons.
+            // UIKit gesture overlay handles tap (select), long-press
+            // (context menu), and right-click (context menu). Applied
+            // only to the chord label area so the preview button
+            // remains tappable.
             .overlay {
-                RightClickOverlay { onActivate(index) }
+                BlockGestureOverlay(
+                    onTap: onTap,
+                    onLongPressOrRightClick: { onActivate(index) }
+                )
             }
     }
 }
 
-// MARK: - Right-Click Overlay
+// MARK: - Block Gesture Overlay (Tap + Long-Press + Right-Click)
 //
-// A UIView that detects secondary (right) click via UIKit gesture recognizer.
-// Returns itself from hitTest only for indirect-pointer (mouse/trackpad)
-// events so that direct finger touches pass through to SwiftUI views below.
+// A UIView overlay with UIKit gesture recognizers for tap (select chord),
+// long-press (context menu), and secondary click (context menu). Scoped to
+// the chord label area only — the preview button is a sibling view outside
+// this overlay.
 
 #if canImport(UIKit)
-private struct RightClickOverlay: UIViewRepresentable {
-    let action: () -> Void
+private struct BlockGestureOverlay: UIViewRepresentable {
+    let onTap: () -> Void
+    let onLongPressOrRightClick: () -> Void
 
-    func makeUIView(context: Context) -> RightClickPassthroughView {
-        let view = RightClickPassthroughView()
+    func makeUIView(context: Context) -> UIView {
+        let view = UIView()
         view.backgroundColor = .clear
 
+        // Primary tap — select/deselect the chord block
         let tap = UITapGestureRecognizer(
             target: context.coordinator,
-            action: #selector(Coordinator.handleTap)
+            action: #selector(Coordinator.handlePrimaryTap)
         )
-        tap.buttonMaskRequired = .secondary
-        tap.allowedTouchTypes = [NSNumber(value: UITouch.TouchType.indirectPointer.rawValue)]
         view.addGestureRecognizer(tap)
+
+        // Long-press — show context menu overlay
+        let longPress = UILongPressGestureRecognizer(
+            target: context.coordinator,
+            action: #selector(Coordinator.handleLongPress(_:))
+        )
+        longPress.minimumPressDuration = 0.45
+        view.addGestureRecognizer(longPress)
+
+        // Right-click / secondary click — show context menu overlay
+        let secondaryTap = UITapGestureRecognizer(
+            target: context.coordinator,
+            action: #selector(Coordinator.handleSecondaryTap)
+        )
+        secondaryTap.buttonMaskRequired = .secondary
+        secondaryTap.allowedTouchTypes = [NSNumber(value: UITouch.TouchType.indirectPointer.rawValue)]
+        view.addGestureRecognizer(secondaryTap)
+
+        // Primary tap should fail when long-press succeeds
+        tap.require(toFail: longPress)
 
         return view
     }
 
-    func updateUIView(_ uiView: RightClickPassthroughView, context: Context) {
-        context.coordinator.action = action
+    func updateUIView(_ uiView: UIView, context: Context) {
+        context.coordinator.onTap = onTap
+        context.coordinator.onLongPressOrRightClick = onLongPressOrRightClick
     }
 
     func makeCoordinator() -> Coordinator {
-        Coordinator(action: action)
+        Coordinator(onTap: onTap, onLongPressOrRightClick: onLongPressOrRightClick)
     }
 
     final class Coordinator {
-        var action: () -> Void
+        var onTap: () -> Void
+        var onLongPressOrRightClick: () -> Void
 
-        init(action: @escaping () -> Void) {
-            self.action = action
+        init(onTap: @escaping () -> Void, onLongPressOrRightClick: @escaping () -> Void) {
+            self.onTap = onTap
+            self.onLongPressOrRightClick = onLongPressOrRightClick
         }
 
-        @objc func handleTap() {
-            action()
+        @objc func handlePrimaryTap() {
+            onTap()
         }
-    }
-}
 
-/// Returns self from hitTest only for indirect-pointer (mouse) events.
-/// Direct finger touches return nil so they pass through to SwiftUI views.
-private final class RightClickPassthroughView: UIView {
-    override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
-        // Only intercept indirect pointer (mouse/trackpad) events
-        if let touches = event?.allTouches {
-            for touch in touches where touch.type == .indirectPointer {
-                return super.hitTest(point, with: event)
-            }
+        @objc func handleLongPress(_ gesture: UILongPressGestureRecognizer) {
+            guard gesture.state == .began else { return }
+            onLongPressOrRightClick()
         }
-        // Direct finger touches pass through
-        return nil
+
+        @objc func handleSecondaryTap() {
+            onLongPressOrRightClick()
+        }
     }
 }
 #endif
