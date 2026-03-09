@@ -4,6 +4,7 @@ import SwiftUI
 public struct SharedTimelineView<VM: ChordFlowViewModel>: View {
     @ObservedObject var vm: VM
     var onBlockTap: ((Int) -> Void)?
+    var onBlockLongPress: (Int) -> Void
 
     private let blockHeight: CGFloat = 56
     private let barNumberHeight: CGFloat = 18
@@ -18,9 +19,14 @@ public struct SharedTimelineView<VM: ChordFlowViewModel>: View {
     @State private var dragSwapAccumulator: CGFloat = 0
     @State private var dragStartX: CGFloat = 0
 
-    public init(vm: VM, onBlockTap: ((Int) -> Void)? = nil) {
+    public init(
+        vm: VM,
+        onBlockTap: ((Int) -> Void)? = nil,
+        onBlockLongPress: @escaping (Int) -> Void
+    ) {
         self._vm = ObservedObject(wrappedValue: vm)
         self.onBlockTap = onBlockTap
+        self.onBlockLongPress = onBlockLongPress
     }
 
     public var body: some View {
@@ -327,9 +333,7 @@ public struct SharedTimelineView<VM: ChordFlowViewModel>: View {
                             onBlockTap?(index)
                         }
                     }
-                    .contextMenu {
-                        blockContextMenu(block: block, index: index)
-                    }
+                    .modifier(BlockInteractionModifier(vm: vm, block: block, index: index, onActivate: onBlockLongPress))
                 }
             } else {
                 HStack(spacing: 0) {
@@ -384,36 +388,9 @@ public struct SharedTimelineView<VM: ChordFlowViewModel>: View {
                         }
                         .buttonStyle(.plain)
                     }
-                    .contextMenu {
-                        blockContextMenu(block: block, index: index)
-                    }
+                    .modifier(BlockInteractionModifier(vm: vm, block: block, index: index, onActivate: onBlockLongPress))
                 }
             }
-        }
-    }
-
-    // MARK: - Block Context Menu
-
-    @ViewBuilder
-    private func blockContextMenu(block: CFSequenceBlock, index: Int) -> some View {
-        Button {
-            vm.previewBlock(block)
-        } label: {
-            Label("Preview", systemImage: "play.fill")
-        }
-
-        Button {
-            vm.duplicateBlock(at: index)
-        } label: {
-            Label("Duplicate", systemImage: "doc.on.doc")
-        }
-
-        Divider()
-
-        Button(role: .destructive) {
-            vm.removeBlock(at: index)
-        } label: {
-            Label("Remove", systemImage: "trash")
         }
     }
 
@@ -459,6 +436,44 @@ public struct SharedTimelineView<VM: ChordFlowViewModel>: View {
         case .arpDown: return "Arp Down"
         case .strum: return "Strum"
         }
+    }
+}
+
+// MARK: - Block Interaction Modifier
+//
+// Long-press gesture (for touch) fires the onActivate callback to show the
+// custom overlay. A native .contextMenu with the same actions handles
+// right-click on macOS Catalyst / iPadOS with mouse. The .contextMenu
+// doesn't work in AUv3 hosts, but the long-press does — both code paths
+// exist so whichever environment is active has a working interaction.
+
+private struct BlockInteractionModifier<VM: ChordFlowViewModel>: ViewModifier {
+    let vm: VM
+    let block: CFSequenceBlock
+    let index: Int
+    let onActivate: (Int) -> Void
+
+    func body(content: Content) -> some View {
+        content
+            // Long-press for touch (simultaneous so child taps still work)
+            .simultaneousGesture(
+                LongPressGesture(minimumDuration: 0.45)
+                    .onEnded { _ in onActivate(index) }
+            )
+            // Right-click / secondary click — uses native .contextMenu which
+            // works in the standalone app and Mac Catalyst but not in AUv3.
+            .contextMenu {
+                Button { vm.previewBlock(block) } label: {
+                    Label("Preview", systemImage: "play.fill")
+                }
+                Button { vm.duplicateBlock(at: index) } label: {
+                    Label("Duplicate", systemImage: "doc.on.doc")
+                }
+                Divider()
+                Button(role: .destructive) { vm.removeBlock(at: index) } label: {
+                    Label("Remove", systemImage: "trash")
+                }
+            }
     }
 }
 #endif

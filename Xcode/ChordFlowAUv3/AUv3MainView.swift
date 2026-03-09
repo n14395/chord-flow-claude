@@ -5,6 +5,8 @@ import ChordFlowShared
 
 struct AUv3View: View {
     @ObservedObject var vm: AUv3ViewModel
+    @State private var showBorrowedPicker = false
+    @State private var contextMenuBlockIndex: Int?
 
     var body: some View {
         VStack(spacing: 0) {
@@ -35,6 +37,10 @@ struct AUv3View: View {
                 .padding(.bottom, CFSpacing.micro)
         }
         .background(Color.cfBackground.ignoresSafeArea())
+        .dismissBorrowedPicker(isExpanded: $showBorrowedPicker)
+        .overlay {
+            SharedBlockActionOverlay(vm: vm, blockIndex: $contextMenuBlockIndex)
+        }
         .sheet(isPresented: $vm.showModeSheet) {
             modePickerSheet
                 .presentationDetents([.medium])
@@ -137,7 +143,7 @@ struct AUv3View: View {
             HStack(spacing: CFSpacing.spacious) {
                 tensionSelector
                 octaveSelector
-                borrowedPresetPill
+                SharedBorrowedPresetPicker(vm: vm, isExpanded: $showBorrowedPicker)
             }
         }
     }
@@ -231,57 +237,32 @@ struct AUv3View: View {
         }
     }
 
-    // MARK: - Borrowed Preset
-
-    private var borrowedPresetPill: some View {
-        VStack(spacing: CFSpacing.micro) {
-            Menu {
-                ForEach(CFBorrowedChordPreset.allCases, id: \.self) { preset in
-                    Button(preset.displayName()) {
-                        vm.borrowedPreset = preset
-                        vm.refreshChordButtons()
-                    }
-                }
-            } label: {
-                Text(vm.borrowedPreset.displayName())
-                    .font(.system(size: 10, weight: .semibold, design: .rounded))
-                    .foregroundStyle(Color.cfBorrowed)
-                    .padding(.horizontal, CFSpacing.compact)
-                    .padding(.vertical, CFSpacing.tight)
-                    .background(
-                        Capsule()
-                            .fill(Color.cfBorrowed.opacity(0.15))
-                            .strokeBorder(Color.cfBorrowed, lineWidth: 1)
-                    )
-            }
-
-            Text("BORROWED")
-                .font(.system(size: 8, weight: .medium, design: .rounded))
-                .foregroundStyle(Color.cfTextTertiary)
-        }
-    }
-
     // MARK: - Playback Bar (with inline timeline)
 
     private var playbackBar: some View {
         VStack(spacing: 0) {
             HStack(spacing: CFSpacing.compact) {
-                // Transport status indicator (host-controlled, not interactive)
-                ZStack {
-                    Circle()
-                        .fill(vm.isPlaying ? Color.cfTonic : Color.cfSurface)
-                        .frame(width: 44, height: 44)
-                    if vm.isPlaying {
-                        RoundedRectangle(cornerRadius: 3)
-                            .fill(Color.cfBase)
-                            .frame(width: 18, height: 18)
-                    } else {
-                        Image(systemName: "play.fill")
-                            .font(.system(size: 18))
-                            .foregroundStyle(Color.cfTextTertiary)
-                            .offset(x: 1)
+                // Play / Stop button
+                Button {
+                    vm.togglePlayback()
+                } label: {
+                    ZStack {
+                        Circle()
+                            .fill(vm.isPlaying ? Color.cfDestructive : Color.cfTonic)
+                            .frame(width: 44, height: 44)
+                        if vm.isPlaying {
+                            RoundedRectangle(cornerRadius: 3)
+                                .fill(Color.cfTextPrimary)
+                                .frame(width: 18, height: 18)
+                        } else {
+                            Image(systemName: "play.fill")
+                                .font(.system(size: 18))
+                                .foregroundStyle(Color.cfBase)
+                                .offset(x: 2)
+                        }
                     }
                 }
+                .buttonStyle(.plain)
 
                 // Status text
                 VStack(alignment: .leading, spacing: 1) {
@@ -295,9 +276,15 @@ struct AUv3View: View {
                 .fixedSize(horizontal: true, vertical: false)
 
                 // Inline timeline
-                SharedTimelineView(vm: vm) { index in
-                    vm.selectedBlockIndex = vm.selectedBlockIndex == index ? nil : index
-                }
+                SharedTimelineView(
+                    vm: vm,
+                    onBlockTap: { index in
+                        vm.selectedBlockIndex = vm.selectedBlockIndex == index ? nil : index
+                    },
+                    onBlockLongPress: { index in
+                        contextMenuBlockIndex = index
+                    }
+                )
                 .frame(maxWidth: .infinity)
             }
             .padding(.horizontal, CFSpacing.spacious)

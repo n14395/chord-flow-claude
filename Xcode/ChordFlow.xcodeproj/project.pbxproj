@@ -8,12 +8,14 @@
 
 /* Begin PBXBuildFile section */
 		06A9318E1A86442A54ED933E /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3112A4B5EF407C146ED90066 /* RootView.swift */; };
+		081EE882371B3F62D4E45A3B /* SharedBlockActionOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80D715634AA010DB757393AE /* SharedBlockActionOverlay.swift */; };
 		0910F0B0FBCA6886379CAC47 /* ChordFlowShared.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C21FFB8CB0C34360450136A3 /* ChordFlowShared.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		0D8952BA1A9429AB11266317 /* ChordFlowShared.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C21FFB8CB0C34360450136A3 /* ChordFlowShared.framework */; };
 		1565EFCE599B17FABEBE08D3 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD8F7245296F96C8E3012B22 /* main.swift */; };
 		20C1712474E97BED9E6AF06F /* ExportScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4156FA601940D69FDC658829 /* ExportScreen.swift */; };
 		2201D79B75445F8171B62A19 /* KnobView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C364D28B7AE03B0CFFAFA7A3 /* KnobView.swift */; };
 		2240AF40DEC32E24C8B90127 /* AUv3ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA5A9832E9AF74775A6E9C18 /* AUv3ViewController.swift */; };
+		2B187353BA5A10D6F085C859 /* SharedBorrowedPresetPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = D22492FB24031D6519986C38 /* SharedBorrowedPresetPicker.swift */; };
 		3E44DB608090BB59515F3379 /* SuggestScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07741CB781828BC724C71C6C /* SuggestScreen.swift */; };
 		3ED0B3A12221343E084EF5EC /* ComposeScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDEC4BE9436C5B7AEA7F72F3 /* ComposeScreen.swift */; };
 		3F9DCC02417213CBE7DF4E59 /* ChordFlowCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB75877EB00543EC152F0A9B /* ChordFlowCore.swift */; };
@@ -131,6 +133,7 @@
 		68C81244636DE807D6EAB71A /* MIDIOutputManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MIDIOutputManager.swift; sourceTree = "<group>"; };
 		71E8FF4031C60D12F18519F0 /* ChordFlowMIDIProcessorAudioUnit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChordFlowMIDIProcessorAudioUnit.swift; sourceTree = "<group>"; };
 		7276B6E91134D6076E115FF8 /* ChordFlowHostHarnessTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ChordFlowHostHarnessTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		80D715634AA010DB757393AE /* SharedBlockActionOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedBlockActionOverlay.swift; sourceTree = "<group>"; };
 		835D5E76D3976F196247D401 /* ProgressionPlaybackEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressionPlaybackEngine.swift; sourceTree = "<group>"; };
 		8EF172A8ACD7ECB0D09309AF /* MIDIFileWriter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MIDIFileWriter.swift; sourceTree = "<group>"; };
 		9C41217A021FA3473DDB900C /* HostHarnessCore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HostHarnessCore.swift; sourceTree = "<group>"; };
@@ -141,6 +144,7 @@
 		B161D922C69887355BCB1919 /* ChordFlowApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChordFlowApp.swift; sourceTree = "<group>"; };
 		C21FFB8CB0C34360450136A3 /* ChordFlowShared.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ChordFlowShared.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		C364D28B7AE03B0CFFAFA7A3 /* KnobView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KnobView.swift; sourceTree = "<group>"; };
+		D22492FB24031D6519986C38 /* SharedBorrowedPresetPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedBorrowedPresetPicker.swift; sourceTree = "<group>"; };
 		E0E4405DD3888F7DF04167F3 /* SharedCircleOfFifthsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedCircleOfFifthsView.swift; sourceTree = "<group>"; };
 		E41F21E14C4893E031AA0E1C /* SharedTimelineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedTimelineView.swift; sourceTree = "<group>"; };
 		E65FCCA68DAB5940036608E5 /* SharedSuggestionCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedSuggestionCardView.swift; sourceTree = "<group>"; };
@@ -300,6 +304,8 @@
 				435BABE1510CA2A3CE969C46 /* Info.plist */,
 				8EF172A8ACD7ECB0D09309AF /* MIDIFileWriter.swift */,
 				68C81244636DE807D6EAB71A /* MIDIOutputManager.swift */,
+				80D715634AA010DB757393AE /* SharedBlockActionOverlay.swift */,
+				D22492FB24031D6519986C38 /* SharedBorrowedPresetPicker.swift */,
 				15DBD3EAB70B0E4079D0BC71 /* SharedChordDetailPanel.swift */,
 				E0E4405DD3888F7DF04167F3 /* SharedCircleOfFifthsView.swift */,
 				E65FCCA68DAB5940036608E5 /* SharedSuggestionCardView.swift */,
@@ -538,6 +544,8 @@
 				489276FA8462DF2E812BA0F9 /* DesignTokens.swift in Sources */,
 				BC63C671375E6D07B562D152 /* MIDIFileWriter.swift in Sources */,
 				90C716081B5D4C909563A88E /* MIDIOutputManager.swift in Sources */,
+				081EE882371B3F62D4E45A3B /* SharedBlockActionOverlay.swift in Sources */,
+				2B187353BA5A10D6F085C859 /* SharedBorrowedPresetPicker.swift in Sources */,
 				EC2CC5CAD6728E617DAAD58C /* SharedChordDetailPanel.swift in Sources */,
 				506F8F22CF77A551275DA56F /* SharedCircleOfFifthsView.swift in Sources */,
 				7E6646805BD3C93BCA98B3CB /* SharedSuggestionCardView.swift in Sources */,

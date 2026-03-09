@@ -60,7 +60,9 @@ final class AUv3ViewModel: ObservableObject, ChordFlowViewModel {
         // Poll debug/transport state from the AU
         debugTimer = Timer.scheduledTimer(withTimeInterval: 1.0 / 15.0, repeats: true) { [weak self] _ in
             guard let self else { return }
-            self.isPlaying = self.audioUnit.debugIsPlaying
+            // Show playing when either the render block reports playing, or
+            // the AU is un-muted (user pressed play) and we're waiting for render
+            self.isPlaying = self.audioUnit.debugIsPlaying || !self.audioUnit.debugMuted
             self.playbackProgress = self.computePlaybackProgress()
             self.debugInfo = "renders=\(self.audioUnit.debugRenderCount) beat=\(String(format: "%.1f", self.audioUnit.debugBeatPosition)) playing=\(self.audioUnit.debugIsPlaying) midi=\(self.audioUnit.debugHasMidiOut) chords=\(self.audioUnit.debugChordCount)"
         }
@@ -138,7 +140,9 @@ final class AUv3ViewModel: ObservableObject, ChordFlowViewModel {
     }
 
     func togglePlayback() {
-        // Host-controlled — no-op in AUv3
+        // Toggle playback: un-mutes MIDI output and starts internal beat clock
+        // (when host isn't providing transport), or mutes and stops everything.
+        audioUnit.togglePlayback()
     }
 
     // MARK: - Read AU Parameters
@@ -233,14 +237,59 @@ final class AUv3ViewModel: ObservableObject, ChordFlowViewModel {
 
     // MARK: - Preview
 
+    private var previewWorkItems: [DispatchWorkItem] = []
+
     func previewChord(_ chord: CFChord) {
-        let notes = Self.chordTones(chord)
-        audioUnit.sendPreviewNotes(notes)
+        // For chord previews (from circle), always use block pattern
+        let block = CFSequenceBlock(
+            barStart: 0, beatStart: 0, lengthBeats: 2,
+            chord: chord, pattern: .block,
+            octaveShift: defaultOctave
+        )
+        schedulePreviewEvents(for: block)
     }
 
     func previewBlock(_ block: CFSequenceBlock) {
-        let notes = Self.chordTones(block.chord)
-        audioUnit.sendPreviewNotes(notes)
+        // For block previews (from detail panel / timeline), respect the block's pattern
+        var preview = block
+        preview.barStart = 0
+        preview.beatStart = 0
+        schedulePreviewEvents(for: preview)
+    }
+
+    /// Use ChordFlowEngine.render() to produce pattern-aware MIDI events, then
+    /// schedule them as timed note-on / note-off pairs through the AU's individual
+    /// note queue (additive — notes don't cancel each other).
+    private func schedulePreviewEvents(for block: CFSequenceBlock) {
+        // Cancel any in-flight preview scheduling
+        for item in previewWorkItems { item.cancel() }
+        previewWorkItems.removeAll()
+        audioUnit.cancelAllPreviews()
+
+        let events = ChordFlowEngine.render(blocks: [block], swing: 0)
+        let tempo: Double = 120 // preview tempo
+        let ticksPerSecond = Double(ChordFlowEngine.ppq) * tempo / 60.0
+
+        for event in events {
+            guard event.status == 0x90 else { continue }
+            let note = event.data1
+            let onTime = Double(event.startTick) / ticksPerSecond
+            let offTime = Double(event.startTick + event.durationTicks) / ticksPerSecond
+
+            // Schedule note-on
+            let onItem = DispatchWorkItem { [weak self] in
+                self?.audioUnit.queuePreviewNoteOn(note)
+            }
+            previewWorkItems.append(onItem)
+            DispatchQueue.main.asyncAfter(deadline: .now() + onTime, execute: onItem)
+
+            // Schedule note-off
+            let offItem = DispatchWorkItem { [weak self] in
+                self?.audioUnit.queuePreviewNoteOff(note)
+            }
+            previewWorkItems.append(offItem)
+            DispatchQueue.main.asyncAfter(deadline: .now() + offTime, execute: offItem)
+        }
     }
 
     // MARK: - Chord Progression Management
@@ -436,11 +485,20 @@ final class AUv3ViewModel: ObservableObject, ChordFlowViewModel {
         // Build the sequenced chord tones for the render block
         var chordTonesList: [[UInt8]] = []
         var beatLengths: [Double] = []
+        var patterns: [Int] = []
         for block in blocks {
-            chordTonesList.append(Self.chordTones(block.chord))
+            // Apply octaveShift to MIDI note numbers before sending to the AU
+            let rawTones = Self.chordTones(block.chord)
+            let shiftedTones = rawTones.map {
+                UInt8(min(max(Int($0) + block.octaveShift * 12, 0), 127))
+            }
+            chordTonesList.append(shiftedTones)
             beatLengths.append(block.lengthBeats)
+            // Map CFPattern to Int: block=0, arpUp=1, arpDown=2, strum=3
+            let patIdx = CFPattern.allCases.firstIndex(of: block.pattern) ?? 0
+            patterns.append(patIdx)
         }
-        audioUnit.updateProgression(chords: chordTonesList, beatLengths: beatLengths)
+        audioUnit.updateProgression(chords: chordTonesList, beatLengths: beatLengths, patterns: patterns)
     }
 
     private func computePlaybackProgress() -> Double {

@@ -4,6 +4,7 @@ import ChordFlowShared
 struct PlaybackBarView: View {
     @ObservedObject var vm: AppViewModel
     var onBlockTap: ((Int) -> Void)?
+    var onBlockLongPress: (Int) -> Void
 
     var body: some View {
         VStack(spacing: 0) {
@@ -42,9 +43,13 @@ struct PlaybackBarView: View {
                 }
                 .fixedSize(horizontal: true, vertical: false)
 
-                // Inline timeline (replaces Spacer + BPM)
-                SharedTimelineView(vm: vm, onBlockTap: onBlockTap)
-                    .frame(maxWidth: .infinity)
+                // Inline timeline
+                SharedTimelineView(
+                    vm: vm,
+                    onBlockTap: onBlockTap,
+                    onBlockLongPress: onBlockLongPress
+                )
+                .frame(maxWidth: .infinity)
             }
             .padding(.horizontal, CFSpacing.spacious)
             .padding(.vertical, CFSpacing.compact)

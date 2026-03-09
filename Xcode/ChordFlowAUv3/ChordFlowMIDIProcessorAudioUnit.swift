@@ -33,6 +33,16 @@ public final class ChordFlowMIDIProcessorAudioUnit: AUAudioUnit {
     private var lastBeatPosition: Double = -1
     private var renderCallCount: Int = 0
 
+    // Internal playback state (when host transport is not available / not running)
+    var internalPlaybackActive: Bool = false
+    var internalTempo: Double = 120
+    private var internalBeatPosition: Double = 0
+
+    // Mute flag: when true, the AUv3 suppresses chord playback even if the host is playing.
+    // Toggled by the play/stop button. When un-muted and the host is playing, we follow host.
+    // When un-muted and the host is stopped, we use internal playback.
+    var isMuted: Bool = true
+
     // Debug state readable from UI
     var debugHasMusicalContext: Bool { musicalContextBlock != nil }
     var debugHasTransport: Bool { transportStateBlock != nil }
@@ -41,6 +51,8 @@ public final class ChordFlowMIDIProcessorAudioUnit: AUAudioUnit {
     var debugIsPlaying: Bool { wasPlaying }
     var debugBeatPosition: Double { lastBeatPosition }
     var debugChordCount: Int { cachedChords.count }
+    var debugInternalPlayback: Bool { internalPlaybackActive }
+    var debugMuted: Bool { isMuted }
 
     // Backing storage for parameter values (avoids infinite recursion via implementorValueProvider)
     private var tonicValue: AUValue = 0
@@ -60,7 +72,12 @@ public final class ChordFlowMIDIProcessorAudioUnit: AUAudioUnit {
     // When non-empty, this takes priority over cachedChords.
     private var progressionChords: [[UInt8]] = []
     private var progressionBeatLengths: [Double] = []
+    private var progressionPatterns: [Int] = []  // 0=block, 1=arpUp, 2=arpDown, 3=strum
     private var hasUserProgression: Bool { !progressionChords.isEmpty }
+
+    // Pattern scheduling state: tracks which individual note within an arp/strum
+    // pattern we last triggered, so we advance through them over time.
+    private var patternNoteIndex: Int = -1
 
     // Preview note queue (UI thread writes, render thread reads and drains)
     private var previewNoteOns: [UInt8] = []
@@ -68,6 +85,13 @@ public final class ChordFlowMIDIProcessorAudioUnit: AUAudioUnit {
     private var previewActiveNotes: [UInt8] = []
     private var hasPendingPreviewOn: Bool = false
     private var hasPendingPreviewOff: Bool = false
+
+    // Individual preview note queues (for pattern-aware previews)
+    // These accumulate notes without clearing previous ones.
+    private var pendingIndividualOns: [UInt8] = []
+    private var pendingIndividualOffs: [UInt8] = []
+    private var hasPendingIndividualOn: Bool = false
+    private var hasPendingIndividualOff: Bool = false
 
     public override var outputBusses: AUAudioUnitBusArray { outputBussesInternal }
     public override var inputBusses: AUAudioUnitBusArray { inputBussesInternal }
@@ -109,6 +133,7 @@ public final class ChordFlowMIDIProcessorAudioUnit: AUAudioUnit {
         lastChordBeat = -1
         wasPlaying = false
         lastBeatPosition = -1
+        patternNoteIndex = -1
         sendActiveNotesOff()
     }
 
@@ -244,14 +269,41 @@ public final class ChordFlowMIDIProcessorAudioUnit: AUAudioUnit {
     // MARK: - User Progression
 
     /// Called from the UI thread to push a user-built chord progression to the render thread.
-    func updateProgression(chords: [[UInt8]], beatLengths: [Double]) {
+    func updateProgression(chords: [[UInt8]], beatLengths: [Double], patterns: [Int]) {
         // Simple assignment — these arrays are value types and the render thread
         // reads them non-atomically, but the worst case is a single buffer with
         // stale data, which is acceptable for a UI-driven update.
         progressionChords = chords
         progressionBeatLengths = beatLengths
+        progressionPatterns = patterns
         // Reset chord beat tracking so the next render cycle picks up the new progression
         lastChordBeat = -1
+        patternNoteIndex = -1
+    }
+
+    // MARK: - Internal Playback
+
+    /// Toggle playback. This controls two things:
+    /// 1. Un-mutes/mutes the MIDI output (allows host-driven playback to sound)
+    /// 2. Starts/stops an internal beat clock for when the host isn't playing
+    func togglePlayback() {
+        if isMuted {
+            // Start: un-mute and enable internal clock
+            isMuted = false
+            internalBeatPosition = 0
+            lastChordBeat = -1
+            patternNoteIndex = -1
+            internalPlaybackActive = true
+        } else {
+            // Stop: mute and disable internal clock
+            isMuted = true
+            internalPlaybackActive = false
+        }
+    }
+
+    func stopPlayback() {
+        isMuted = true
+        internalPlaybackActive = false
     }
 
     // MARK: - Preview
@@ -286,6 +338,33 @@ public final class ChordFlowMIDIProcessorAudioUnit: AUAudioUnit {
         previewNoteOffs = previewActiveNotes
         hasPendingPreviewOff = true
         previewActiveNotes = []
+    }
+
+    /// Queue a single note-on for the next render cycle (additive — doesn't stop other notes).
+    func queuePreviewNoteOn(_ note: UInt8) {
+        pendingIndividualOns.append(note)
+        previewActiveNotes.append(note)
+        hasPendingIndividualOn = true
+    }
+
+    /// Queue a single note-off for the next render cycle.
+    func queuePreviewNoteOff(_ note: UInt8) {
+        pendingIndividualOffs.append(note)
+        previewActiveNotes.removeAll { $0 == note }
+        hasPendingIndividualOff = true
+    }
+
+    /// Stop all preview notes and clear queues.
+    func cancelAllPreviews() {
+        if !previewActiveNotes.isEmpty {
+            previewNoteOffs.append(contentsOf: previewActiveNotes)
+            hasPendingPreviewOff = true
+            previewActiveNotes = []
+        }
+        pendingIndividualOns.removeAll()
+        pendingIndividualOffs.removeAll()
+        hasPendingIndividualOn = false
+        hasPendingIndividualOff = false
     }
 
     // MARK: - Chord Cache
@@ -346,7 +425,9 @@ public final class ChordFlowMIDIProcessorAudioUnit: AUAudioUnit {
             // Read host transport
             var beatPosition: Double = 0
             var isPlaying = false
+            var hostIsPlaying = false
             var timeSigNum = 4
+            var sampleRate: Double = 44_100
 
             if let ctx = au.musicalContextBlock {
                 var tempo: Double = 120
@@ -358,6 +439,7 @@ public final class ChordFlowMIDIProcessorAudioUnit: AUAudioUnit {
                 if ctx(&tempo, &tsNum, &tsDen, &bp, &sampleOff, &downbeat) {
                     beatPosition = bp
                     timeSigNum = max(1, Int(tsNum))
+                    sampleRate = max(1, Double(au.outputBus.format.sampleRate))
                 }
             }
 
@@ -367,7 +449,8 @@ public final class ChordFlowMIDIProcessorAudioUnit: AUAudioUnit {
                 var cycleStart: Double = 0
                 var cycleEnd: Double = 0
                 if transport(&flags, &samplePos, &cycleStart, &cycleEnd) {
-                    isPlaying = flags.contains(.moving)
+                    hostIsPlaying = flags.contains(.moving)
+                    isPlaying = hostIsPlaying
                 }
             }
 
@@ -375,7 +458,24 @@ public final class ChordFlowMIDIProcessorAudioUnit: AUAudioUnit {
             // infer playing state from beat position advancing
             if !isPlaying && au.lastBeatPosition >= 0 && beatPosition != au.lastBeatPosition {
                 isPlaying = true
+                hostIsPlaying = true
             }
+
+            // When muted, suppress chord playback entirely (previews still work)
+            if au.isMuted {
+                isPlaying = false
+            } else if !hostIsPlaying && au.internalPlaybackActive && au.hasUserProgression {
+                // Internal playback: drive our own beat clock when host isn't playing
+                isPlaying = true
+                let beatsPerSecond = au.internalTempo / 60.0
+                let beatsThisBuffer = beatsPerSecond * Double(frameCount) / sampleRate
+                au.internalBeatPosition += beatsThisBuffer
+                beatPosition = au.internalBeatPosition
+            } else if hostIsPlaying && au.internalPlaybackActive {
+                // Host is driving transport — disable internal clock (host takes over)
+                au.internalPlaybackActive = false
+            }
+
             au.lastBeatPosition = beatPosition
 
             au.renderCallCount += 1
@@ -385,6 +485,7 @@ public final class ChordFlowMIDIProcessorAudioUnit: AUAudioUnit {
                 au.lastChordBeat = -1
             } else if !isPlaying && au.wasPlaying {
                 au.sendActiveNotesOff()
+                au.patternNoteIndex = -1
             }
             au.wasPlaying = isPlaying
 
@@ -405,11 +506,29 @@ public final class ChordFlowMIDIProcessorAudioUnit: AUAudioUnit {
                 au.previewNoteOns.removeAll(keepingCapacity: true)
             }
 
+            // Drain individual preview note queues (pattern-aware previews)
+            if au.hasPendingIndividualOff {
+                au.hasPendingIndividualOff = false
+                for note in au.pendingIndividualOffs {
+                    au.sendNoteOff(note)
+                }
+                au.pendingIndividualOffs.removeAll(keepingCapacity: true)
+            }
+            if au.hasPendingIndividualOn {
+                au.hasPendingIndividualOn = false
+                let offset = AUEventSampleTime(min(Int(frameCount) - 1, 64))
+                for note in au.pendingIndividualOns {
+                    au.sendNoteOn(note, offset: offset)
+                }
+                au.pendingIndividualOns.removeAll(keepingCapacity: true)
+            }
+
             if isPlaying {
                 if au.hasUserProgression {
                     // User-built progression with variable beat lengths
                     let chords = au.progressionChords
                     let lengths = au.progressionBeatLengths
+                    let patterns = au.progressionPatterns
                     let chordCount = chords.count
                     guard chordCount > 0, lengths.count == chordCount else { return noErr }
 
@@ -424,25 +543,110 @@ public final class ChordFlowMIDIProcessorAudioUnit: AUAudioUnit {
                     // Walk chord boundaries to find which chord we're in
                     var accumulated: Double = 0
                     var currentIdx = 0
+                    var chordStartBeat: Double = 0
                     for i in 0..<chordCount {
+                        let prevAccum = accumulated
                         accumulated += lengths[i]
-                        if positiveBeat < accumulated { currentIdx = i; break }
-                        if i == chordCount - 1 { currentIdx = i }
+                        if positiveBeat < accumulated {
+                            currentIdx = i
+                            chordStartBeat = prevAccum
+                            break
+                        }
+                        if i == chordCount - 1 {
+                            currentIdx = i
+                            chordStartBeat = prevAccum
+                        }
                     }
 
                     // Use a combination of wrap cycle + index to detect chord changes
                     let cycleNumber = Int(floor(beatPosition / totalBeats))
                     let chordKey = cycleNumber * 1000 + currentIdx
 
+                    let pat = currentIdx < patterns.count ? patterns[currentIdx] : 0
+                    let notes = chords[currentIdx]
+                    let chordDuration = lengths[currentIdx]
+                    let beatInChord = positiveBeat - chordStartBeat
+                    let offset = AUEventSampleTime(min(Int(frameCount) - 1, 64))
+
                     if chordKey != au.lastChordBeat {
+                        // Chord changed — reset state
                         au.lastChordBeat = chordKey
                         au.sendActiveNotesOff()
-                        let notes = chords[currentIdx]
-                        let offset = AUEventSampleTime(min(Int(frameCount) - 1, 64))
-                        for note in notes {
-                            au.sendNoteOn(note, offset: offset)
+                        au.patternNoteIndex = -1
+
+                        switch pat {
+                        case 0:
+                            // Block: all notes on at once, sustain until next chord
+                            for note in notes {
+                                au.sendNoteOn(note, offset: offset)
+                            }
+                            au.activeNotes = Array(notes)
+
+                        case 1, 2:
+                            // Arp Up / Arp Down: first note triggers immediately
+                            let sorted = pat == 1
+                                ? notes.sorted()           // ascending
+                                : notes.sorted().reversed() // descending, Array() below
+                            let orderedNotes = Array(sorted)
+                            if !orderedNotes.isEmpty {
+                                au.sendNoteOn(orderedNotes[0], offset: offset)
+                                au.activeNotes = [orderedNotes[0]]
+                                au.patternNoteIndex = 0
+                            }
+
+                        case 3:
+                            // Strum: trigger first note immediately, others on subsequent renders
+                            if !notes.isEmpty {
+                                au.sendNoteOn(notes[0], offset: offset)
+                                au.activeNotes = [notes[0]]
+                                au.patternNoteIndex = 0
+                            }
+
+                        default:
+                            // Unknown pattern — fall back to block
+                            for note in notes {
+                                au.sendNoteOn(note, offset: offset)
+                            }
+                            au.activeNotes = Array(notes)
                         }
-                        au.activeNotes = notes
+                    } else {
+                        // Same chord — handle arp/strum note advancement
+                        switch pat {
+                        case 1, 2:
+                            // Arp: subdivide chord duration evenly among notes
+                            let sorted = pat == 1
+                                ? notes.sorted()
+                                : notes.sorted().reversed()
+                            let orderedNotes = Array(sorted)
+                            let noteCount = orderedNotes.count
+                            guard noteCount > 1 else { break }
+                            let step = chordDuration / Double(noteCount)
+                            let expectedIdx = min(Int(beatInChord / step), noteCount - 1)
+                            if expectedIdx != au.patternNoteIndex, expectedIdx >= 0 {
+                                au.sendActiveNotesOff()
+                                au.sendNoteOn(orderedNotes[expectedIdx], offset: offset)
+                                au.activeNotes = [orderedNotes[expectedIdx]]
+                                au.patternNoteIndex = expectedIdx
+                            }
+
+                        case 3:
+                            // Strum: trigger notes with ~1/32 beat gap between them
+                            let strumGap = 1.0 / 32.0  // beat gap between strum notes
+                            let noteCount = notes.count
+                            guard noteCount > 1 else { break }
+                            let expectedIdx = min(Int(beatInChord / strumGap), noteCount - 1)
+                            if expectedIdx > au.patternNoteIndex, expectedIdx < noteCount {
+                                // Add newly strummed notes (don't remove previous — they sustain)
+                                for i in (au.patternNoteIndex + 1)...expectedIdx {
+                                    au.sendNoteOn(notes[i], offset: offset)
+                                    au.activeNotes.append(notes[i])
+                                }
+                                au.patternNoteIndex = expectedIdx
+                            }
+
+                        default:
+                            break // Block pattern — nothing to advance
+                        }
                     }
                 } else {
                     // Fallback: auto-cycle through parameter-generated diatonic chords

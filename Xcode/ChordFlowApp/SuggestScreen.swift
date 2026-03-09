@@ -5,6 +5,8 @@ struct SuggestScreen: View {
     @ObservedObject var vm: AppViewModel
     @Environment(\.horizontalSizeClass) private var sizeClass
     @State private var styleFilter: String = "All"
+    @State private var showBorrowedPicker = false
+    @State private var contextMenuBlockIndex: Int?
 
     private let styleFilters = ["All", "Pop", "Jazz", "Neo-Soul", "Cinematic", "Exp."]
 
@@ -17,6 +19,10 @@ struct SuggestScreen: View {
             }
         }
         .background(Color.cfBackground.ignoresSafeArea())
+        .dismissBorrowedPicker(isExpanded: $showBorrowedPicker)
+        .overlay {
+            SharedBlockActionOverlay(vm: vm, blockIndex: $contextMenuBlockIndex)
+        }
         .sheet(isPresented: $vm.showModeSheet) {
             modePickerSheet
                 .presentationDetents([.medium])
@@ -50,9 +56,15 @@ struct SuggestScreen: View {
             }
 
             // Playback bar (includes inline timeline)
-            PlaybackBarView(vm: vm) { index in
-                vm.selectedBlockIndex = vm.selectedBlockIndex == index ? nil : index
-            }
+            PlaybackBarView(
+                vm: vm,
+                onBlockTap: { index in
+                    vm.selectedBlockIndex = vm.selectedBlockIndex == index ? nil : index
+                },
+                onBlockLongPress: { index in
+                    contextMenuBlockIndex = index
+                }
+            )
             .padding(.horizontal, CFSpacing.compact)
             .padding(.bottom, CFSpacing.tight)
         }
@@ -71,8 +83,6 @@ struct SuggestScreen: View {
                         }
 
                         controlsStrip
-
-                        borrowedPresetPills
                     }
                 }
                 .frame(maxWidth: .infinity)
@@ -89,9 +99,15 @@ struct SuggestScreen: View {
             .padding(.top, CFSpacing.standard)
 
             // Playback bar (includes inline timeline)
-            PlaybackBarView(vm: vm) { index in
-                vm.selectedBlockIndex = vm.selectedBlockIndex == index ? nil : index
-            }
+            PlaybackBarView(
+                vm: vm,
+                onBlockTap: { index in
+                    vm.selectedBlockIndex = vm.selectedBlockIndex == index ? nil : index
+                },
+                onBlockLongPress: { index in
+                    contextMenuBlockIndex = index
+                }
+            )
             .padding(.horizontal, CFSpacing.spacious)
             .padding(.bottom, CFSpacing.compact)
         }
@@ -121,6 +137,8 @@ struct SuggestScreen: View {
 
                 octaveSelector
 
+                SharedBorrowedPresetPicker(vm: vm, isExpanded: $showBorrowedPicker)
+
                 KnobView(
                     value: $vm.project.tempo,
                     in: 60...180,
@@ -130,10 +148,6 @@ struct SuggestScreen: View {
                     format: { "\(Int($0.rounded()))" }
                 )
                 .frame(width: 72, height: 90)
-
-                if sizeClass != .regular {
-                    borrowedPresetPill
-                }
             }
         }
     }
@@ -226,69 +240,6 @@ struct SuggestScreen: View {
             Text("OCTAVE")
                 .font(.system(size: 8, weight: .medium, design: .rounded))
                 .foregroundStyle(Color.cfTextTertiary)
-        }
-    }
-
-    // MARK: - Borrowed Preset
-
-    private var borrowedPresetPill: some View {
-        VStack(spacing: CFSpacing.micro) {
-            Menu {
-                ForEach(CFBorrowedChordPreset.allCases, id: \.self) { preset in
-                    Button(preset.displayName()) {
-                        vm.borrowedPreset = preset
-                        vm.refreshChordButtons()
-                    }
-                }
-            } label: {
-                Text(vm.borrowedPreset.displayName())
-                    .font(.system(size: 10, weight: .semibold, design: .rounded))
-                    .foregroundStyle(Color.cfBorrowed)
-                    .padding(.horizontal, CFSpacing.compact)
-                    .padding(.vertical, CFSpacing.tight)
-                    .background(
-                        Capsule()
-                            .fill(Color.cfBorrowed.opacity(0.15))
-                            .strokeBorder(Color.cfBorrowed, lineWidth: 1)
-                    )
-            }
-
-            Text("BORROWED")
-                .font(.system(size: 8, weight: .medium, design: .rounded))
-                .foregroundStyle(Color.cfTextTertiary)
-        }
-    }
-
-    private var borrowedPresetPills: some View {
-        VStack(alignment: .leading, spacing: CFSpacing.tight) {
-            Text("BORROWED PRESET")
-                .font(.cfCaption)
-                .foregroundStyle(Color.cfTextSecondary)
-                .textCase(.uppercase)
-
-            let presets: [CFBorrowedChordPreset] = [.diatonicOnly, .jazz, .cinematic, .experimental, .everything]
-            FlowLayout(spacing: CFSpacing.tight) {
-                ForEach(presets, id: \.self) { preset in
-                    let isActive = vm.borrowedPreset == preset
-                    Button {
-                        vm.borrowedPreset = preset
-                        vm.refreshChordButtons()
-                    } label: {
-                        Text(preset.displayName())
-                            .font(.system(size: 11, weight: isActive ? .semibold : .regular, design: .rounded))
-                            .foregroundStyle(isActive ? Color.cfBorrowed : Color.cfTextSecondary)
-                            .padding(.horizontal, CFSpacing.compact)
-                            .padding(.vertical, CFSpacing.tight)
-                            .background(
-                                Capsule()
-                                    .fill(isActive ? Color.cfBorrowed.opacity(0.2) : Color.cfSurface)
-                                    .strokeBorder(isActive ? Color.cfBorrowed : Color.cfBorder,
-                                                  lineWidth: isActive ? 1.5 : 1)
-                            )
-                    }
-                    .buttonStyle(.plain)
-                }
-            }
         }
     }
 
