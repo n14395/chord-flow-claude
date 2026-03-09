@@ -33,16 +33,6 @@ public final class ChordFlowMIDIProcessorAudioUnit: AUAudioUnit {
     private var lastBeatPosition: Double = -1
     private var renderCallCount: Int = 0
 
-    // Internal playback state (when host transport is not available / not running)
-    var internalPlaybackActive: Bool = false
-    var internalTempo: Double = 120
-    private var internalBeatPosition: Double = 0
-
-    // Mute flag: when true, the AUv3 suppresses chord playback even if the host is playing.
-    // Toggled by the play/stop button. When un-muted and the host is playing, we follow host.
-    // When un-muted and the host is stopped, we use internal playback.
-    var isMuted: Bool = true
-
     // Debug state readable from UI
     var debugHasMusicalContext: Bool { musicalContextBlock != nil }
     var debugHasTransport: Bool { transportStateBlock != nil }
@@ -51,8 +41,6 @@ public final class ChordFlowMIDIProcessorAudioUnit: AUAudioUnit {
     var debugIsPlaying: Bool { wasPlaying }
     var debugBeatPosition: Double { lastBeatPosition }
     var debugChordCount: Int { cachedChords.count }
-    var debugInternalPlayback: Bool { internalPlaybackActive }
-    var debugMuted: Bool { isMuted }
 
     // Backing storage for parameter values (avoids infinite recursion via implementorValueProvider)
     private var tonicValue: AUValue = 0
@@ -281,31 +269,6 @@ public final class ChordFlowMIDIProcessorAudioUnit: AUAudioUnit {
         patternNoteIndex = -1
     }
 
-    // MARK: - Internal Playback
-
-    /// Toggle playback. This controls two things:
-    /// 1. Un-mutes/mutes the MIDI output (allows host-driven playback to sound)
-    /// 2. Starts/stops an internal beat clock for when the host isn't playing
-    func togglePlayback() {
-        if isMuted {
-            // Start: un-mute and enable internal clock
-            isMuted = false
-            internalBeatPosition = 0
-            lastChordBeat = -1
-            patternNoteIndex = -1
-            internalPlaybackActive = true
-        } else {
-            // Stop: mute and disable internal clock
-            isMuted = true
-            internalPlaybackActive = false
-        }
-    }
-
-    func stopPlayback() {
-        isMuted = true
-        internalPlaybackActive = false
-    }
-
     // MARK: - Preview
 
     /// Send a set of MIDI notes immediately via the render block's MIDI output.
@@ -461,20 +424,8 @@ public final class ChordFlowMIDIProcessorAudioUnit: AUAudioUnit {
                 hostIsPlaying = true
             }
 
-            // When muted, suppress chord playback entirely (previews still work)
-            if au.isMuted {
-                isPlaying = false
-            } else if !hostIsPlaying && au.internalPlaybackActive && au.hasUserProgression {
-                // Internal playback: drive our own beat clock when host isn't playing
-                isPlaying = true
-                let beatsPerSecond = au.internalTempo / 60.0
-                let beatsThisBuffer = beatsPerSecond * Double(frameCount) / sampleRate
-                au.internalBeatPosition += beatsThisBuffer
-                beatPosition = au.internalBeatPosition
-            } else if hostIsPlaying && au.internalPlaybackActive {
-                // Host is driving transport — disable internal clock (host takes over)
-                au.internalPlaybackActive = false
-            }
+            // AUv3 follows host transport entirely — no internal clock or mute toggle.
+            // isPlaying is already set from transportStateBlock / beat-advancing fallback above.
 
             au.lastBeatPosition = beatPosition
 

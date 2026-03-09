@@ -242,33 +242,32 @@ struct AUv3View: View {
     private var playbackBar: some View {
         VStack(spacing: 0) {
             HStack(spacing: CFSpacing.compact) {
-                // Play / Stop button
-                Button {
-                    vm.togglePlayback()
-                } label: {
-                    ZStack {
-                        Circle()
-                            .fill(vm.isPlaying ? Color.cfDestructive : Color.cfTonic)
-                            .frame(width: 44, height: 44)
-                        if vm.isPlaying {
-                            RoundedRectangle(cornerRadius: 3)
-                                .fill(Color.cfTextPrimary)
-                                .frame(width: 18, height: 18)
-                        } else {
-                            Image(systemName: "play.fill")
-                                .font(.system(size: 18))
-                                .foregroundStyle(Color.cfBase)
-                                .offset(x: 2)
-                        }
+                // Transport indicator (follows host)
+                ZStack {
+                    Circle()
+                        .fill(vm.isPlaying ? Color.cfTonic : Color.cfSurface)
+                        .frame(width: 32, height: 32)
+                        .overlay(
+                            Circle()
+                                .strokeBorder(vm.isPlaying ? Color.cfTonic : Color.cfBorder, lineWidth: 1)
+                        )
+                    if vm.isPlaying {
+                        Image(systemName: "play.fill")
+                            .font(.system(size: 13))
+                            .foregroundStyle(Color.cfBase)
+                            .offset(x: 1)
+                    } else {
+                        Image(systemName: "stop.fill")
+                            .font(.system(size: 11))
+                            .foregroundStyle(Color.cfTextTertiary)
                     }
                 }
-                .buttonStyle(.plain)
 
                 // Status text
                 VStack(alignment: .leading, spacing: 1) {
-                    Text(vm.isPlaying ? "Playing" : "Ready")
+                    Text(vm.isPlaying ? "Playing" : "Stopped")
                         .font(.system(size: 14, weight: .semibold, design: .rounded))
-                        .foregroundStyle(vm.isPlaying ? Color.cfTonic : Color.cfTextPrimary)
+                        .foregroundStyle(vm.isPlaying ? Color.cfTonic : Color.cfTextSecondary)
                     Text(statusDetail)
                         .font(.system(size: 11, weight: .regular, design: .rounded))
                         .foregroundStyle(Color.cfTextSecondary)

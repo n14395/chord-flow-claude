@@ -40,7 +40,7 @@ public protocol ChordFlowViewModel: ObservableObject {
     var barCount: Int { get }
     var currentBar: Int { get }
 
-    /// Toggle playback on/off. In AUv3 this may be a no-op (host-controlled).
+    /// Toggle playback on/off. No-op in AUv3 (transport follows the host).
     func togglePlayback()
 
     // MARK: - Tension

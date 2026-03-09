@@ -57,12 +57,10 @@ final class AUv3ViewModel: ObservableObject, ChordFlowViewModel {
             }
         })
 
-        // Poll debug/transport state from the AU
+        // Poll transport state from the AU — the plugin follows the host transport entirely
         debugTimer = Timer.scheduledTimer(withTimeInterval: 1.0 / 15.0, repeats: true) { [weak self] _ in
             guard let self else { return }
-            // Show playing when either the render block reports playing, or
-            // the AU is un-muted (user pressed play) and we're waiting for render
-            self.isPlaying = self.audioUnit.debugIsPlaying || !self.audioUnit.debugMuted
+            self.isPlaying = self.audioUnit.debugIsPlaying
             self.playbackProgress = self.computePlaybackProgress()
             self.debugInfo = "renders=\(self.audioUnit.debugRenderCount) beat=\(String(format: "%.1f", self.audioUnit.debugBeatPosition)) playing=\(self.audioUnit.debugIsPlaying) midi=\(self.audioUnit.debugHasMidiOut) chords=\(self.audioUnit.debugChordCount)"
         }
@@ -140,9 +138,7 @@ final class AUv3ViewModel: ObservableObject, ChordFlowViewModel {
     }
 
     func togglePlayback() {
-        // Toggle playback: un-mutes MIDI output and starts internal beat clock
-        // (when host isn't providing transport), or mutes and stops everything.
-        audioUnit.togglePlayback()
+        // No-op in AUv3 — transport is controlled entirely by the host (AUM, Audiobus, etc.)
     }
 
     // MARK: - Read AU Parameters
