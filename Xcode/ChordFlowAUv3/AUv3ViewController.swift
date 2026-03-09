@@ -32,6 +32,14 @@ final class AUv3ViewModel: ObservableObject, ChordFlowViewModel {
     @Published var selectedTab: Int = 0
     @Published var styleFilter: String = "All"
 
+    // MARK: Save/Load State
+
+    @Published var savedProjects: [CFSavedProject] = []
+    @Published var status: String = "Ready"
+
+    static let projectExtension = "chordflow"
+    private static let validProjectExtensions: Set<String> = ["chordflow", "json"]
+
     // MARK: Debug / Transport State
 
     @Published var debugInfo: String = "waiting..."
@@ -50,6 +58,7 @@ final class AUv3ViewModel: ObservableObject, ChordFlowViewModel {
         readAllParameters()
         refreshChordButtons()
         refreshSuggestions()
+        refreshSavedProjects()
 
         parameterObservation = audioUnit.parameterTree?.token(byAddingParameterObserver: { [weak self] address, value in
             DispatchQueue.main.async {
@@ -139,6 +148,113 @@ final class AUv3ViewModel: ObservableObject, ChordFlowViewModel {
 
     func togglePlayback() {
         // No-op in AUv3 — transport is controlled entirely by the host (AUM, Audiobus, etc.)
+    }
+
+    // MARK: - Export
+
+    func encodeProjectData() -> Data? {
+        let doc = CFProjectDocument(tempo: 120, key: key, blocks: sequencedBlocks(blocks))
+        return try? ChordFlowEngine.encodeProject(doc)
+    }
+
+    func exportMIDI() {
+        let events = ChordFlowEngine.render(blocks: sequencedBlocks(blocks), swing: 0)
+        let data = MIDIFileWriter.export(events: events)
+        let url = URL.documentsDirectory.appending(path: "ChordFlow-Export.mid")
+        do {
+            try data.write(to: url)
+            status = "Exported: ChordFlow-Export.mid"
+        } catch {
+            status = "Export failed: \(error.localizedDescription)"
+        }
+    }
+
+    func exportProject() {
+        let url = URL.documentsDirectory.appending(path: "ChordFlow-Project.\(Self.projectExtension)")
+        do {
+            let doc = CFProjectDocument(tempo: 120, key: key, blocks: sequencedBlocks(blocks))
+            try ChordFlowEngine.encodeProject(doc).write(to: url)
+            status = "Exported: \(url.lastPathComponent)"
+        } catch {
+            status = "Export failed: \(error.localizedDescription)"
+        }
+    }
+
+    // MARK: - Save / Load
+
+    func saveProjectAs(name: String) {
+        let safeName = name.replacingOccurrences(of: "/", with: "-")
+        let url = CFAppGroup.projectsURL.appending(path: "\(safeName).\(Self.projectExtension)")
+        do {
+            let doc = CFProjectDocument(tempo: 120, key: key, blocks: sequencedBlocks(blocks))
+            let data = try ChordFlowEngine.encodeProject(doc)
+            try data.write(to: url)
+            status = "Saved: \(safeName).\(Self.projectExtension)"
+            refreshSavedProjects()
+        } catch {
+            status = "Save failed: \(error.localizedDescription)"
+        }
+    }
+
+    func loadProject(from url: URL) {
+        do {
+            let accessing = url.startAccessingSecurityScopedResource()
+            defer { if accessing { url.stopAccessingSecurityScopedResource() } }
+            let data = try Data(contentsOf: url)
+            let doc = try ChordFlowEngine.decodeProject(data)
+            blocks = doc.blocks
+            selectedBlockIndex = nil
+            refreshChordButtons()
+            refreshSuggestions()
+            syncProgressionToAU()
+            status = "Loaded: \(url.lastPathComponent)"
+        } catch {
+            status = "Load failed: \(error.localizedDescription)"
+        }
+    }
+
+    func deleteProject(fileName: String) {
+        let url = CFAppGroup.projectsURL.appending(path: fileName)
+        try? FileManager.default.removeItem(at: url)
+        refreshSavedProjects()
+    }
+
+    func refreshSavedProjects() {
+        let fm = FileManager.default
+        let dir = CFAppGroup.projectsURL
+        guard let files = try? fm.contentsOfDirectory(at: dir, includingPropertiesForKeys: [.contentModificationDateKey]) else {
+            savedProjects = []
+            return
+        }
+        savedProjects = files
+            .filter { Self.validProjectExtensions.contains($0.pathExtension) }
+            .compactMap { url -> CFSavedProject? in
+                guard let attrs = try? fm.attributesOfItem(atPath: url.path),
+                       let date = attrs[.modificationDate] as? Date else { return nil }
+                var keyName = "Unknown"
+                var blockCount = 0
+                if let data = try? Data(contentsOf: url),
+                   let doc = try? ChordFlowEngine.decodeProject(data) {
+                    keyName = "\(doc.key.tonic.display()) \(doc.key.mode.displayName())"
+                    blockCount = doc.blocks.count
+                }
+                return CFSavedProject(fileName: url.lastPathComponent, date: date, key: keyName, blockCount: blockCount)
+            }
+            .sorted { $0.date > $1.date }
+    }
+
+    private func sequencedBlocks(_ blocks: [CFSequenceBlock]) -> [CFSequenceBlock] {
+        var result: [CFSequenceBlock] = []
+        var currentBeat: Double = 0
+        for var block in blocks {
+            let bar = Int(currentBeat / 4)
+            let beat = currentBeat - Double(bar * 4)
+            block.barStart = bar
+            block.beatStart = beat
+            result.append(block)
+            currentBeat += block.lengthBeats
+        }
+        return result
     }
 
     // MARK: - Read AU Parameters

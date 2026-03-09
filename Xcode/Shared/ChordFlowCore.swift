@@ -218,3 +218,35 @@ public struct CFProjectDocument: Codable, Equatable {
         self.blocks = blocks
     }
 }
+
+// MARK: - Saved Project Metadata
+
+public struct CFSavedProject: Identifiable, Equatable {
+    public var id: String { fileName }
+    public var fileName: String
+    public var date: Date
+    public var key: String
+    public var blockCount: Int
+
+    public init(fileName: String, date: Date, key: String, blockCount: Int) {
+        self.fileName = fileName
+        self.date = date
+        self.key = key
+        self.blockCount = blockCount
+    }
+}
+
+// MARK: - Shared App Group Container
+
+public enum CFAppGroup {
+    public static let identifier = "group.com.n14395.chordflow2"
+
+    /// The shared container directory for saving/loading projects.
+    /// When the App Group is registered and provisioned, both the main app and AUv3
+    /// extension see the same directory. Falls back to the app's documents directory
+    /// if the App Group container is unavailable.
+    public static var projectsURL: URL {
+        FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: identifier)
+            ?? URL.documentsDirectory
+    }
+}

@@ -33,15 +33,7 @@ final class AppViewModel: ObservableObject, ChordFlowViewModel {
     // MARK: - Persistence
 
     private static let autoSaveFileName = "ChordFlow-AutoSave.json"
-    @Published var savedProjects: [SavedProject] = []
-
-    struct SavedProject: Identifiable, Equatable {
-        var id: String { fileName }
-        var fileName: String
-        var date: Date
-        var key: String
-        var blockCount: Int
-    }
+    @Published var savedProjects: [CFSavedProject] = []
 
     private static var autoSaveURL: URL {
         URL.documentsDirectory.appending(path: autoSaveFileName)
@@ -357,7 +349,7 @@ final class AppViewModel: ObservableObject, ChordFlowViewModel {
 
     func saveProjectAs(name: String) {
         let safeName = name.replacingOccurrences(of: "/", with: "-")
-        let url = URL.documentsDirectory.appending(path: "\(safeName).\(Self.projectExtension)")
+        let url = CFAppGroup.projectsURL.appending(path: "\(safeName).\(Self.projectExtension)")
         do {
             let data = try ChordFlowEngine.encodeProject(project)
             try data.write(to: url)
@@ -389,7 +381,7 @@ final class AppViewModel: ObservableObject, ChordFlowViewModel {
     }
 
     func deleteProject(fileName: String) {
-        let url = URL.documentsDirectory.appending(path: fileName)
+        let url = CFAppGroup.projectsURL.appending(path: fileName)
         try? FileManager.default.removeItem(at: url)
         refreshSavedProjects()
     }
@@ -398,17 +390,16 @@ final class AppViewModel: ObservableObject, ChordFlowViewModel {
 
     func refreshSavedProjects() {
         let fm = FileManager.default
-        let dir = URL.documentsDirectory
+        let dir = CFAppGroup.projectsURL
         guard let files = try? fm.contentsOfDirectory(at: dir, includingPropertiesForKeys: [.contentModificationDateKey]) else {
             savedProjects = []
             return
         }
         savedProjects = files
             .filter { Self.validProjectExtensions.contains($0.pathExtension) && $0.lastPathComponent != Self.autoSaveFileName }
-            .compactMap { url -> SavedProject? in
+            .compactMap { url -> CFSavedProject? in
                 guard let attrs = try? fm.attributesOfItem(atPath: url.path),
-                      let date = attrs[.modificationDate] as? Date else { return nil }
-                // Try to read block count and key from the file
+                       let date = attrs[.modificationDate] as? Date else { return nil }
                 var keyName = "Unknown"
                 var blockCount = 0
                 if let data = try? Data(contentsOf: url),
@@ -416,7 +407,7 @@ final class AppViewModel: ObservableObject, ChordFlowViewModel {
                     keyName = "\(doc.key.tonic.display()) \(doc.key.mode.displayName())"
                     blockCount = doc.blocks.count
                 }
-                return SavedProject(fileName: url.lastPathComponent, date: date, key: keyName, blockCount: blockCount)
+                return CFSavedProject(fileName: url.lastPathComponent, date: date, key: keyName, blockCount: blockCount)
             }
             .sorted { $0.date > $1.date }
     }

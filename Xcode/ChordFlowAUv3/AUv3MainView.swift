@@ -1,4 +1,5 @@
 import SwiftUI
+import UniformTypeIdentifiers
 import ChordFlowShared
 
 // MARK: - Main AUv3 View
@@ -7,6 +8,22 @@ struct AUv3View: View {
     @ObservedObject var vm: AUv3ViewModel
     @State private var showBorrowedPicker = false
     @State private var contextMenuBlockIndex: Int?
+
+    // Output tab state
+    @State private var showSaveAlert = false
+    @State private var saveProjectName = ""
+    @State private var showImportPicker = false
+    @State private var showExportPicker = false
+    @State private var showShareSheet = false
+    @State private var shareURL: URL?
+    @State private var exportDocument: ChordFlowDocument?
+    @State private var showAllFilesModal = false
+
+    private var defaultFileName: String {
+        let f = DateFormatter()
+        f.dateFormat = "yyyy-MM-dd-HHmm"
+        return "ChordFlow-\(f.string(from: Date()))"
+    }
 
     var body: some View {
         VStack(spacing: 0) {
@@ -18,23 +35,26 @@ struct AUv3View: View {
                 switch vm.selectedTab {
                 case 0: composeTab
                 case 1: suggestTab
+                case 2: outputTab
                 default: composeTab
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
 
-            // Playback bar with inline timeline
-            playbackBar
-                .padding(.horizontal, CFSpacing.compact)
-                .padding(.bottom, CFSpacing.tight)
+            // Playback bar with inline timeline (hidden on Output tab)
+            if vm.selectedTab != 2 {
+                playbackBar
+                    .padding(.horizontal, CFSpacing.compact)
+                    .padding(.bottom, CFSpacing.tight)
 
-            // Debug info
-            Text(vm.debugInfo)
-                .font(.system(size: 8, weight: .regular, design: .monospaced))
-                .foregroundStyle(Color.cfTextTertiary.opacity(0.4))
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.horizontal, CFSpacing.compact)
-                .padding(.bottom, CFSpacing.micro)
+                // Debug info
+                Text(vm.debugInfo)
+                    .font(.system(size: 8, weight: .regular, design: .monospaced))
+                    .foregroundStyle(Color.cfTextTertiary.opacity(0.4))
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal, CFSpacing.compact)
+                    .padding(.bottom, CFSpacing.micro)
+            }
         }
         .background(Color.cfBackground.ignoresSafeArea())
         .dismissBorrowedPicker(isExpanded: $showBorrowedPicker)
@@ -47,6 +67,50 @@ struct AUv3View: View {
                 .presentationDragIndicator(.visible)
                 .presentationBackground(Color.cfSurface)
         }
+        .alert("Save Project", isPresented: $showSaveAlert) {
+            TextField("Project name", text: $saveProjectName)
+            Button("Save") {
+                guard !saveProjectName.trimmingCharacters(in: .whitespaces).isEmpty else { return }
+                vm.saveProjectAs(name: saveProjectName)
+                saveProjectName = ""
+            }
+            Button("Cancel", role: .cancel) { saveProjectName = "" }
+        } message: {
+            Text("Enter a name for this project")
+        }
+        .fileImporter(
+            isPresented: $showImportPicker,
+            allowedContentTypes: [.chordFlowProject, .json],
+            allowsMultipleSelection: false
+        ) { result in
+            if case .success(let urls) = result, let url = urls.first {
+                vm.loadProject(from: url)
+            }
+        }
+        .fileExporter(
+            isPresented: $showExportPicker,
+            document: exportDocument,
+            contentType: .chordFlowProject,
+            defaultFilename: defaultFileName
+        ) { result in
+            switch result {
+            case .success(let url):
+                vm.status = "Exported: \(url.lastPathComponent)"
+            case .failure(let error):
+                vm.status = "Export failed: \(error.localizedDescription)"
+            }
+        }
+        .sheet(isPresented: $showShareSheet) {
+            if let url = shareURL {
+                SharedShareSheet(url: url)
+            }
+        }
+        .sheet(isPresented: $showAllFilesModal) {
+            SharedAllFilesModal(vm: vm, isPresented: $showAllFilesModal)
+                .presentationDetents([.large])
+                .presentationDragIndicator(.visible)
+                .presentationBackground(Color.cfBackground)
+        }
     }
 
     // MARK: - Tab Bar
@@ -55,6 +119,7 @@ struct AUv3View: View {
         HStack(spacing: 0) {
             tabButton(title: "Compose", icon: "circle.circle", tag: 0)
             tabButton(title: "Suggest", icon: "lightbulb", tag: 1)
+            tabButton(title: "Output", icon: "arrow.up.forward.square", tag: 2)
         }
         .background(Color.cfSurface)
     }
@@ -132,6 +197,89 @@ struct AUv3View: View {
         }
         .padding(.horizontal, CFSpacing.spacious)
         .padding(.top, CFSpacing.standard)
+    }
+
+    // MARK: - Output Tab
+
+    private var outputTab: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: CFSpacing.spacious) {
+                // Project section
+                SharedSectionHeader("PROJECT", icon: "doc.badge.gearshape")
+                HStack(alignment: .top, spacing: CFSpacing.standard) {
+                    // Left column: Project card + Import/Export card
+                    VStack(spacing: CFSpacing.standard) {
+                        SharedProjectCard(
+                            vm: vm,
+                            onSave: {
+                                saveProjectName = defaultFileName
+                                showSaveAlert = true
+                            },
+                            onOpen: {
+                                showAllFilesModal = true
+                            },
+                            onShare: {
+                                vm.exportProject()
+                                let url = URL.documentsDirectory.appending(path: "ChordFlow-Project.\(AUv3ViewModel.projectExtension)")
+                                if FileManager.default.fileExists(atPath: url.path) {
+                                    shareURL = url
+                                    showShareSheet = true
+                                }
+                            }
+                        )
+
+                        SharedImportExportCard(
+                            onImport: { showImportPicker = true },
+                            onExport: {
+                                if let data = vm.encodeProjectData() {
+                                    exportDocument = ChordFlowDocument(data: data)
+                                    showExportPicker = true
+                                }
+                            }
+                        )
+                    }
+
+                    // Right column: Recently saved (5 items)
+                    SharedRecentProjectsList(vm: vm) {
+                        showAllFilesModal = true
+                    }
+                }
+
+                // MIDI export
+                SharedSectionHeader("MIDI EXPORT", icon: "pianokeys")
+                SharedMIDIExportCard(vm: vm) {
+                    vm.exportMIDI()
+                    let url = URL.documentsDirectory.appending(path: "ChordFlow-Export.mid")
+                    if FileManager.default.fileExists(atPath: url.path) {
+                        shareURL = url
+                        showShareSheet = true
+                    }
+                }
+                .frame(maxWidth: 480)
+
+                // Reference
+                SharedSectionHeader("REFERENCE", icon: "info.circle")
+                HStack(alignment: .top, spacing: CFSpacing.standard) {
+                    SharedAUv3StatusCard(isRunning: true)
+                    SharedTransportCard(vm: vm, transportMode: "Host")
+                }
+
+                // Status
+                if !vm.status.isEmpty && vm.status != "Ready" {
+                    Text(vm.status)
+                        .font(.cfBody)
+                        .foregroundStyle(Color.cfTextSecondary)
+                        .padding(.horizontal, CFSpacing.standard)
+                }
+            }
+            .padding(.horizontal, CFSpacing.spacious)
+            .padding(.top, CFSpacing.standard)
+            .padding(.bottom, CFSpacing.page)
+        }
+        .background(Color.cfBackground)
+        .onAppear {
+            vm.refreshSavedProjects()
+        }
     }
 
     // MARK: - Controls Strip

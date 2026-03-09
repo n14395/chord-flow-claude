@@ -73,6 +73,36 @@ public protocol ChordFlowViewModel: ObservableObject {
     func harmonicFunction(forBlockAt index: Int) -> HarmonicFunction
     func romanNumeral(for chord: CFChord) -> String
 
+    // MARK: - Display
+
+    var keyDisplayName: String { get }
+
+    // MARK: - Save / Load / Export
+
+    var savedProjects: [CFSavedProject] { get }
+    var status: String { get set }
+
+    /// Save the current project to the App Group container with the given name.
+    func saveProjectAs(name: String)
+
+    /// Load a project from the given URL.
+    func loadProject(from url: URL)
+
+    /// Delete a saved project by filename from the App Group container.
+    func deleteProject(fileName: String)
+
+    /// Refresh the list of saved projects from the App Group container.
+    func refreshSavedProjects()
+
+    /// Encode the current progression as project data.
+    func encodeProjectData() -> Data?
+
+    /// Export the current project to a temp file for sharing.
+    func exportProject()
+
+    /// Export the current progression as a Standard MIDI file to the documents directory.
+    func exportMIDI()
+
     // MARK: - Static Helpers (provided via default implementations)
 
     static func chordTones(_ chord: CFChord) -> [UInt8]
