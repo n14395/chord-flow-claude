@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+    <!-- Background radial gradient: slightly lighter center for depth -->
+    <radialGradient id="bg" cx="50%" cy="50%" r="60%">
+      <stop offset="0%" stop-color="#222444"/>
+      <stop offset="100%" stop-color="#1A1B2E"/>
+    </radialGradient>
+
+    <!-- Subtle amber center glow (echoes in-app Circle of Fifths glow) -->
+    <radialGradient id="centerGlow" cx="50%" cy="50%" r="45%">
+      <stop offset="0%" stop-color="#F5A623" stop-opacity="0.08"/>
+      <stop offset="100%" stop-color="#F5A623" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Gold dot glow filter -->
+    <filter id="goldGlow" x="-150%" y="-150%" width="400%" height="400%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="18"/>
+    </filter>
+
+    <!-- Blue dot glow filter -->
+    <filter id="blueGlow" x="-150%" y="-150%" width="400%" height="400%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="12"/>
+    </filter>
+  </defs>
+
+  <!-- Background fill -->
+  <rect width="1024" height="1024" fill="url(#bg)"/>
+
+  <!-- Center ambient glow -->
+  <circle cx="512" cy="512" r="460" fill="url(#centerGlow)"/>
+
+  <!-- Subtle ring track -->
+  <circle cx="512" cy="512" r="320" fill="none" stroke="#3A3D5C" stroke-width="1.5" opacity="0.3"/>
+
+  <!--
+    12 dots on ring (radius 320, center 512,512)
+    Angle = index * 30 - 90 degrees (index 0 = 12 o'clock)
+
+     0: (512, 192)    12 o'clock   GOLD
+     1: (672, 235)     1 o'clock   GOLD
+     2: (789, 352)     2 o'clock   GOLD
+     3: (832, 512)     3 o'clock   muted
+     4: (789, 672)     4 o'clock   muted
+     5: (672, 789)     5 o'clock   muted
+     6: (512, 832)     6 o'clock   muted
+     7: (352, 789)     7 o'clock   BLUE
+     8: (235, 672)     8 o'clock   muted
+     9: (192, 512)     9 o'clock   muted
+    10: (235, 352)    10 o'clock   muted
+    11: (352, 235)    11 o'clock   GOLD
+  -->
+
+  <!-- Muted dots (r=24) -->
+  <circle cx="832" cy="512" r="24" fill="#3A3D5C"/>  <!-- 3 -->
+  <circle cx="789" cy="672" r="24" fill="#3A3D5C"/>  <!-- 4 -->
+  <circle cx="672" cy="789" r="24" fill="#3A3D5C"/>  <!-- 5 -->
+  <circle cx="512" cy="832" r="24" fill="#3A3D5C"/>  <!-- 6 -->
+  <circle cx="235" cy="672" r="24" fill="#3A3D5C"/>  <!-- 8 -->
+  <circle cx="192" cy="512" r="24" fill="#3A3D5C"/>  <!-- 9 -->
+  <circle cx="235" cy="352" r="24" fill="#3A3D5C"/>  <!-- 10 -->
+
+  <!-- Blue dot glow layer (position 7) -->
+  <circle cx="352" cy="789" r="30" fill="#4A90D9" opacity="0.35" filter="url(#blueGlow)"/>
+  <!-- Blue dot solid -->
+  <circle cx="352" cy="789" r="30" fill="#4A90D9"/>
+
+  <!-- Gold dots glow layer (positions 11, 0, 1, 2) -->
+  <circle cx="352" cy="235" r="36" fill="#F5A623" opacity="0.25" filter="url(#goldGlow)"/>
+  <circle cx="512" cy="192" r="36" fill="#F5A623" opacity="0.25" filter="url(#goldGlow)"/>
+  <circle cx="672" cy="235" r="36" fill="#F5A623" opacity="0.25" filter="url(#goldGlow)"/>
+  <circle cx="789" cy="352" r="36" fill="#F5A623" opacity="0.25" filter="url(#goldGlow)"/>
+
+  <!-- Gold dots solid (positions 11, 0, 1, 2) -->
+  <circle cx="352" cy="235" r="36" fill="#F5A623"/>
+  <circle cx="512" cy="192" r="36" fill="#F5A623"/>
+  <circle cx="672" cy="235" r="36" fill="#F5A623"/>
+  <circle cx="789" cy="352" r="36" fill="#F5A623"/>
+</svg>

@@ -1,0 +1,107 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+    <!-- Background radial gradient -->
+    <radialGradient id="bg" cx="50%" cy="50%" r="60%">
+      <stop offset="0%" stop-color="#222444"/>
+      <stop offset="100%" stop-color="#1A1B2E"/>
+    </radialGradient>
+
+    <!-- Center ambient glow -->
+    <radialGradient id="centerGlow" cx="50%" cy="50%" r="25%">
+      <stop offset="0%" stop-color="#F5A623" stop-opacity="0.15"/>
+      <stop offset="100%" stop-color="#F5A623" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Petal tip glow filter -->
+    <filter id="petalGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="20"/>
+    </filter>
+
+    <!-- Center dot glow filter -->
+    <filter id="dotGlow" x="-100%" y="-100%" width="300%" height="300%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="14"/>
+    </filter>
+  </defs>
+
+  <!-- Background fill -->
+  <rect width="1024" height="1024" fill="url(#bg)"/>
+
+  <!-- Center ambient glow -->
+  <circle cx="512" cy="512" r="380" fill="url(#centerGlow)"/>
+
+  <!-- Faint reference ring (hints at Circle of Fifths) -->
+  <circle cx="512" cy="512" r="310" fill="none" stroke="#3A3D5C" stroke-width="1" opacity="0.2"/>
+
+  <!--
+    Five tapered petals radiating from center (512,512).
+    Each petal drawn in local coords pointing RIGHT, then rotated.
+    Narrow base (near center) → wide rounded tip (outward).
+
+    Angles are asymmetric, roughly echoing chord-tone intervals:
+      Petal 5 (9th):    -110°  upper-left       35° gap
+      Petal 1 (Root):    -75°  slightly right of up
+                                                 45° gap
+      Petal 2 (3rd):     -30°  upper-right
+                                                 85° gap
+      Petal 3 (5th):      55°  lower-right
+                                                 95° gap
+      Petal 4 (7th):     150°  lower-left
+                                                100° gap back to petal 5
+  -->
+
+  <!-- ====== Glow layers (blurred copies behind each petal) ====== -->
+
+  <g transform="translate(512,512) rotate(-110)" opacity="0.3" filter="url(#petalGlow)">
+    <path d="M 40 -12 C 118 -16 206 -40 235 -40 A 40 40 0 0 1 235 40 C 206 40 118 16 40 12 Z" fill="#F5C773"/>
+  </g>
+
+  <g transform="translate(512,512) rotate(150)" opacity="0.3" filter="url(#petalGlow)">
+    <path d="M 40 -13 C 124 -18 219 -44 250 -44 A 44 44 0 0 1 250 44 C 219 44 124 18 40 13 Z" fill="#D94A8C"/>
+  </g>
+
+  <g transform="translate(512,512) rotate(55)" opacity="0.3" filter="url(#petalGlow)">
+    <path d="M 40 -15 C 138 -21 248 -52 285 -52 A 52 52 0 0 1 285 52 C 248 52 138 21 40 15 Z" fill="#4A90D9"/>
+  </g>
+
+  <g transform="translate(512,512) rotate(-30)" opacity="0.3" filter="url(#petalGlow)">
+    <path d="M 40 -14 C 132 -19 236 -48 270 -48 A 48 48 0 0 1 270 48 C 236 48 132 19 40 14 Z" fill="#7ED321"/>
+  </g>
+
+  <g transform="translate(512,512) rotate(-75)" opacity="0.3" filter="url(#petalGlow)">
+    <path d="M 40 -16 C 144 -22 261 -55 300 -55 A 55 55 0 0 1 300 55 C 261 55 144 22 40 16 Z" fill="#F5A623"/>
+  </g>
+
+  <!-- ====== Solid petals (back to front: 5, 4, 3, 2, 1) ====== -->
+
+  <!-- Petal 5: Light amber (#F5C773) — 9th/color tone, upper-left -->
+  <g transform="translate(512,512) rotate(-110)">
+    <path d="M 40 -12 C 118 -16 206 -40 235 -40 A 40 40 0 0 1 235 40 C 206 40 118 16 40 12 Z" fill="#F5C773"/>
+  </g>
+
+  <!-- Petal 4: Pink (#D94A8C) — 7th/borrowed, lower-left -->
+  <g transform="translate(512,512) rotate(150)">
+    <path d="M 40 -13 C 124 -18 219 -44 250 -44 A 44 44 0 0 1 250 44 C 219 44 124 18 40 13 Z" fill="#D94A8C"/>
+  </g>
+
+  <!-- Petal 3: Blue (#4A90D9) — 5th/dominant, lower-right -->
+  <g transform="translate(512,512) rotate(55)">
+    <path d="M 40 -15 C 138 -21 248 -52 285 -52 A 52 52 0 0 1 285 52 C 248 52 138 21 40 15 Z" fill="#4A90D9"/>
+  </g>
+
+  <!-- Petal 2: Green (#7ED321) — 3rd/subdominant, upper-right -->
+  <g transform="translate(512,512) rotate(-30)">
+    <path d="M 40 -14 C 132 -19 236 -48 270 -48 A 48 48 0 0 1 270 48 C 236 48 132 19 40 14 Z" fill="#7ED321"/>
+  </g>
+
+  <!-- Petal 1: Gold (#F5A623) — Root/tonic, near top (on top of all others) -->
+  <g transform="translate(512,512) rotate(-75)">
+    <path d="M 40 -16 C 144 -22 261 -55 300 -55 A 55 55 0 0 1 300 55 C 261 55 144 22 40 16 Z" fill="#F5A623"/>
+  </g>
+
+  <!-- ====== Center root dot ====== -->
+
+  <!-- Dot glow -->
+  <circle cx="512" cy="512" r="48" fill="#F5A623" opacity="0.3" filter="url(#dotGlow)"/>
+  <!-- Dot solid -->
+  <circle cx="512" cy="512" r="45" fill="#F5A623"/>
+</svg>

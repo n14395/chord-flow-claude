@@ -20,6 +20,7 @@
 		3ED0B3A12221343E084EF5EC /* ComposeScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDEC4BE9436C5B7AEA7F72F3 /* ComposeScreen.swift */; };
 		3F9DCC02417213CBE7DF4E59 /* ChordFlowCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB75877EB00543EC152F0A9B /* ChordFlowCore.swift */; };
 		4382C04DB4DCDDF3314F8F35 /* ProgressionPlaybackEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 835D5E76D3976F196247D401 /* ProgressionPlaybackEngine.swift */; };
+		SF2A0001B4DCDDF3314F8F35 /* ChordFlowPiano.sf2 in Resources */ = {isa = PBXBuildFile; fileRef = SF2F0001D3976F196247D401 /* ChordFlowPiano.sf2 */; };
 		44B7FFAB150032154F8233FC /* ChordFlowShared.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C21FFB8CB0C34360450136A3 /* ChordFlowShared.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		489276FA8462DF2E812BA0F9 /* DesignTokens.swift in Sources */ = {isa = PBXBuildFile; fileRef = 23ACA31B03BB71B3C47A0F39 /* DesignTokens.swift */; };
 		506F8F22CF77A551275DA56F /* SharedCircleOfFifthsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0E4405DD3888F7DF04167F3 /* SharedCircleOfFifthsView.swift */; };
@@ -36,7 +37,6 @@
 		96EE8C665F3F0D8665CA063D /* AppViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A37A91AD1A46A6655269749B /* AppViewModel.swift */; };
 		9F41798E9A32E4A655CDCA81 /* ChordFlowShared.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C21FFB8CB0C34360450136A3 /* ChordFlowShared.framework */; };
 		A0E4BD8CF1EF725084869EE7 /* AUv3DesignTokens.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57A932D8EEAC08D15D44812D /* AUv3DesignTokens.swift */; };
-
 		A66B5E30E14CA41E70A22BED /* AUv3SuggestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C7C519C6403FB065071421B /* AUv3SuggestView.swift */; };
 		B414B420BCFAC7A577E71D1A /* ChordFlowEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A1800A3C5E1948588B10394 /* ChordFlowEngine.swift */; };
 		BC575126EAE671B50650F95E /* ChordFlow AUv3.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = F391EF4AFBA678FA74A60050 /* ChordFlow AUv3.appex */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -45,6 +45,7 @@
 		C2A4F8E9D3B5617082C9A4F0 /* SharedOutputViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F67890ABCDEF01 /* SharedOutputViews.swift */; };
 		CB0D65B73D413A3455EE5D46 /* PlaybackBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 530DDEDB41331498E4122933 /* PlaybackBarView.swift */; };
 		CE38E68B326386914206CC64 /* HostHarnessTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E35F4131737A00F17AF8E67 /* HostHarnessTests.swift */; };
+		DBDCB4AA2F5F502C00D715BB /* Media.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DBDCB4A92F5F502C00D715BB /* Media.xcassets */; };
 		EC2CC5CAD6728E617DAAD58C /* SharedChordDetailPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15DBD3EAB70B0E4079D0BC71 /* SharedChordDetailPanel.swift */; };
 /* End PBXBuildFile section */
 
@@ -110,7 +111,6 @@
 
 /* Begin PBXFileReference section */
 		0325985AD047A96A525A480D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
-		B3D4E5F6A7890123CDEF4567 /* ChordFlowAUv3.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ChordFlowAUv3.entitlements; sourceTree = "<group>"; };
 		07741CB781828BC724C71C6C /* SuggestScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuggestScreen.swift; sourceTree = "<group>"; };
 		15DBD3EAB70B0E4079D0BC71 /* SharedChordDetailPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedChordDetailPanel.swift; sourceTree = "<group>"; };
 		170121B735BF5273944F8292 /* ChordFlowAudioUnitFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChordFlowAudioUnitFactory.swift; sourceTree = "<group>"; };
@@ -131,12 +131,12 @@
 		57A932D8EEAC08D15D44812D /* AUv3DesignTokens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AUv3DesignTokens.swift; sourceTree = "<group>"; };
 		58156C553D0F76B8B1DDBCA4 /* DesignTokens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignTokens.swift; sourceTree = "<group>"; };
 		5E35F4131737A00F17AF8E67 /* HostHarnessTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HostHarnessTests.swift; sourceTree = "<group>"; };
-
 		68C81244636DE807D6EAB71A /* MIDIOutputManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MIDIOutputManager.swift; sourceTree = "<group>"; };
 		71E8FF4031C60D12F18519F0 /* ChordFlowMIDIProcessorAudioUnit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChordFlowMIDIProcessorAudioUnit.swift; sourceTree = "<group>"; };
 		7276B6E91134D6076E115FF8 /* ChordFlowHostHarnessTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ChordFlowHostHarnessTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		80D715634AA010DB757393AE /* SharedBlockActionOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedBlockActionOverlay.swift; sourceTree = "<group>"; };
 		835D5E76D3976F196247D401 /* ProgressionPlaybackEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressionPlaybackEngine.swift; sourceTree = "<group>"; };
+		SF2F0001D3976F196247D401 /* ChordFlowPiano.sf2 */ = {isa = PBXFileReference; lastKnownFileType = file; path = ChordFlowPiano.sf2; sourceTree = "<group>"; };
 		8EF172A8ACD7ECB0D09309AF /* MIDIFileWriter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MIDIFileWriter.swift; sourceTree = "<group>"; };
 		9C41217A021FA3473DDB900C /* HostHarnessCore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HostHarnessCore.swift; sourceTree = "<group>"; };
 		A1B2C3D4E5F67890ABCDEF01 /* SharedOutputViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedOutputViews.swift; sourceTree = "<group>"; };
@@ -145,9 +145,11 @@
 		AB75877EB00543EC152F0A9B /* ChordFlowCore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChordFlowCore.swift; sourceTree = "<group>"; };
 		AD8F7245296F96C8E3012B22 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		B161D922C69887355BCB1919 /* ChordFlowApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChordFlowApp.swift; sourceTree = "<group>"; };
+		B3D4E5F6A7890123CDEF4567 /* ChordFlowAUv3.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ChordFlowAUv3.entitlements; sourceTree = "<group>"; };
 		C21FFB8CB0C34360450136A3 /* ChordFlowShared.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ChordFlowShared.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		C364D28B7AE03B0CFFAFA7A3 /* KnobView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KnobView.swift; sourceTree = "<group>"; };
 		D22492FB24031D6519986C38 /* SharedBorrowedPresetPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedBorrowedPresetPicker.swift; sourceTree = "<group>"; };
+		DBDCB4A92F5F502C00D715BB /* Media.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Media.xcassets; sourceTree = "<group>"; };
 		E0E4405DD3888F7DF04167F3 /* SharedCircleOfFifthsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedCircleOfFifthsView.swift; sourceTree = "<group>"; };
 		E41F21E14C4893E031AA0E1C /* SharedTimelineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedTimelineView.swift; sourceTree = "<group>"; };
 		E65FCCA68DAB5940036608E5 /* SharedSuggestionCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedSuggestionCardView.swift; sourceTree = "<group>"; };
@@ -182,6 +184,7 @@
 				A37A91AD1A46A6655269749B /* AppViewModel.swift */,
 				5710A02C934F07BB4697D9DE /* ChordFlowApp.entitlements */,
 				B161D922C69887355BCB1919 /* ChordFlowApp.swift */,
+				SF2F0001D3976F196247D401 /* ChordFlowPiano.sf2 */,
 				FDEC4BE9436C5B7AEA7F72F3 /* ComposeScreen.swift */,
 				58156C553D0F76B8B1DDBCA4 /* DesignTokens.swift */,
 				4E45454F23C1921A384788D4 /* Info.plist */,
@@ -207,6 +210,7 @@
 		27B2CBC3A4FE818B7F81DFD6 = {
 			isa = PBXGroup;
 			children = (
+				DBDCB4A92F5F502C00D715BB /* Media.xcassets */,
 				70DCB5436A691C9E57623D88 /* Xcode */,
 				8E6C5EC31237106BFE79EBCB /* Products */,
 			);
@@ -352,6 +356,7 @@
 			buildConfigurationList = 872DC4F038300130A3E51EAE /* Build configuration list for PBXNativeTarget "ChordFlowApp" */;
 			buildPhases = (
 				ADD4EE4CE46227257B5149B0 /* Sources */,
+				SF2R0001A55E8E98C830596B /* Resources */,
 				49E0D3BADE4C67DC3CED40AB /* Frameworks */,
 				8C4150F5DE4C1186C163F52C /* Embed Foundation Extensions */,
 				B7CBDD0A96A0DA24B0251F14 /* Embed Frameworks */,
@@ -483,7 +488,16 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DBDCB4AA2F5F502C00D715BB /* Media.xcassets in Resources */,
 				8F7D98E479EAB0F8831FB8B8 /* MainInterface.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		SF2R0001A55E8E98C830596B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				SF2A0001B4DCDDF3314F8F35 /* ChordFlowPiano.sf2 in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

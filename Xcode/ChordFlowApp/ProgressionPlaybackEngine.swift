@@ -2,51 +2,93 @@ import AVFoundation
 import Foundation
 import ChordFlowShared
 
-private final class ActiveNoteStore {
-    private struct Voice {
-        var startedAt: TimeInterval
-        var releasedAt: TimeInterval?
+// MARK: - Sine-Wave Voice Timeline
+
+/// Thread-safe timeline of note events consumed by the sine-synth render callback.
+/// The main thread loads events atomically; the render thread advances and synthesises.
+private final class SineTimeline {
+    struct Voice {
+        var startSample: Int64
+        var releaseSample: Int64?
+    }
+
+    private struct NoteEvent {
+        var sampleFrame: Int64
+        var isNoteOn: Bool
+        var note: UInt8
+        var velocity: UInt8
+    }
+
+    private struct State {
+        var events: [NoteEvent] = []
+        var cursor: Int = 0
+        var isActive: Bool = false
+        var sampleClock: Int64 = 0
     }
 
     private let lock = NSLock()
+    private var state = State()
     private var voices: [UInt8: Voice] = [:]
 
-    func noteOn(_ note: UInt8) {
-        let now = CFAbsoluteTimeGetCurrent()
+    func load(events: [(frame: Int64, isNoteOn: Bool, note: UInt8, velocity: UInt8)]) {
+        let sorted = events.sorted { $0.frame < $1.frame }
+            .map { NoteEvent(sampleFrame: $0.frame, isNoteOn: $0.isNoteOn, note: $0.note, velocity: $0.velocity) }
         lock.lock()
-        voices[note] = Voice(startedAt: now, releasedAt: nil)
-        lock.unlock()
-    }
-
-    func noteOff(_ note: UInt8) {
-        let now = CFAbsoluteTimeGetCurrent()
-        lock.lock()
-        if var voice = voices[note] {
-            voice.releasedAt = now
-            voices[note] = voice
-        }
+        state = State(events: sorted, cursor: 0, isActive: true, sampleClock: 0)
+        voices.removeAll()
         lock.unlock()
     }
 
     func clear() {
         lock.lock()
+        state = State()
         voices.removeAll()
         lock.unlock()
     }
 
-    func snapshot(now: TimeInterval) -> [(note: UInt8, startedAt: TimeInterval, releasedAt: TimeInterval?)] {
+    struct AdvanceResult {
+        var voices: [UInt8: Voice]
+        var bufferStartClock: Int64
+    }
+
+    func advance(frameCount: Int64) -> AdvanceResult? {
         lock.lock()
-        voices = voices.filter { _, voice in
-            guard let releasedAt = voice.releasedAt else { return true }
-            return now - releasedAt < 1.2
+        defer { lock.unlock() }
+
+        guard state.isActive else { return nil }
+
+        let bufferStart = state.sampleClock
+        let bufferEnd = bufferStart + frameCount
+
+        while state.cursor < state.events.count {
+            let event = state.events[state.cursor]
+            guard event.sampleFrame < bufferEnd else { break }
+            state.cursor += 1
+
+            if event.isNoteOn {
+                voices[event.note] = Voice(
+                    startSample: max(event.sampleFrame, bufferStart),
+                    releaseSample: nil
+                )
+            } else if var voice = voices[event.note], voice.releaseSample == nil {
+                voice.releaseSample = max(event.sampleFrame, bufferStart)
+                voices[event.note] = voice
+            }
         }
-        let current = voices.map { key, value in
-            (note: key, startedAt: value.startedAt, releasedAt: value.releasedAt)
+
+        // Prune fully-decayed voices
+        let pruneThreshold: Int64 = 66_150
+        voices = voices.filter { _, v in
+            guard let rel = v.releaseSample else { return true }
+            return (bufferEnd - rel) < pruneThreshold
         }
-        lock.unlock()
-        return current
+
+        state.sampleClock = bufferEnd
+        return AdvanceResult(voices: voices, bufferStartClock: bufferStart)
     }
 }
+
+// MARK: - Playback Engine
 
 @MainActor
 final class ProgressionPlaybackEngine {
@@ -56,19 +98,38 @@ final class ProgressionPlaybackEngine {
     private(set) var startTime: CFAbsoluteTime = 0
     private(set) var duration: Double = 0
 
-    /// Returns 0...1 progress fraction, or 0 when not playing.
+    /// Returns 0-1 progress fraction, or 0 when not playing.
     var progress: Double {
         guard duration > 0 else { return 0 }
         let elapsed = CFAbsoluteTimeGetCurrent() - startTime
         return min(max(elapsed / duration, 0), 1)
     }
 
+    // Audio graph
     private let audioEngine = AVAudioEngine()
-    private let noteStore = ActiveNoteStore()
+    private let sampler = AVAudioUnitSampler()
+    private let reverb = AVAudioUnitReverb()
+
+    // Scheduling (sampler path uses DispatchQueue; sine path uses SineTimeline)
     private let schedulerQueue = DispatchQueue(label: "com.nwf.chordflow.playback", qos: .userInitiated)
     private var scheduledItems: [DispatchWorkItem] = []
-    private var sourceNode: AVAudioSourceNode?
+
+    // Generation counter — prevents stale finish handlers from interfering
+    private var playbackGeneration: UInt64 = 0
+
+    // State
     private var prepared = false
+    private var useSampler = false
+    private var hwSampleRate: Double = 44_100
+
+    // Active notes (sampler path, for stop-all)
+    private var activeNotes = Set<UInt8>()
+
+    // Sine-wave timeline + source node
+    private let sineTimeline = SineTimeline()
+    private var sourceNode: AVAudioSourceNode?
+
+    // MARK: - Play
 
     func play(events: [CFMIDIEvent], tempo: Double, ppq: Int = ChordFlowEngine.ppq) {
         stop()
@@ -76,50 +137,83 @@ final class ProgressionPlaybackEngine {
         prepareAudioIfNeeded()
         guard audioEngine.isRunning else { return }
 
+        playbackGeneration &+= 1
+        let gen = playbackGeneration
+
         let secondsPerTick = 60.0 / max(1.0, tempo) / Double(max(1, ppq))
         var longestEnd: Double = 0
 
+        if useSampler {
+            scheduleSamplerEvents(events: events, secondsPerTick: secondsPerTick, longestEnd: &longestEnd)
+        } else {
+            scheduleSineEvents(events: events, secondsPerTick: secondsPerTick, longestEnd: &longestEnd)
+        }
+
+        startTime = CFAbsoluteTimeGetCurrent()
+        duration = longestEnd
+        onPlaybackStateChange?(true)
+
+        // End-of-playback: only fires if this generation is still current
+        let finish = DispatchWorkItem { [weak self] in
+            Task { @MainActor [weak self] in
+                guard let self, self.playbackGeneration == gen else { return }
+                self.stop()
+            }
+        }
+        scheduledItems.append(finish)
+        schedulerQueue.asyncAfter(deadline: .now() + longestEnd + 0.05, execute: finish)
+    }
+
+    // MARK: - Sampler Scheduling (DispatchQueue)
+
+    private func scheduleSamplerEvents(events: [CFMIDIEvent], secondsPerTick: Double, longestEnd: inout Double) {
         for event in events {
             let note = event.data1
+            let velocity = event.data2
             let onTime = max(0, Double(event.startTick) * secondsPerTick)
             let offTime = max(0, Double(event.startTick + event.durationTicks) * secondsPerTick)
             longestEnd = max(longestEnd, offTime)
 
             let noteOn = DispatchWorkItem { [weak self] in
-                self?.noteStore.noteOn(note)
+                self?.sampler.startNote(note, withVelocity: velocity, onChannel: 0)
+                self?.activeNotes.insert(note)
             }
             let noteOff = DispatchWorkItem { [weak self] in
-                self?.noteStore.noteOff(note)
+                self?.sampler.stopNote(note, onChannel: 0)
+                self?.activeNotes.remove(note)
             }
             scheduledItems.append(noteOn)
             scheduledItems.append(noteOff)
             schedulerQueue.asyncAfter(deadline: .now() + onTime, execute: noteOn)
             schedulerQueue.asyncAfter(deadline: .now() + offTime, execute: noteOff)
         }
+    }
 
-        // Store timing info before firing state change
-        startTime = CFAbsoluteTimeGetCurrent()
-        duration = longestEnd
+    // MARK: - Sine Scheduling (render-callback timeline)
 
-        onPlaybackStateChange?(true)
+    private func scheduleSineEvents(events: [CFMIDIEvent], secondsPerTick: Double, longestEnd: inout Double) {
+        var timeline: [(frame: Int64, isNoteOn: Bool, note: UInt8, velocity: UInt8)] = []
+        timeline.reserveCapacity(events.count * 2)
 
-        let finish = DispatchWorkItem { [weak self] in
-            guard let self else { return }
-            self.noteStore.clear()
-            Task { @MainActor in
-                self.duration = 0
-                self.onPlaybackStateChange?(false)
-            }
+        for event in events {
+            let onSec = max(0, Double(event.startTick) * secondsPerTick)
+            let offSec = max(0, Double(event.startTick + event.durationTicks) * secondsPerTick)
+            longestEnd = max(longestEnd, offSec)
+
+            timeline.append((Int64(onSec * hwSampleRate), true, event.data1, event.data2))
+            timeline.append((Int64(offSec * hwSampleRate), false, event.data1, 0))
         }
-        scheduledItems.append(finish)
-        schedulerQueue.asyncAfter(deadline: .now() + longestEnd + 0.05, execute: finish)
+
+        sineTimeline.load(events: timeline)
     }
 
     /// Runs the timeline for progress tracking but produces no audio.
-    /// Used when MIDI output is active and the built-in sine player should be silent.
     func playSilent(events: [CFMIDIEvent], tempo: Double, ppq: Int = ChordFlowEngine.ppq) {
         stop()
         guard !events.isEmpty else { return }
+
+        playbackGeneration &+= 1
+        let gen = playbackGeneration
 
         let secondsPerTick = 60.0 / max(1.0, tempo) / Double(max(1, ppq))
         var longestEnd: Double = 0
@@ -133,25 +227,38 @@ final class ProgressionPlaybackEngine {
         onPlaybackStateChange?(true)
 
         let finish = DispatchWorkItem { [weak self] in
-            guard let self else { return }
-            Task { @MainActor in
-                self.duration = 0
-                self.onPlaybackStateChange?(false)
+            Task { @MainActor [weak self] in
+                guard let self, self.playbackGeneration == gen else { return }
+                self.stop()
             }
         }
         scheduledItems.append(finish)
         schedulerQueue.asyncAfter(deadline: .now() + longestEnd + 0.05, execute: finish)
     }
 
+    // MARK: - Stop
+
     func stop() {
-        for item in scheduledItems {
-            item.cancel()
-        }
+        // Cancel all pending dispatch items
+        for item in scheduledItems { item.cancel() }
         scheduledItems.removeAll()
-        noteStore.clear()
+
+        // Silence sampler
+        if useSampler {
+            for note in activeNotes {
+                sampler.stopNote(note, onChannel: 0)
+            }
+            activeNotes.removeAll()
+        }
+
+        // Silence sine synth
+        sineTimeline.clear()
+
         duration = 0
         onPlaybackStateChange?(false)
     }
+
+    // MARK: - Audio Setup
 
     private func prepareAudioIfNeeded() {
         guard !prepared else {
@@ -167,12 +274,93 @@ final class ProgressionPlaybackEngine {
         try? session.setActive(true)
         #endif
 
-        let format = AVAudioFormat(standardFormatWithSampleRate: 44_100, channels: 2)!
-        var sampleClock: Double = 0
-        let source = AVAudioSourceNode { [weak noteStore] _, _, frameCount, audioBufferList -> OSStatus in
+        let outputRate = audioEngine.outputNode.outputFormat(forBus: 0).sampleRate
+        hwSampleRate = outputRate > 0 ? outputRate : 44_100
+
+        if configureSamplerChain() {
+            useSampler = true
+        } else {
+            configureSineFallback()
+            useSampler = false
+        }
+
+        audioEngine.mainMixerNode.outputVolume = 0.8
+        try? audioEngine.start()
+        prepared = true
+    }
+
+    // MARK: - Sampler Configuration
+
+    private func configureSamplerChain() -> Bool {
+        audioEngine.attach(sampler)
+        audioEngine.attach(reverb)
+
+        reverb.loadFactoryPreset(.mediumHall)
+        reverb.wetDryMix = 30
+
+        let format = audioEngine.mainMixerNode.outputFormat(forBus: 0)
+        audioEngine.connect(sampler, to: reverb, format: format)
+        audioEngine.connect(reverb, to: audioEngine.mainMixerNode, format: format)
+
+        if loadSoundFont() {
+            return true
+        }
+
+        audioEngine.disconnectNodeOutput(sampler)
+        audioEngine.disconnectNodeOutput(reverb)
+        audioEngine.detach(sampler)
+        audioEngine.detach(reverb)
+        return false
+    }
+
+    private func loadSoundFont() -> Bool {
+        if let bundled = Bundle.main.urls(forResourcesWithExtension: "sf2", subdirectory: nil) {
+            for url in bundled {
+                if loadBank(at: url) { return true }
+            }
+        }
+
+        #if os(macOS)
+        let systemDLS = URL(fileURLWithPath: "/System/Library/Components/CoreAudio.component/Contents/Resources/gs_instruments.dls")
+        if FileManager.default.fileExists(atPath: systemDLS.path) {
+            if loadBank(at: systemDLS) { return true }
+        }
+        #endif
+
+        return false
+    }
+
+    private func loadBank(at url: URL) -> Bool {
+        do {
+            try sampler.loadSoundBankInstrument(
+                at: url,
+                program: 0,
+                bankMSB: UInt8(kAUSampler_DefaultMelodicBankMSB),
+                bankLSB: 0
+            )
+            return true
+        } catch {
+            return false
+        }
+    }
+
+    // MARK: - Sine-Wave Fallback
+
+    private func configureSineFallback() {
+        let sampleRate = hwSampleRate
+        let format = AVAudioFormat(standardFormatWithSampleRate: sampleRate, channels: 2)!
+
+        let chorusRate = 1.7
+        let chorusDepthCents = 8.0
+
+        let timeline = self.sineTimeline
+        var globalClock: Double = 0
+
+        let source = AVAudioSourceNode(format: format) { _, _, frameCount, audioBufferList -> OSStatus in
             let bufferCount = Int(audioBufferList.pointee.mNumberBuffers)
             let firstBufferPtr = withUnsafeMutablePointer(to: &audioBufferList.pointee.mBuffers) { $0 }
             let buffers = UnsafeMutableBufferPointer(start: firstBufferPtr, count: bufferCount)
+            let isStereo = bufferCount >= 2
 
             for buffer in buffers {
                 if let mData = buffer.mData {
@@ -180,62 +368,107 @@ final class ProgressionPlaybackEngine {
                 }
             }
 
-            guard let noteStore else { return noErr }
-            let bufferStartTime = CFAbsoluteTimeGetCurrent()
-            let voices = noteStore.snapshot(now: bufferStartTime)
-            guard !voices.isEmpty else { return noErr }
+            guard let result = timeline.advance(frameCount: Int64(frameCount)) else {
+                globalClock += Double(frameCount)
+                return noErr
+            }
+            let voices = result.voices
+            guard !voices.isEmpty else {
+                globalClock += Double(frameCount)
+                return noErr
+            }
 
             let frameTotal = Int(frameCount)
-            let channelTotal = max(1, bufferCount)
-            let gain = 0.24 / sqrt(Double(max(1, voices.count)))
+            let gain = 0.22 / sqrt(Double(max(1, voices.count)))
+            let bufferStartClock = result.bufferStartClock
 
             for frame in 0..<frameTotal {
-                let now = bufferStartTime + (Double(frame) / format.sampleRate)
-                var sample = 0.0
+                let currentFrame = bufferStartClock + Int64(frame)
+                let clock = globalClock + Double(frame)
+                var sampleL = 0.0
+                var sampleR = 0.0
 
-                for voice in voices {
-                    let hz = 440.0 * pow(2.0, Double(Int(voice.note) - 69) / 12.0)
-                    let angle = (2.0 * Double.pi * hz * sampleClock) / format.sampleRate
+                for (note, voice) in voices {
+                    let ageSamples = Double(currentFrame - voice.startSample)
+                    guard ageSamples >= 0 else { continue }
+                    let age = ageSamples / sampleRate
 
-                    let age = max(0, now - voice.startedAt)
-                    let attack = min(1.0, age / 0.008)
-                    let decay = 0.22 + 0.78 * exp(-age * 3.2)
+                    // Envelope: fast attack, dual-stage decay
+                    let attack = min(1.0, age / 0.006)
+                    let body = 0.60 * exp(-age * 2.5)
+                    let tail = 0.40 * exp(-age * 0.6)
                     let release: Double
-                    if let releasedAt = voice.releasedAt {
-                        release = exp(-max(0, now - releasedAt) * 18.0)
+                    if let relSample = voice.releaseSample {
+                        let relAge = Double(currentFrame - relSample) / sampleRate
+                        guard relAge < 1.5 else { continue }
+                        release = exp(-max(0, relAge) * 5.0)
                     } else {
                         release = 1.0
                     }
-                    let envelope = attack * decay * release
+                    let envelope = attack * (body + tail) * release
                     if envelope < 0.0001 { continue }
 
-                    let brightness = exp(-age * 6.5)
-                    let timbre = sin(angle)
-                        + (0.45 * brightness * sin(angle * 2.01))
-                        + (0.22 * brightness * sin(angle * 3.98))
-                        + (0.12 * brightness * sin(angle * 6.02))
+                    let hz = 440.0 * pow(2.0, Double(Int(note) - 69) / 12.0)
+                    let angle = (2.0 * .pi * hz * clock) / sampleRate
 
-                    sample += timbre * envelope
+                    let lfoPhase = 2.0 * .pi * chorusRate * clock / sampleRate
+                    let lfoL = sin(lfoPhase)
+                    let lfoR = sin(lfoPhase + 1.9)
+                    let detuneL = pow(2.0, (chorusDepthCents * lfoL) / 1200.0)
+                    let detuneR = pow(2.0, (chorusDepthCents * lfoR) / 1200.0)
+
+                    let bright1 = exp(-age * 4.0)
+                    let bright2 = exp(-age * 7.0)
+
+                    let angleL = angle * detuneL
+                    let timbreL = sin(angleL)
+                        + (0.48 * bright1 * sin(angleL * 2.003))
+                        + (0.30 * bright1 * sin(angleL * 2.998))
+                        + (0.22 * bright2 * sin(angleL * 4.009))
+                        + (0.14 * bright2 * sin(angleL * 5.002))
+                        + (0.08 * bright2 * sin(angleL * 6.013))
+                        + (0.04 * bright2 * sin(angleL * 7.997))
+                        + (0.025 * bright2 * sin(angleL * 10.05))
+
+                    let angleR = angle * detuneR
+                    let timbreR = sin(angleR)
+                        + (0.48 * bright1 * sin(angleR * 2.003))
+                        + (0.30 * bright1 * sin(angleR * 2.998))
+                        + (0.22 * bright2 * sin(angleR * 4.009))
+                        + (0.14 * bright2 * sin(angleR * 5.002))
+                        + (0.08 * bright2 * sin(angleR * 6.013))
+                        + (0.04 * bright2 * sin(angleR * 7.997))
+                        + (0.025 * bright2 * sin(angleR * 10.05))
+
+                    let pan = 0.5 + 0.2 * sin(Double(note) * 0.73)
+                    sampleL += timbreL * envelope * (1.0 - pan * 0.4)
+                    sampleR += timbreR * envelope * (0.6 + pan * 0.4)
                 }
 
-                let mixed = Float(max(-1.0, min(1.0, sample * gain)))
-                sampleClock += 1
+                let mixedL = Float(max(-1.0, min(1.0, sampleL * gain)))
+                let mixedR = Float(max(-1.0, min(1.0, sampleR * gain)))
 
-                for channel in 0..<channelTotal {
-                    guard let mData = buffers[channel].mData else { continue }
-                    let channelData = mData.assumingMemoryBound(to: Float.self)
-                    channelData[frame] = mixed
+                if isStereo {
+                    if let mData = buffers[0].mData {
+                        mData.assumingMemoryBound(to: Float.self)[frame] = mixedL
+                    }
+                    if let mData = buffers[1].mData {
+                        mData.assumingMemoryBound(to: Float.self)[frame] = mixedR
+                    }
+                } else {
+                    let mono = (mixedL + mixedR) * 0.5
+                    if let mData = buffers[0].mData {
+                        mData.assumingMemoryBound(to: Float.self)[frame] = mono
+                    }
                 }
             }
 
+            globalClock += Double(frameCount)
             return noErr
         }
 
         sourceNode = source
         audioEngine.attach(source)
         audioEngine.connect(source, to: audioEngine.mainMixerNode, format: format)
-        audioEngine.mainMixerNode.outputVolume = 0.8
-        try? audioEngine.start()
-        prepared = true
     }
 }

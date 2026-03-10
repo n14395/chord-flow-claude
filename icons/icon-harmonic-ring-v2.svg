@@ -1,0 +1,128 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+    <!-- Background radial gradient -->
+    <radialGradient id="bg" cx="50%" cy="50%" r="60%">
+      <stop offset="0%" stop-color="#222444"/>
+      <stop offset="100%" stop-color="#1A1B2E"/>
+    </radialGradient>
+
+    <!-- Subtle amber center glow -->
+    <radialGradient id="centerGlow" cx="50%" cy="50%" r="45%">
+      <stop offset="0%" stop-color="#F5A623" stop-opacity="0.08"/>
+      <stop offset="100%" stop-color="#F5A623" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Glow filter for diatonic dots -->
+    <filter id="glow" x="-150%" y="-150%" width="400%" height="400%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="16"/>
+    </filter>
+
+    <!-- Smaller glow filter for borrowed dots -->
+    <filter id="glowSmall" x="-150%" y="-150%" width="400%" height="400%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="10"/>
+    </filter>
+
+    <!-- Stronger glow for the root dot -->
+    <filter id="rootGlow" x="-150%" y="-150%" width="400%" height="400%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="20"/>
+    </filter>
+  </defs>
+
+  <!-- Background fill -->
+  <rect width="1024" height="1024" fill="url(#bg)"/>
+
+  <!-- Center ambient glow -->
+  <circle cx="512" cy="512" r="460" fill="url(#centerGlow)"/>
+
+  <!-- Subtle ring track -->
+  <circle cx="512" cy="512" r="320" fill="none" stroke="#3A3D5C" stroke-width="1.5" opacity="0.3"/>
+
+  <!--
+    12 dots on ring (radius 320, center 512,512).
+    Colored by harmonic function in C major:
+
+     Pos  Note  Function       Color                 Radius
+      0    C    Root/Tonic     Gold   #F5A623         40  (enlarged root)
+      1    G    Dominant       Blue   #4A90D9         32
+      2    D    Subdominant    Green  #7ED321         32
+      3    A    Tonic          Gold   #F5A623         32
+      4    E    Tonic          Gold   #F5A623         32
+      5    B    Dominant       Blue   #4A90D9         32
+      6    F#   Borrowed       Pink   #D94A8C         24
+      7    Db   Borrowed       Pink   #D94A8C         24
+      8    Ab   Borrowed       Pink   #D94A8C         24
+      9    Eb   Borrowed       Pink   #D94A8C         24
+     10    Bb   Borrowed       Pink   #D94A8C         24
+     11    F    Subdominant    Green  #7ED321         32
+
+    Coordinates (angle = index*30 - 90):
+      0: (512, 192)     6: (512, 832)
+      1: (672, 235)     7: (352, 789)
+      2: (789, 352)     8: (235, 672)
+      3: (832, 512)     9: (192, 512)
+      4: (789, 672)    10: (235, 352)
+      5: (672, 789)    11: (352, 235)
+  -->
+
+  <!-- ====== Glow layers ====== -->
+
+  <!-- Root glow (position 0: C) -->
+  <circle cx="512" cy="192" r="40" fill="#F5A623" opacity="0.3" filter="url(#rootGlow)"/>
+
+  <!-- Gold/Tonic glows (positions 3, 4) -->
+  <circle cx="832" cy="512" r="32" fill="#F5A623" opacity="0.25" filter="url(#glow)"/>
+  <circle cx="789" cy="672" r="32" fill="#F5A623" opacity="0.25" filter="url(#glow)"/>
+
+  <!-- Blue/Dominant glows (positions 1, 5) -->
+  <circle cx="672" cy="235" r="32" fill="#4A90D9" opacity="0.3" filter="url(#glow)"/>
+  <circle cx="672" cy="789" r="32" fill="#4A90D9" opacity="0.3" filter="url(#glow)"/>
+
+  <!-- Green/Subdominant glows (positions 2, 11) -->
+  <circle cx="789" cy="352" r="32" fill="#7ED321" opacity="0.25" filter="url(#glow)"/>
+  <circle cx="352" cy="235" r="32" fill="#7ED321" opacity="0.25" filter="url(#glow)"/>
+
+  <!-- Pink/Borrowed glows (positions 6-10) -->
+  <circle cx="512" cy="832" r="24" fill="#D94A8C" opacity="0.2" filter="url(#glowSmall)"/>
+  <circle cx="352" cy="789" r="24" fill="#D94A8C" opacity="0.2" filter="url(#glowSmall)"/>
+  <circle cx="235" cy="672" r="24" fill="#D94A8C" opacity="0.2" filter="url(#glowSmall)"/>
+  <circle cx="192" cy="512" r="24" fill="#D94A8C" opacity="0.2" filter="url(#glowSmall)"/>
+  <circle cx="235" cy="352" r="24" fill="#D94A8C" opacity="0.2" filter="url(#glowSmall)"/>
+
+  <!-- ====== Solid dots ====== -->
+
+  <!-- Position 0: C — Root (Gold, enlarged) -->
+  <circle cx="512" cy="192" r="40" fill="#F5A623"/>
+
+  <!-- Position 1: G — Dominant (Blue) -->
+  <circle cx="672" cy="235" r="32" fill="#4A90D9"/>
+
+  <!-- Position 2: D — Subdominant (Green) -->
+  <circle cx="789" cy="352" r="32" fill="#7ED321"/>
+
+  <!-- Position 3: A — Tonic (Gold) -->
+  <circle cx="832" cy="512" r="32" fill="#F5A623"/>
+
+  <!-- Position 4: E — Tonic (Gold) -->
+  <circle cx="789" cy="672" r="32" fill="#F5A623"/>
+
+  <!-- Position 5: B — Dominant (Blue) -->
+  <circle cx="672" cy="789" r="32" fill="#4A90D9"/>
+
+  <!-- Position 6: F# — Borrowed (Pink) -->
+  <circle cx="512" cy="832" r="24" fill="#D94A8C"/>
+
+  <!-- Position 7: Db — Borrowed (Pink) -->
+  <circle cx="352" cy="789" r="24" fill="#D94A8C"/>
+
+  <!-- Position 8: Ab — Borrowed (Pink) -->
+  <circle cx="235" cy="672" r="24" fill="#D94A8C"/>
+
+  <!-- Position 9: Eb — Borrowed (Pink) -->
+  <circle cx="192" cy="512" r="24" fill="#D94A8C"/>
+
+  <!-- Position 10: Bb — Borrowed (Pink) -->
+  <circle cx="235" cy="352" r="24" fill="#D94A8C"/>
+
+  <!-- Position 11: F — Subdominant (Green) -->
+  <circle cx="352" cy="235" r="32" fill="#7ED321"/>
+</svg>
