@@ -46,6 +46,7 @@
 		CB0D65B73D413A3455EE5D46 /* PlaybackBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 530DDEDB41331498E4122933 /* PlaybackBarView.swift */; };
 		CE38E68B326386914206CC64 /* HostHarnessTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E35F4131737A00F17AF8E67 /* HostHarnessTests.swift */; };
 		DBDCB4AA2F5F502C00D715BB /* Media.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DBDCB4A92F5F502C00D715BB /* Media.xcassets */; };
+		DBDCB4AB2F5F502C00D715BC /* Media.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DBDCB4A92F5F502C00D715BB /* Media.xcassets */; };
 		EC2CC5CAD6728E617DAAD58C /* SharedChordDetailPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15DBD3EAB70B0E4079D0BC71 /* SharedChordDetailPanel.swift */; };
 /* End PBXBuildFile section */
 
@@ -498,6 +499,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				SF2A0001B4DCDDF3314F8F35 /* ChordFlowPiano.sf2 in Resources */,
+				DBDCB4AB2F5F502C00D715BC /* Media.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
