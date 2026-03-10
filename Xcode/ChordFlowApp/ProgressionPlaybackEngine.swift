@@ -110,9 +110,13 @@ final class ProgressionPlaybackEngine {
     private let sampler = AVAudioUnitSampler()
     private let reverb = AVAudioUnitReverb()
 
-    // Scheduling (sampler path uses DispatchQueue; sine path uses SineTimeline)
-    private let schedulerQueue = DispatchQueue(label: "com.nwf.chordflow.playback", qos: .userInitiated)
-    private var scheduledItems: [DispatchWorkItem] = []
+    // Scheduling
+    private let schedulerQueue = DispatchQueue(label: "com.nwf.chordflow.playback", qos: .userInteractive)
+
+    // Sampler path: high-frequency polling timer + sorted event list
+    private var samplerTimer: DispatchSourceTimer?
+    private var samplerEvents: [(absTime: Double, isNoteOn: Bool, note: UInt8, velocity: UInt8)] = []
+    private var samplerCursor = 0
 
     // Generation counter — prevents stale finish handlers from interfering
     private var playbackGeneration: UInt64 = 0
@@ -143,50 +147,79 @@ final class ProgressionPlaybackEngine {
         let secondsPerTick = 60.0 / max(1.0, tempo) / Double(max(1, ppq))
         var longestEnd: Double = 0
 
+        // Capture startTime before scheduling so event timestamps and progress share the same epoch
+        startTime = CFAbsoluteTimeGetCurrent()
+
         if useSampler {
             scheduleSamplerEvents(events: events, secondsPerTick: secondsPerTick, longestEnd: &longestEnd)
         } else {
             scheduleSineEvents(events: events, secondsPerTick: secondsPerTick, longestEnd: &longestEnd)
         }
 
-        startTime = CFAbsoluteTimeGetCurrent()
         duration = longestEnd
         onPlaybackStateChange?(true)
 
-        // End-of-playback: only fires if this generation is still current
-        let finish = DispatchWorkItem { [weak self] in
-            Task { @MainActor [weak self] in
-                guard let self, self.playbackGeneration == gen else { return }
-                self.stop()
-            }
+        // For the sine path, schedule a finish timer (sampler path finishes via its own timer)
+        if !useSampler {
+            scheduleFinishTimer(delay: longestEnd + 0.05, generation: gen)
         }
-        scheduledItems.append(finish)
-        schedulerQueue.asyncAfter(deadline: .now() + longestEnd + 0.05, execute: finish)
     }
 
-    // MARK: - Sampler Scheduling (DispatchQueue)
+    // MARK: - Sampler Scheduling (DispatchSourceTimer)
 
     private func scheduleSamplerEvents(events: [CFMIDIEvent], secondsPerTick: Double, longestEnd: inout Double) {
+        // Build sorted event list with absolute wall-clock timestamps.
+        // startTime is set by play() before calling this method, so events and progress share the same epoch.
+        let baseTime = startTime
+        var list: [(absTime: Double, isNoteOn: Bool, note: UInt8, velocity: UInt8)] = []
+        list.reserveCapacity(events.count * 2)
+
         for event in events {
-            let note = event.data1
-            let velocity = event.data2
             let onTime = max(0, Double(event.startTick) * secondsPerTick)
             let offTime = max(0, Double(event.startTick + event.durationTicks) * secondsPerTick)
             longestEnd = max(longestEnd, offTime)
-
-            let noteOn = DispatchWorkItem { [weak self] in
-                self?.sampler.startNote(note, withVelocity: velocity, onChannel: 0)
-                self?.activeNotes.insert(note)
-            }
-            let noteOff = DispatchWorkItem { [weak self] in
-                self?.sampler.stopNote(note, onChannel: 0)
-                self?.activeNotes.remove(note)
-            }
-            scheduledItems.append(noteOn)
-            scheduledItems.append(noteOff)
-            schedulerQueue.asyncAfter(deadline: .now() + onTime, execute: noteOn)
-            schedulerQueue.asyncAfter(deadline: .now() + offTime, execute: noteOff)
+            list.append((baseTime + onTime, true, event.data1, event.data2))
+            list.append((baseTime + offTime, false, event.data1, 0))
         }
+
+        list.sort { $0.absTime < $1.absTime }
+        samplerEvents = list
+        samplerCursor = 0
+
+        // Start a 1ms polling timer on the scheduler queue
+        let gen = playbackGeneration
+        let timer = DispatchSource.makeTimerSource(queue: schedulerQueue)
+        timer.schedule(deadline: .now(), repeating: .milliseconds(1), leeway: .microseconds(100))
+        timer.setEventHandler { [weak self] in
+            guard let self else { return }
+            let now = CFAbsoluteTimeGetCurrent()
+
+            // Fire all events whose time has arrived
+            while self.samplerCursor < self.samplerEvents.count {
+                let ev = self.samplerEvents[self.samplerCursor]
+                guard ev.absTime <= now else { break }
+                self.samplerCursor += 1
+
+                if ev.isNoteOn {
+                    self.sampler.startNote(ev.note, withVelocity: ev.velocity, onChannel: 0)
+                    self.activeNotes.insert(ev.note)
+                } else {
+                    self.sampler.stopNote(ev.note, onChannel: 0)
+                    self.activeNotes.remove(ev.note)
+                }
+            }
+
+            // All events consumed — end playback
+            if self.samplerCursor >= self.samplerEvents.count {
+                timer.cancel()
+                Task { @MainActor [weak self] in
+                    guard let self, self.playbackGeneration == gen else { return }
+                    self.stop()
+                }
+            }
+        }
+        timer.resume()
+        samplerTimer = timer
     }
 
     // MARK: - Sine Scheduling (render-callback timeline)
@@ -226,22 +259,37 @@ final class ProgressionPlaybackEngine {
         duration = longestEnd
         onPlaybackStateChange?(true)
 
-        let finish = DispatchWorkItem { [weak self] in
+        scheduleFinishTimer(delay: longestEnd + 0.05, generation: gen)
+    }
+
+    // MARK: - Finish Timer (sine path + playSilent)
+
+    private var finishTimer: DispatchSourceTimer?
+
+    private func scheduleFinishTimer(delay: Double, generation: UInt64) {
+        let timer = DispatchSource.makeTimerSource(queue: schedulerQueue)
+        timer.schedule(deadline: .now() + delay)
+        timer.setEventHandler { [weak self] in
+            timer.cancel()
             Task { @MainActor [weak self] in
-                guard let self, self.playbackGeneration == gen else { return }
+                guard let self, self.playbackGeneration == generation else { return }
                 self.stop()
             }
         }
-        scheduledItems.append(finish)
-        schedulerQueue.asyncAfter(deadline: .now() + longestEnd + 0.05, execute: finish)
+        timer.resume()
+        finishTimer = timer
     }
 
     // MARK: - Stop
 
     func stop() {
-        // Cancel all pending dispatch items
-        for item in scheduledItems { item.cancel() }
-        scheduledItems.removeAll()
+        // Cancel timers
+        samplerTimer?.cancel()
+        samplerTimer = nil
+        finishTimer?.cancel()
+        finishTimer = nil
+        samplerEvents.removeAll()
+        samplerCursor = 0
 
         // Silence sampler
         if useSampler {
