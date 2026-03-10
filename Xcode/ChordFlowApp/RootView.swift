@@ -81,6 +81,7 @@ struct RootView: View {
                 .foregroundStyle(isSelected ? Color.cfTonic : Color.cfTextTertiary)
                 .padding(.horizontal, CFSpacing.spacious)
                 .padding(.vertical, CFSpacing.compact)
+                .contentShape(Capsule())
                 .background(
                     Capsule()
                         .fill(isSelected ? Color.cfElevated : Color.clear)

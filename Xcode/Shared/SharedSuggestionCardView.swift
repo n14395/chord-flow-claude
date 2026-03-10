@@ -107,6 +107,7 @@ public struct SharedSuggestionCardView: View {
                     }
                 }
                 .padding(CFSpacing.compact)
+                .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
         }
