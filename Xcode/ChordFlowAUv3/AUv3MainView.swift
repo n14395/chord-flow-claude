@@ -9,6 +9,11 @@ struct AUv3View: View {
     @State private var showBorrowedPicker = false
     @State private var contextMenuBlockIndex: Int?
 
+    // Help
+    @State private var showHelp = false
+    @AppStorage("hasSeenHelp", store: UserDefaults(suiteName: "group.com.n14395.chordflow2"))
+    private var hasSeenHelp = false
+
     // Output tab state
     @State private var showSaveAlert = false
     @State private var saveProjectName = ""
@@ -111,22 +116,44 @@ struct AUv3View: View {
                 .presentationDragIndicator(.visible)
                 .presentationBackground(Color.cfBackground)
         }
+        .onAppear {
+            if !hasSeenHelp {
+                showHelp = true
+            }
+        }
+        .sheet(isPresented: $showHelp, onDismiss: { hasSeenHelp = true }) {
+            SharedHelpView {
+                showHelp = false
+            }
+            .presentationDetents([.large])
+            .presentationDragIndicator(.visible)
+            .presentationBackground(Color.cfBackground)
+        }
     }
 
     // MARK: - Tab Bar
 
     private var tabBar: some View {
-        HStack(spacing: CFSpacing.tight) {
-            tabButton(title: "Compose", tag: 0)
-            tabButton(title: "Suggest", tag: 1)
-            tabButton(title: "Files", tag: 2)
+        HStack(spacing: CFSpacing.compact) {
+            HStack(spacing: CFSpacing.tight) {
+                tabButton(title: "Compose", tag: 0)
+                tabButton(title: "Suggest", tag: 1)
+                tabButton(title: "Files", tag: 2)
+            }
+            .padding(3)
+            .background(
+                Capsule()
+                    .fill(Color.cfSurface)
+                    .strokeBorder(Color.cfBorder.opacity(0.6), lineWidth: 1)
+            )
+
+            Button { showHelp = true } label: {
+                Image(systemName: "questionmark.circle")
+                    .font(.system(size: 20, weight: .medium))
+                    .foregroundStyle(Color.cfTextTertiary)
+            }
+            .buttonStyle(.plain)
         }
-        .padding(3)
-        .background(
-            Capsule()
-                .fill(Color.cfSurface)
-                .strokeBorder(Color.cfBorder.opacity(0.6), lineWidth: 1)
-        )
         .padding(.horizontal, CFSpacing.spacious)
         .padding(.vertical, CFSpacing.compact)
     }

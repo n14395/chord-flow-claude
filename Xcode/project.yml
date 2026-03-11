@@ -52,12 +52,18 @@ targets:
         CFBundleDisplayName: ChordFlow2
         CFBundleShortVersionString: "1.0"
         CFBundleVersion: "1"
+        LSApplicationCategoryType: public.app-category.music
         UIApplicationSceneManifest:
           UIApplicationSupportsMultipleScenes: false
         UIBackgroundModes:
           - audio
         UIFileSharingEnabled: true
         LSSupportsOpeningDocumentsInPlace: true
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationPortraitUpsideDown
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
         UILaunchScreen: {}
         UTExportedTypeDeclarations:
           - UTTypeIdentifier: com.n14395.chordflow2.project
@@ -128,8 +134,7 @@ targets:
                 tags: [Effects, MIDI]
     dependencies:
       - target: ChordFlowShared
-        embed: true
-        codeSign: true
+        embed: false
 
   ChordFlowHostHarness:
     type: tool

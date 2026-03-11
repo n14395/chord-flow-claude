@@ -7,6 +7,9 @@ struct RootView: View {
     @StateObject private var vm = AppViewModel()
     @State private var selectedTab = 0
     @State private var contextMenuBlockIndex: Int?
+    @State private var showHelp = false
+    @AppStorage("hasSeenHelp", store: UserDefaults(suiteName: "group.com.n14395.chordflow2"))
+    private var hasSeenHelp = false
     @Environment(\.horizontalSizeClass) private var sizeClass
 
     var body: some View {
@@ -45,6 +48,19 @@ struct RootView: View {
             SharedBlockActionOverlay(vm: vm, blockIndex: $contextMenuBlockIndex)
         }
         .preferredColorScheme(.dark)
+        .onAppear {
+            if !hasSeenHelp {
+                showHelp = true
+            }
+        }
+        .sheet(isPresented: $showHelp, onDismiss: { hasSeenHelp = true }) {
+            SharedHelpView {
+                showHelp = false
+            }
+            .presentationDetents([.large])
+            .presentationDragIndicator(.visible)
+            .presentationBackground(Color.cfBackground)
+        }
         .onOpenURL { url in
             vm.loadProject(from: url)
             selectedTab = 0 // Switch to Compose after loading
@@ -54,17 +70,26 @@ struct RootView: View {
     // MARK: - Top Tab Bar
 
     private var tabBar: some View {
-        HStack(spacing: CFSpacing.tight) {
-            tabButton(title: "Compose", tag: 0)
-            tabButton(title: "Suggest", tag: 1)
-            tabButton(title: "Files", tag: 2)
+        HStack(spacing: CFSpacing.compact) {
+            HStack(spacing: CFSpacing.tight) {
+                tabButton(title: "Compose", tag: 0)
+                tabButton(title: "Suggest", tag: 1)
+                tabButton(title: "Files", tag: 2)
+            }
+            .padding(3)
+            .background(
+                Capsule()
+                    .fill(Color.cfSurface)
+                    .strokeBorder(Color.cfBorder.opacity(0.6), lineWidth: 1)
+            )
+
+            Button { showHelp = true } label: {
+                Image(systemName: "questionmark.circle")
+                    .font(.system(size: 20, weight: .medium))
+                    .foregroundStyle(Color.cfTextTertiary)
+            }
+            .buttonStyle(.plain)
         }
-        .padding(3)
-        .background(
-            Capsule()
-                .fill(Color.cfSurface)
-                .strokeBorder(Color.cfBorder.opacity(0.6), lineWidth: 1)
-        )
         .padding(.horizontal, CFSpacing.spacious)
         .padding(.vertical, CFSpacing.compact)
     }
